@@ -1,8 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {CommonState} from "../types/reduxState";
 
+const initDarkMode = () => {
+    const now = new Date();
+    const utcNow = now.getTime() + now.getTimezoneOffset() * 60 * 1000; 
+    const koreanTimeDiff = 9 * 60 * 60 * 1000;
+    const koreaNow = new Date(utcNow + koreanTimeDiff);
+    if (18 <= koreaNow.getHours() || koreaNow.getHours() <= 6) 
+        return true;
+  
+    return false;
+  };
+  
+
 const initialState: CommonState = {
-    isDark: false,
+    isDark: initDarkMode(),
     postState: "read",
     toggle: false,
     search: "",

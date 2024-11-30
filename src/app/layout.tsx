@@ -1,7 +1,6 @@
 import Script from "next/script";
 import ReduxProvider from "./ReduxProvider";
-import { useDispatch } from "react-redux";
-import { setDarkMode } from "./store";
+import "./globals.css";
 
 export const metadata = {
   title: "부엉이 개발자 블로그",
@@ -24,26 +23,18 @@ export const metadata = {
   },
 };
 
+
 function FontLinks() {
   return (
     <>
       <link 
-        href="https://fonts.googleapis.com/css?family=Nanum+Gothic+Coding:400|Nanum+Gothic:400|Montserrat:wght@300;500;600" 
+        href="https://fonts.googleapis.com/css?family=Nanum+Gothic+Coding:400|Nanum+Gothic:400|Montserrat:wght@300;500;600&display=swap" 
         rel="stylesheet" 
       />
     </>
   );
 }
 
-function CssLinks() {
-  return (
-    <>
-      <link rel="stylesheet" href="/css/bootstrap.min.css" />
-      <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet" />
-      <link href="/css/prism-one-dark.css" rel="stylesheet" />
-    </>
-  );
-}
 
 function ExternalScripts() {
   const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID || '';
@@ -98,12 +89,12 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     <html lang="ko">
       <head>
         <FontLinks />
-        <CssLinks />
       </head>
       <body>
         <ReduxProvider>
           {children}
         </ReduxProvider>
+        <div id="root-modal" />
         <ExternalScripts />
       </body>
     </html>

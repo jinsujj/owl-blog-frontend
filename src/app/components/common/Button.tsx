@@ -43,11 +43,10 @@ interface IProps {
   children: React.ReactNode;
   width?: string;
   color?: keyof typeof palette; 
-  type?: string;
   onClick?: () => void;
 }
 
-const Button = ({ children, width, type, color, ...props }: IProps) => {
+const Button = ({ children, width, color, ...props }: IProps) => {
   if (width === undefined) 
     width = "130px";
 

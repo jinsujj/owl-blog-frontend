@@ -12,56 +12,68 @@ interface StyledProps {
   $isdark: boolean;
 }
 
+const media = {
+    mobile: "@media only screen and (max-width: 768px)",
+};
+
+const buttonGroupStyles = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  ${media.mobile} {
+    width: 100%;
+    float: right;
+  }
+`;
+
+const userInfoStyles = css`
+  border: 1px solid ${palette.green};
+  border-radius: 50px;
+  padding: 0 10px;
+  width: auto;
+  height: 30px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10px;
+
+  color: ${palette.black};
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+  ${media.mobile} {
+    display: none;
+  }
+`;
+
 const Container = styled.div<StyledProps>`
-    ${(props) =>
-        props.$isdark &&
-        css`
-        .userInfo {
-            color: ${palette.gray} !important;
-            cursor: pointer;
-        }
-        `}
-
-    position: relative;
-
-    .btn-group {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        @media only screen and (max-width: 768px) {
-        width: 100%;
-        float: right;
-        }
-    }
-
-    .userInfo {
-        border: 1px solid ${palette.green};
-        border-radius: 50px;
-        padding: 0 10px;
-        width: auto;
-        height: 30px;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-left: 10px;
-
-        color: ${palette.black};
-        font-size: 16px;
-        font-weight: 600;
+  ${(props) =>
+    props.$isdark &&
+    css`
+      .userInfo {
+        color: ${palette.gray} !important;
         cursor: pointer;
+      }
+    `}
 
-        @media only screen and (max-width: 768px) {
-        display: none;
-        }
-    }
+  position: relative;
 
-    .logout-button {
-        @media only screen and (max-width: 768px) {
-        display: none;
-        }
+  .btn-group {
+    ${buttonGroupStyles}
+  }
+
+  .userInfo {
+    ${userInfoStyles}
+  }
+
+  .logout-button {
+    ${media.mobile} {
+      display: none;
     }
+  }
 `;
 
 const HeaderProfile = () => {
