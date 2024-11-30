@@ -1,5 +1,7 @@
 import Script from "next/script";
 import ReduxProvider from "./ReduxProvider";
+import { useDispatch } from "react-redux";
+import { setDarkMode } from "./store";
 
 export const metadata = {
   title: "부엉이 개발자 블로그",
@@ -89,6 +91,7 @@ function ExternalScripts() {
     </>
   );
 }
+
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
