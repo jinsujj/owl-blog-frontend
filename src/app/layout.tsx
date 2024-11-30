@@ -1,3 +1,4 @@
+import { wrapper } from "./store";
 
 export const metadata = {
   title: "부엉이 개발자 블로그",
@@ -20,11 +21,11 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({
+const RootLayout =({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   return (
     <html lang="en">
       <body>
@@ -36,3 +37,6 @@ export default function RootLayout({
     </html>
   );
 }
+
+
+export default wrapper.withRedux(RootLayout);
