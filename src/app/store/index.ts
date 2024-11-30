@@ -1,36 +1,28 @@
-import { AnyAction, combineReducers, configureStore } from "@reduxjs/toolkit";
-import { createWrapper, HYDRATE } from "next-redux-wrapper";
+import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useSelector as useReduxSelector } from "react-redux";
 import common from "./common";
 
-
-const rootReducer= combineReducers({
+const rootReducer = {
     common: common.reducer,
-})
+};
 
-export type RootState = ReturnType<typeof rootReducer>;
+export const store = configureStore({
+    reducer: rootReducer,
+    devTools: process.env.NODE_ENV !== 'production',
+    middleware: (getDefaultMiddleware) => 
+        getDefaultMiddleware({
+            serializableCheck: false
+        })
+});
 
-const reducer = (state: RootState | undefined, action: AnyAction): RootState => {
-    if(action.type == HYDRATE ){
-        const nextState = {
-            ...state,               // 기존 상태를 유지
-            ...action.payload,      // hydration으로 들어온 변화를 적용
-        }
-        return nextState;
-    }
-    else {
-        return rootReducer(state, action)
-    }
-}
+// RootState 타입 정의 - 전체 Redux 상태의 타입
+export type RootState = ReturnType<typeof store.getState>;
 
-export const useSelector : TypedUseSelectorHook<RootState> = useReduxSelector;
+// AppDispatch 타입 정의 - 디스패치 함수의 타입
+export type AppDispatch = typeof store.dispatch;
 
-const initStore = () => {
-    const store = configureStore({
-        reducer,
-        devTools: process.env.NODE_ENV !== 'production',
-    });
-    return store;
-}
+// 타입이 지정된 useSelector 훅
+export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
 
-export const wrapper = createWrapper(initStore);
+// 공통 액션들을 외부에서 쉽게 import할 수 있도록 export
+export const { setToggle, setDarkMode, setPostState, setSearchFilter, setCategory, setSubCategory, initCommonState } = common.actions;

@@ -1,4 +1,4 @@
-import { wrapper } from "./store";
+import ReduxProvider from "./ReduxProvider";
 
 export const metadata = {
   title: "부엉이 개발자 블로그",
@@ -21,22 +21,19 @@ export const metadata = {
   },
 };
 
-const RootLayout =({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+const RootLayout =({children}: {children: React.ReactNode}) => {
+
   return (
     <html lang="en">
       <body>
-        <main>
-          {children}
-          <div id="root-modal" />
-        </main>
+        <ReduxProvider>
+            {children}
+            <div id="root-modal" />
+        </ReduxProvider>
       </body>
     </html>
   );
 }
 
 
-export default wrapper.withRedux(RootLayout);
+export default RootLayout;
