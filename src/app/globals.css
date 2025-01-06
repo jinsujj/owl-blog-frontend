@@ -1,9 +1,7 @@
 @import url('/css/bootstrap.min.css');
-@import url('https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css');
-@import url('/css/prism-one-dark.css');
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
-}
+} */
