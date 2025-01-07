@@ -4,6 +4,7 @@ import Button from "./components/common/Button";
 import Header from "./components/common/Header";
 import { setDarkMode, useSelector } from "./store";
 import { useDispatch } from 'react-redux';
+import palette from "./styles/palette";
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ const HomePage = () => {
       <h1>부엉이 개발자 블로그</h1>
       {isDarkMode === true && <h2>저녁 시간이네요</h2>}
       {isDarkMode !== true && <h2>낮 시간이네요</h2>}
-      <Button onClick={changeDarkMode} color="green">
+      <Button onClick={changeDarkMode} color={palette.green}>
         다크모드 변경
       </Button>
     </div>

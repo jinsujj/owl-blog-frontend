@@ -16,6 +16,7 @@ const Container = styled.button<StyledProps>`
   height: 40px;
   padding: 0 16px;
   margin-right: 5px;
+	margin-bottom: 10px;
 
   border: 1px solid
     ${(props) => (props.color === "" ? palette.blue : props.color)};
@@ -42,7 +43,7 @@ const Container = styled.button<StyledProps>`
 interface IProps {
   children: React.ReactNode;
   width?: string;
-  color?: keyof typeof palette; 
+  color?: string; 
   onClick?: () => void;
 }
 

@@ -94,17 +94,17 @@ const HeaderProfile = () => {
     <Container $isdark={isDarkMode}>
       <div className="btn-group">
         {postState === "read" && (
-          <Button onClick={onClickPostBlog} width="110px" color="green">
+          <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
             수정하기
           </Button>
         )}
         {postState !== "write" && (
-          <Button onClick={onClickPostBlog} width="110px" color="green">
+          <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
             글쓰기
           </Button>
         )}
         {postState !== "read" && (
-          <Button onClick={onClickPostBlog} width="110px" color="green">
+          <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
             뒤로가기
           </Button>
         )}

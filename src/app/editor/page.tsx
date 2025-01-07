@@ -3,10 +3,28 @@
 import { OutputData } from "@editorjs/editorjs";
 import React, {useState} from "react";
 import Editor from "./Editor";
+import Button from "../components/common/Button";
+import palette from "../styles/palette";
+import WidthSlider from "../components/editor/WidthSlder";
+import styled from "styled-components";
+
+
+const Container = styled.div`
+   padding: 20px;
+	 max-width: 1400px;
+	 margin: 0 auto;
+`;
+
+const SliderWrapper = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 100px;
+`;
 
 const EditorPage: React.FC = () => {
 	const [isReadOnly, setIsReadOnly] = useState(false);
 	const [editorData, setEditorData] = useState<OutputData>({blocks: []});
+	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
 
 	const toggleMode = () => {
 		setIsReadOnly((prev) => !prev);
@@ -17,15 +35,22 @@ const EditorPage: React.FC = () => {
 		setEditorData(data);
 	}
 
+	const handleWidthChage = (width: number) =>{
+		setEditorMaxWidth(`${width}px`);
+	}
+
 
 	return (
-    <div style={{ padding: '20px' }}>
+    <Container>
       <h1>Editor.js Example with Next.js 15</h1>
-      <button onClick={toggleMode} style={{ marginBottom: '10px', padding: '5px 10px' }}>
-        {isReadOnly ? 'Switch to Edit Mode' : 'Switch to Read-Only Mode'}
-      </button>
-      <Editor isReadOnly={isReadOnly} initialData={editorData} onSave={handleSave} />
-    </div>
+      <Button onClick={toggleMode} color={palette.green}>
+        {isReadOnly ? 'Edit Mode' : 'Read-Only'}
+      </Button>
+      <Editor isReadOnly={isReadOnly} initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} />
+			<SliderWrapper>
+				<WidthSlider defaultWidth={600} onWidthChange={handleWidthChage}/>
+			</SliderWrapper>
+    </Container>
   );
 };
 
