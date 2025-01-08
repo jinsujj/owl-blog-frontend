@@ -1,12 +1,16 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import EditorJS, { BlockToolConstructable, OutputData } from '@editorjs/editorjs';
-import CodeTool from '@editorjs/code';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import styled from 'styled-components';
+import EditorJS, { BlockToolConstructable, OutputData } from '@editorjs/editorjs';
+import CodeTool from '@editorjs/code';
 import Header from '@editorjs/header';
+import EditorjsList from '@editorjs/list';
+import Warning from '@editorjs/warning';
+import Marker from '@editorjs/marker';
+import Table from '@editorjs/table';
 
 interface EditorContainerProps {
   $isReadOnly: boolean;
@@ -27,6 +31,7 @@ export const EditorContainer = styled.div<EditorContainerProps>`
     margin: 0 auto;
     position: relative;
   }
+
 `;
 
 
@@ -65,6 +70,30 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
       data: initialData,
 			autofocus: true,
       tools: {
+				list: EditorjsList,
+				warning: {
+					class: Warning,
+					inlineToolbar: true,
+					shortcut: 'CMD+SHIFT+W',
+					config: { 
+						titlePlaceholder: 'Title',
+						messagePlaceholder: 'Message',
+					},
+				},
+				Marker: {
+					class: Marker,
+					shortcut: 'CMD+SHIFT+M',
+				},
+				table: {
+					class: Table as unknown as BlockToolConstructable,
+					inlineToolbar: true,
+					config: {
+						rows: 2,
+						cols: 3,
+						maxRows: 5,
+						maxCols: 5,
+					},
+				},
         header: {
           class: Header as unknown as BlockToolConstructable,
           inlineToolbar: ['link', 'marker', 'bold', 'italic'],
