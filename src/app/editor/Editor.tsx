@@ -4,13 +4,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import styled from 'styled-components';
+import Button from '../components/common/Button';
+import palette from '../styles/palette';
 import EditorJS, { BlockToolConstructable, OutputData } from '@editorjs/editorjs';
 import CodeTool from '@editorjs/code';
 import Header from '@editorjs/header';
-import EditorjsList from '@editorjs/list';
+import List from '@editorjs/list';
 import Warning from '@editorjs/warning';
 import Marker from '@editorjs/marker';
 import Table from '@editorjs/table';
+import Embed from '@editorjs/embed';
+import LinkTool from '@editorjs/link';
 
 interface EditorContainerProps {
   $isReadOnly: boolean;
@@ -32,8 +36,19 @@ export const EditorContainer = styled.div<EditorContainerProps>`
     position: relative;
   }
 
-`;
+	.cdx-warning__message{
+		display: none;
+	}
 
+	.embed-tool__caption {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		border: none;
+		color: ${palette.gray}
+	}
+`;
 
 interface EditorProps {
   isReadOnly: boolean;
@@ -70,22 +85,41 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
       data: initialData,
 			autofocus: true,
       tools: {
-				list: EditorjsList,
+				list: {
+					class: List as unknown as BlockToolConstructable,
+					inlineToolbar: true,
+					shortcut: 'OPTION+A', 
+				},
 				warning: {
 					class: Warning,
 					inlineToolbar: true,
-					shortcut: 'CMD+SHIFT+W',
+					shortcut: 'OPTION+W',
 					config: { 
 						titlePlaceholder: 'Title',
 						messagePlaceholder: 'Message',
 					},
 				},
+				embed: {
+					class: Embed,
+					config: {
+						services: {
+							youtube: true,
+						}
+					}
+				},
 				Marker: {
 					class: Marker,
-					shortcut: 'CMD+SHIFT+M',
+					shortcut: 'OPTION+M',
+				},
+				linkTool: {
+					class: LinkTool,
+					config: {
+						endpoint: 'https://api.microlink.io?url=', // Your backend endpoint for url data fetching,
+					},
 				},
 				table: {
 					class: Table as unknown as BlockToolConstructable,
+					shortcut: 'OPTION+T',
 					inlineToolbar: true,
 					config: {
 						rows: 2,
@@ -94,15 +128,15 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
 						maxCols: 5,
 					},
 				},
-        header: {
-          class: Header as unknown as BlockToolConstructable,
-          inlineToolbar: ['link', 'marker', 'bold', 'italic'],
-          config: {
-            levels: [1, 2, 3, 4, 5, 6],
-            defaultLevel: 2,
-						placeholder: 'Write a header',
-          },
-        },
+				header: {
+					class: Header as unknown as BlockToolConstructable,
+					inlineToolbar: ['link', 'marker', 'bold', 'italic'], // 추가로 원하는 툴
+					config: {
+						levels: [1, 2, 3, 4, 5], 
+						defaultLevel: 2, 
+						placeholder: 'Write a header', // 기본 텍스트
+					},
+				},
         code: CodeTool,
       },
       onReady: () => {
@@ -152,9 +186,9 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
 				<div id="editorjs" style={{ border: '1px solid #ccc', padding: '10px' }}></div>
 			</EditorContainer>
 				{!isReadOnly && (
-					<button onClick={handleSave} style={{ marginTop: '10px', padding: '5px 10px' }}>
+					<Button onClick={handleSave} color={palette.blue}>
 						Save
-					</button>
+					</Button>
 				)}
 		</>
   );

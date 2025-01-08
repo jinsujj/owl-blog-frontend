@@ -17,6 +17,7 @@ const Container = styled.button<StyledProps>`
   padding: 0 16px;
   margin-right: 5px;
 	margin-bottom: 10px;
+	margin-top: 10px;
 
   border: 1px solid
     ${(props) => (props.color === "" ? palette.blue : props.color)};

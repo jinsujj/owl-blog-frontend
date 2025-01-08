@@ -44,7 +44,7 @@ const EditorPage: React.FC = () => {
     <Container>
       <h1>Editor.js Example with Next.js 15</h1>
       <Button onClick={toggleMode} color={palette.green}>
-        {isReadOnly ? 'Edit Mode' : 'Read-Only'}
+        {isReadOnly ? 'Read-Only': 'Edit Mode'}
       </Button>
       <Editor isReadOnly={isReadOnly} initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} />
 			<SliderWrapper>
