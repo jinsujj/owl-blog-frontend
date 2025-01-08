@@ -15,6 +15,9 @@ import Marker from '@editorjs/marker';
 import Table from '@editorjs/table';
 import Embed from '@editorjs/embed';
 import LinkTool from '@editorjs/link';
+import Delimiter from '@editorjs/delimiter';
+import RawTool from '@editorjs/raw';
+import ImageTool from '@editorjs/image';
 
 interface EditorContainerProps {
   $isReadOnly: boolean;
@@ -85,10 +88,22 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
       data: initialData,
 			autofocus: true,
       tools: {
+				raw:{
+					class: RawTool,
+					shortcut: 'OPTION+R',
+				},
+				code:{
+					class: CodeTool,
+					shortcut: 'OPTION+C',
+				},
 				list: {
 					class: List as unknown as BlockToolConstructable,
 					inlineToolbar: true,
 					shortcut: 'OPTION+A', 
+				},
+				delimiter:{
+					class: Delimiter as unknown as BlockToolConstructable,
+					shortcut: 'OPTION+D', 
 				},
 				warning: {
 					class: Warning,
@@ -98,6 +113,15 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
 						titlePlaceholder: 'Title',
 						messagePlaceholder: 'Message',
 					},
+				},
+				image: {
+					class: ImageTool,
+					config: {
+						endpoints: {
+							byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
+							byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
+						}
+					}
 				},
 				embed: {
 					class: Embed,
@@ -113,6 +137,7 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
 				},
 				linkTool: {
 					class: LinkTool,
+					shortcut: 'OPTION+L',
 					config: {
 						endpoint: 'https://api.microlink.io?url=', // Your backend endpoint for url data fetching,
 					},
@@ -130,14 +155,14 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
 				},
 				header: {
 					class: Header as unknown as BlockToolConstructable,
-					inlineToolbar: ['link', 'marker', 'bold', 'italic'], // 추가로 원하는 툴
+					shortcut: 'OPTION+H',
+					inlineToolbar: ['link', 'marker', 'bold', 'italic'], 
 					config: {
 						levels: [1, 2, 3, 4, 5], 
 						defaultLevel: 2, 
-						placeholder: 'Write a header', // 기본 텍스트
+						placeholder: 'Write a header',
 					},
 				},
-        code: CodeTool,
       },
       onReady: () => {
         if (isReadOnly) {
