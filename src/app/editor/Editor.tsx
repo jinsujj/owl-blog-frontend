@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import EditorJS, { OutputData } from '@editorjs/editorjs';
+import EditorJS, { BlockToolConstructable, OutputData } from '@editorjs/editorjs';
 import CodeTool from '@editorjs/code';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import styled from 'styled-components';
+import Header from '@editorjs/header';
 
 interface EditorContainerProps {
   $isReadOnly: boolean;
@@ -17,7 +18,11 @@ export const EditorContainer = styled.div<EditorContainerProps>`
     border: ${(props) => (props.$isReadOnly ? "none" : "1px solid #ccc")};
   }
 
-  .ce-block__content {
+	.ce-toolbar__content {
+		max-width: ${(props) => props.$maxWidth};
+	}
+
+	.ce-block__content {
     max-width: ${(props) => props.$maxWidth};
     margin: 0 auto;
     position: relative;
@@ -58,7 +63,17 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
       holder: 'editorjs',
       readOnly: isReadOnly,
       data: initialData,
+			autofocus: true,
       tools: {
+        header: {
+          class: Header as unknown as BlockToolConstructable,
+          inlineToolbar: ['link', 'marker', 'bold', 'italic'],
+          config: {
+            levels: [1, 2, 3, 4, 5, 6],
+            defaultLevel: 2,
+						placeholder: 'Write a header',
+          },
+        },
         code: CodeTool,
       },
       onReady: () => {

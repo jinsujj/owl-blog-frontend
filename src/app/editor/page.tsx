@@ -48,7 +48,7 @@ const EditorPage: React.FC = () => {
       </Button>
       <Editor isReadOnly={isReadOnly} initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} />
 			<SliderWrapper>
-				<WidthSlider defaultWidth={600} onWidthChange={handleWidthChage}/>
+				<WidthSlider defaultWidth={650} onWidthChange={handleWidthChage}/>
 			</SliderWrapper>
     </Container>
   );

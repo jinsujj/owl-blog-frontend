@@ -49,7 +49,7 @@ const WidthSlider: React.FC<WidthSliderProps> = ({defaultWidth, onWidthChange}) 
       <SliderWrapper>
         <Slider
           type="range"
-          min="300"
+          min="600"
           max="1200"
           value={sliderValue}
           onChange={handleChange}
