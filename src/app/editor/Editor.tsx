@@ -18,6 +18,7 @@ import LinkTool from '@editorjs/link';
 import Delimiter from '@editorjs/delimiter';
 import RawTool from '@editorjs/raw';
 import ImageTool from '@editorjs/image';
+import AttachesTool from '@editorjs/attaches';
 
 interface EditorContainerProps {
   $isReadOnly: boolean;
@@ -99,7 +100,7 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
 				list: {
 					class: List as unknown as BlockToolConstructable,
 					inlineToolbar: true,
-					shortcut: 'OPTION+A', 
+					shortcut: 'OPTION+O', 
 				},
 				delimiter:{
 					class: Delimiter as unknown as BlockToolConstructable,
@@ -153,14 +154,23 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
 						maxCols: 5,
 					},
 				},
+				attaches: {
+					class: AttachesTool,
+					shortcut: 'OPTION+A',
+					config: {
+						endpoint: 'http://localhost:8008/uploadFile'
+					}
+				},
 				header: {
 					class: Header as unknown as BlockToolConstructable,
 					shortcut: 'OPTION+H',
-					inlineToolbar: ['link', 'marker', 'bold', 'italic'], 
 					config: {
 						levels: [1, 2, 3, 4, 5], 
 						defaultLevel: 2, 
 						placeholder: 'Write a header',
+					},
+					sanitize: {
+						level: true, 
 					},
 				},
       },
@@ -208,7 +218,7 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
   return (
 		<>
 			<EditorContainer $isReadOnly={isReadOnly} $maxWidth={editorMaxWidth}>
-				<div id="editorjs" style={{ border: '1px solid #ccc', padding: '10px' }}></div>
+				<div id="editorjs"></div>
 			</EditorContainer>
 				{!isReadOnly && (
 					<Button onClick={handleSave} color={palette.blue}>

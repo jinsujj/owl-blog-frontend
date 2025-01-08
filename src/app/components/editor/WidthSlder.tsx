@@ -18,6 +18,8 @@ const Label = styled.label`
   font-weight: bold;
   margin-bottom: 10px;
   display: block;
+	user-select: none;
+	pointer-events: none;
 `;
 
 const SliderWrapper = styled.div`
