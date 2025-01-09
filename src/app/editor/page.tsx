@@ -19,6 +19,7 @@ const SliderWrapper = styled.div`
   position: fixed;
   bottom: 20px;
   right: 100px;
+	z-index: 1000;
 `;
 
 const EditorPage: React.FC = () => {

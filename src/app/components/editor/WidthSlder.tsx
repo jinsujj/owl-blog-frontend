@@ -7,11 +7,13 @@ interface WidthSliderProps {
 }
 
 const SliderContainer = styled.div`
-  width: 300px;
+	font-size: 14px;
+  width: 250px;
   margin: 20px auto;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
+	z-index: inherit;
 `;
 
 const Label = styled.label`
