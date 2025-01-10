@@ -104,8 +104,9 @@ const HomePage = () => {
       <Header />
 			<Main>
 				<Title>부엉이 개발자 블로그</Title>
-				{isDarkMode === true && <Subtitle>저녁 시간이네요</Subtitle>}
-				{isDarkMode !== true && <Subtitle>낮 시간이네요</Subtitle>}
+				<Subtitle>
+					{isDarkMode === true ? '저녁 시간이네요' : '낮 시간이네요'}
+				</Subtitle>
 				<Button onClick={changeDarkMode} color={palette.green}>
 					다크모드 변경
 				</Button>

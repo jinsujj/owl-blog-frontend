@@ -10,12 +10,17 @@ import { createBlog } from "../api/blogApi";
 import dynamic from "next/dynamic";
 import useModal from "../hooks/useModal";
 import MessageModal from "../components/modal/MessageModal";
+import Header from "../components/common/Header";
+import { useSelector } from "../store";
 
+interface StyledProps {
+	$isDark: boolean;
+}
 
-const Container = styled.div`
-   padding: 20px;
-	 max-width: 1400px;
+const Container = styled.div<StyledProps>`
+   min-height: 100vh;
 	 margin: 0 auto;
+	 background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
 `;
 
 const SliderWrapper = styled.div`
@@ -28,6 +33,7 @@ const SliderWrapper = styled.div`
 const Editor = dynamic(() => import("./Editor"), { ssr: false });
 
 const EditorPage: React.FC = () => {
+  const isDarkMode = useSelector((state) => state.common.isDark);
 	const [modalMessage, setModalMessage] = useState('');
 	const [alertColor, setAlertColor] = useState('');
 	const [isReadOnly, setIsReadOnly] = useState(false);
@@ -67,10 +73,11 @@ const EditorPage: React.FC = () => {
 
 
 	return (
-    <Container>
-			 <ModalPortal>
+    <Container $isDark={isDarkMode}>
+			<Header />
+			  <ModalPortal>
           <MessageModal message={modalMessage} onClose={closeModal} color={alertColor} />
-        </ModalPortal>
+      	</ModalPortal>
       <Button onClick={toggleMode} color={palette.green}>
         {isReadOnly ? 'Read-Only': 'Edit Mode'}
       </Button>

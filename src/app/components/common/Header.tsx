@@ -1,6 +1,7 @@
 import { useSelector } from "@/app/store";
 import palette from "@/app/styles/palette";
 import styled, { css } from "styled-components";
+import Link from "next/link";
 
 interface StyledProps {
     $isDark: boolean;
@@ -147,10 +148,12 @@ const Header = () => {
 
         {/* 가운데 영역 */}
         <div className="center">
-          <div className="logo">
-            <div className="logo-icon"></div>
-            <span className="logo-text">부엉이 개발자</span>
-          </div>
+					<Link href="/">
+            <div className="logo">
+              <div className="logo-icon"></div>
+              <span className="logo-text">부엉이 개발자</span>
+            </div>
+          </Link>
         </div>
 
         {/* 오른쪽 영역 */}
