@@ -15,23 +15,29 @@ interface StyledProps {
 const PageContainer = styled.div<StyledProps>`
   padding: 0;
   margin: 0;
+	min-height: 100vh;
   font-family: Arial, sans-serif;
   background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
   color: ${(props) => (props.$isDark ? "#fff" : "#333")};
 `;
 
+const MainWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
 const Main = styled.main`
+	max-width: 1400px;
+	width: 100%;
   padding: 20px;
+	display: flex;
+  flex-direction: column;
 `;
 
 const Title = styled.h1`
   font-size: 2rem;
   margin-bottom: 10px;
-`;
-
-const Subtitle = styled.h2`
-  font-size: 1.5rem;
-  margin-bottom: 20px;
 `;
 
 const HomePage = () => {
@@ -102,16 +108,15 @@ const HomePage = () => {
   return (
     <PageContainer $isDark={isDarkMode}>
       <Header />
-			<Main>
-				<Title>부엉이 개발자 블로그</Title>
-				<Subtitle>
-					{isDarkMode === true ? '저녁 시간이네요' : '낮 시간이네요'}
-				</Subtitle>
-				<Button onClick={changeDarkMode} color={palette.green}>
-					다크모드 변경
-				</Button>
-				<CardList posts={posts}/>
-			</Main>
+			<MainWrapper>
+				<Main>
+					<Title>부엉이 개발자 블로그</Title>
+					<Button onClick={changeDarkMode} color={palette.green}>
+						다크모드 변경
+					</Button>
+					<CardList posts={posts}/>
+				</Main>
+			</MainWrapper>
     </PageContainer>
   );
 };

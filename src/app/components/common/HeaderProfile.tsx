@@ -76,11 +76,11 @@ const Container = styled.div<StyledProps>`
   }
 `;
 
+
 const HeaderProfile = () => {
   const dispatch = useDispatch();
   const postState = useSelector((state) => state.common.postState);
   const isDarkMode = useSelector((state) => state.common.isDark);
-  
 
   const onClickPostBlog = () => {
     if (postState === "write" || postState === "modify") {
@@ -95,17 +95,17 @@ const HeaderProfile = () => {
       <div className="btn-group">
         {postState === "read" && (
           <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
-            수정하기
+            Edit
           </Button>
         )}
         {postState !== "write" && (
           <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
-            글쓰기
+            Write
           </Button>
         )}
         {postState !== "read" && (
           <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
-            뒤로가기
+            Back
           </Button>
         )}
       </div>

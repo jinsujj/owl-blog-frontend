@@ -14,7 +14,6 @@ const Container = styled.button<StyledProps>`
 
   width: ${(props) => props.width};
   height: 40px;
-  padding: 0 16px;
   margin-right: 5px;
 	margin-bottom: 10px;
 	margin-top: 10px;

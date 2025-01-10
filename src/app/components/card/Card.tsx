@@ -8,7 +8,7 @@ export const Container = styled.li`
   border: 1px solid #ddd;
   border-radius: 10px;
   overflow: hidden;
-  width: 300px;
+  width: 250px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
@@ -68,7 +68,7 @@ const Card = ({ post }: CardProps) => {
         <CardContent>
 					<CardTitle>{post.title}</CardTitle>
 					<CardSummary>
-						{post.summary.length > 200 ? `${post.summary.slice(0, 200)}...` : post.summary}
+						{post.summary.length > 100 ? `${post.summary.slice(0,100)}...` : post.summary}
 					</CardSummary>
 					<CardDate dateTime={post.updatedAt}>
 						Updated: {new Date(post.updatedAt).toLocaleDateString()}

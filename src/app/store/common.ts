@@ -14,6 +14,7 @@ const initDarkMode = () => {
   
 
 const initialState: CommonState = {
+		isLogged: false,
     isDark: initDarkMode(),
     postState: "read",
     toggle: false,
@@ -27,6 +28,9 @@ const common = createSlice({
     name: "common",
     initialState,
     reducers: {
+				setLogged(state, action: PayloadAction<boolean>){
+					state.isLogged = action.payload;
+				},
         setToggle(state, action: PayloadAction<boolean>){
             state.toggle = action.payload;
         },
