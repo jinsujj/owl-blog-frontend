@@ -115,107 +115,109 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData, editorMaxWidth
   };
 
   useEffect(() => {    
-    editorRef.current = new EditorJS({
-      holder: 'editorjs',
-      readOnly: isReadOnly,
-			placeholder :'Hello world!',
-      data: initialData,
-			autofocus: true,
-      tools: {
-				raw:{
-					class: RawTool,
-					shortcut: 'OPTION+R',
-				},
-				code:{
-					class: CodeTool,
-					shortcut: 'OPTION+C',
-				},
-				list: {
-					class: List as unknown as BlockToolConstructable,
-					inlineToolbar: true,
-					shortcut: 'OPTION+O', 
-				},
-				delimiter:{
-					class: Delimiter as unknown as BlockToolConstructable,
-					shortcut: 'OPTION+D', 
-				},
-				warning: {
-					class: Warning,
-					inlineToolbar: true,
-					shortcut: 'OPTION+W',
-					config: { 
-						titlePlaceholder: 'Title',
-						messagePlaceholder: 'Message',
+		if (!editorRef.current) {
+			editorRef.current = new EditorJS({
+				holder: 'editorjs',
+				readOnly: isReadOnly,
+				placeholder :'Hello world!',
+				data: initialData,
+				autofocus: true,
+				tools: {
+					raw:{
+						class: RawTool,
+						shortcut: 'OPTION+R',
 					},
-				},
-				image: {
-					class: ImageTool,
-					config: {
-						endpoints: {
-							byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
-							byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
+					code:{
+						class: CodeTool,
+						shortcut: 'OPTION+C',
+					},
+					list: {
+						class: List as unknown as BlockToolConstructable,
+						inlineToolbar: true,
+						shortcut: 'OPTION+O', 
+					},
+					delimiter:{
+						class: Delimiter as unknown as BlockToolConstructable,
+						shortcut: 'OPTION+D', 
+					},
+					warning: {
+						class: Warning,
+						inlineToolbar: true,
+						shortcut: 'OPTION+W',
+						config: { 
+							titlePlaceholder: 'Title',
+							messagePlaceholder: 'Message',
+						},
+					},
+					image: {
+						class: ImageTool,
+						config: {
+							endpoints: {
+								byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
+								byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
+							}
 						}
-					}
-				},
-				embed: {
-					class: Embed,
-					config: {
-						services: {
-							youtube: true,
+					},
+					embed: {
+						class: Embed,
+						config: {
+							services: {
+								youtube: true,
+							}
 						}
+					},
+					Marker: {
+						class: Marker,
+						shortcut: 'OPTION+M',
+					},
+					linkTool: {
+						class: LinkTool,
+						shortcut: 'OPTION+L',
+						config: {
+							endpoint: 'https://api.microlink.io?url=', // Your backend endpoint for url data fetching,
+						},
+					},
+					table: {
+						class: Table as unknown as BlockToolConstructable,
+						shortcut: 'OPTION+T',
+						inlineToolbar: true,
+						config: {
+							rows: 2,
+							cols: 3,
+							maxRows: 5,
+							maxCols: 5,
+						},
+					},
+					attaches: {
+						class: AttachesTool,
+						shortcut: 'OPTION+A',
+						config: {
+							endpoint: 'http://localhost:8008/uploadFile'
+						}
+					},
+					header: {
+						class: Header as unknown as BlockToolConstructable,
+						shortcut: 'OPTION+H',
+						config: {
+							levels: [1, 2, 3, 4, 5], 
+							defaultLevel: 2, 
+							placeholder: 'Write a header',
+						},
+						sanitize: {
+							level: true, 
+						},
+					},
+				},
+				onReady: () => {
+					if (isReadOnly) {
+						renderHighlightedCode(); 
 					}
 				},
-				Marker: {
-					class: Marker,
-					shortcut: 'OPTION+M',
-				},
-				linkTool: {
-					class: LinkTool,
-					shortcut: 'OPTION+L',
-					config: {
-						endpoint: 'https://api.microlink.io?url=', // Your backend endpoint for url data fetching,
-					},
-				},
-				table: {
-					class: Table as unknown as BlockToolConstructable,
-					shortcut: 'OPTION+T',
-					inlineToolbar: true,
-					config: {
-						rows: 2,
-						cols: 3,
-						maxRows: 5,
-						maxCols: 5,
-					},
-				},
-				attaches: {
-					class: AttachesTool,
-					shortcut: 'OPTION+A',
-					config: {
-						endpoint: 'http://localhost:8008/uploadFile'
-					}
-				},
-				header: {
-					class: Header as unknown as BlockToolConstructable,
-					shortcut: 'OPTION+H',
-					config: {
-						levels: [1, 2, 3, 4, 5], 
-						defaultLevel: 2, 
-						placeholder: 'Write a header',
-					},
-					sanitize: {
-						level: true, 
-					},
-				},
-      },
-      onReady: () => {
-        if (isReadOnly) {
-          renderHighlightedCode(); 
-        }
-      },
-    });
+			});
+	}
 
     return () => {
-      if (editorRef.current) {
+      if (editorRef.current && typeof editorRef.current.destroy === "function") {
         editorRef.current.destroy();
         editorRef.current = null;
       }

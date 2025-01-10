@@ -8,6 +8,8 @@ import styled from "styled-components";
 import { BlogOutputData } from "../types/editor";
 import { createBlog } from "../api/blogApi";
 import dynamic from "next/dynamic";
+import useModal from "../hooks/useModal";
+import MessageModal from "../components/modal/MessageModal";
 
 
 const Container = styled.div`
@@ -26,9 +28,12 @@ const SliderWrapper = styled.div`
 const Editor = dynamic(() => import("./Editor"), { ssr: false });
 
 const EditorPage: React.FC = () => {
+	const [modalMessage, setModalMessage] = useState('');
+	const [alertColor, setAlertColor] = useState('');
 	const [isReadOnly, setIsReadOnly] = useState(false);
 	const [editorData, setEditorData] = useState<BlogOutputData>({title: '', version: undefined, time: undefined, blocks: []});
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
+	const { openModal, closeModal, ModalPortal } = useModal();
 
 	const toggleMode = () => {
 		setIsReadOnly((prev) => !prev);
@@ -44,9 +49,15 @@ const EditorPage: React.FC = () => {
 		try{
 			const result = await createBlog(title, content);
 			console.log('Blog created successfully', result);
+			setModalMessage("Blog created successfully!");
+			setAlertColor(palette.green);
+			openModal();
 		}
 		catch(error){
 			console.log("Error creating blog:", error);
+			setModalMessage("Failed to create blog. Please try again.");
+			setAlertColor(palette.red);
+			openModal();
 		}
 	}
 
@@ -57,6 +68,9 @@ const EditorPage: React.FC = () => {
 
 	return (
     <Container>
+			 <ModalPortal>
+          <MessageModal message={modalMessage} onClose={closeModal} color={alertColor} />
+        </ModalPortal>
       <Button onClick={toggleMode} color={palette.green}>
         {isReadOnly ? 'Read-Only': 'Edit Mode'}
       </Button>
