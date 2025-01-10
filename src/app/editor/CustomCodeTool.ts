@@ -38,7 +38,7 @@ class CustomCodeTool implements BlockTool {
     return wrapper;
   }
 
-  save(blockContent: HTMLElement) {
+  save() {
     return {
       code: this.data.code,
       language: this.data.language,

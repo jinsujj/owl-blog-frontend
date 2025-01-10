@@ -6,7 +6,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 import styled from 'styled-components';
 import Button from '../components/common/Button';
 import palette from '../styles/palette';
-import EditorJS, { BlockToolConstructable, OutputData } from '@editorjs/editorjs';
+import EditorJS, { BlockToolConstructable } from '@editorjs/editorjs';
 import CodeTool from '@editorjs/code';
 import Header from '@editorjs/header';
 import List from '@editorjs/list';
@@ -19,6 +19,7 @@ import Delimiter from '@editorjs/delimiter';
 import RawTool from '@editorjs/raw';
 import ImageTool from '@editorjs/image';
 import AttachesTool from '@editorjs/attaches';
+import { BlogOutputData } from '../types/editor';
 
 interface EditorContainerProps {
   $isReadOnly: boolean;
@@ -26,6 +27,11 @@ interface EditorContainerProps {
 }
 
 export const EditorContainer = styled.div<EditorContainerProps>`
+	max-width: ${(props) => props.$maxWidth};
+	margin: 0 auto;
+	width: 100%;
+
+
   #editorjs pre {
     border: ${(props) => (props.$isReadOnly ? "none" : "1px solid #ccc")};
   }
@@ -54,14 +60,40 @@ export const EditorContainer = styled.div<EditorContainerProps>`
 	}
 `;
 
+const TitleInputWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`;
+
+const TitleInput = styled.input<{width: string}>`
+	width: 100%;
+	max-width: ${(props) => props.width};
+	font-size: 24px;
+	padding: 10px;
+	margin-bottom: 20px;
+	border: 1px solid ${palette.gray};
+	border-radius: 4px;
+	background-color: #f9f9f9;
+`;
+
+const StyledEditor = styled.div`
+  border-top: 1px solid #ccc; 
+  border-bottom: 1px solid #ccc;
+	width: 100%;
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
+`;
+
+
 interface EditorProps {
   isReadOnly: boolean;
-  initialData?: OutputData;
+  initialData?: BlogOutputData;
 	editorMaxWidth: string;
-  onSave?: (data: OutputData) => void;
+  onSave?: (data: BlogOutputData) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth, onSave }) => {
+const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData, editorMaxWidth, onSave }) => {
+	const [title , setTitle] = useState('');
   const editorRef = useRef<EditorJS | null>(null);
 
   const renderHighlightedCode = () => {
@@ -86,6 +118,7 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
     editorRef.current = new EditorJS({
       holder: 'editorjs',
       readOnly: isReadOnly,
+			placeholder :'Hello world!',
       data: initialData,
 			autofocus: true,
       tools: {
@@ -189,36 +222,28 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData,editorMaxWidth,
     };
   }, [isReadOnly, initialData]);
 
-
-  useEffect(() => {
-    if (!isReadOnly) return;
-
-    const editorElement = document.querySelector('#editorjs');
-    if (!editorElement) return;
-
-    const observer = new MutationObserver(() => {
-      renderHighlightedCode();
-    });
-
-    observer.observe(editorElement, { childList: true, subtree: true });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [isReadOnly]);
-
-
   const handleSave = async () => {
     if (!editorRef.current) return;
 
     const savedData = await editorRef.current.save();
-    if (onSave) onSave(savedData);
+		const blog: BlogOutputData = {...savedData,title: title,}
+    if (onSave) onSave(blog);
   };
 	
   return (
 		<>
 			<EditorContainer $isReadOnly={isReadOnly} $maxWidth={editorMaxWidth}>
-				<div id="editorjs"></div>
+				<TitleInputWrapper>
+					<TitleInput 
+								type="text"
+								placeholder="Enter title here ..."
+								value={title}
+								onChange={(e) => setTitle(e.target.value)}
+								readOnly={isReadOnly}
+								width={editorMaxWidth}
+							/>
+				</TitleInputWrapper>
+				<StyledEditor id="editorjs"></StyledEditor>
 			</EditorContainer>
 				{!isReadOnly && (
 					<Button onClick={handleSave} color={palette.blue}>

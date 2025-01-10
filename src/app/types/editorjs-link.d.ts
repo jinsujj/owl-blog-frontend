@@ -1,5 +1,5 @@
 declare module '@editorjs/link' {
-  import { ToolConstructable, ToolSettings } from '@editorjs/editorjs';
+  import { ToolConstructable } from '@editorjs/editorjs';
 
   interface LinkToolConfig {
     endpoint: string; // 서버 URL
