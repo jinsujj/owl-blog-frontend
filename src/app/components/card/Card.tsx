@@ -1,10 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { Post } from "@/app/api/blogApi";
-import Image from "next/image";
 
-export const CardContainer = styled.li`
-	padding: 10px;
+
+export const Container = styled.li`
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -25,31 +24,58 @@ export const CardContainer = styled.li`
   }
 `;
 
+export const Thumbnail = styled.img`
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+`;
+
+export const CardContent = styled.div`
+  padding: 15px;
+`;
+
+
+export const CardTitle = styled.h3`
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+`;
+
+export const CardSummary = styled.p`
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+	-webkit-line-clamp: 5; 
+	text-overflow: ellipsis;
+	word-wrap: break-word;
+  color: #666;
+`;
+
+export const CardDate = styled.time`
+  font-size: 0.85rem;
+  color: #999;
+`;
+
+
 interface CardProps {
   post: Post;
 }
 
 const Card = ({ post }: CardProps) => {
   return (
-    <CardContainer>
+    <Container>
       <a href={`/post/${post.id}`}>
-				<Image 
-					src={post.thumbnail} 
-					alt={post.title} 
-					width={300} 
-					height={200} 
-					layout="responsive" 
-					style={{ width: "100%" }} 
-        />
-        <div>
-          <h3>{post.title}</h3>
-          <p>{post.summary}</p>
-          <time dateTime={post.updatedAt}>
-            Updated: {new Date(post.updatedAt).toLocaleDateString()}
-          </time>
-        </div>
+				<Thumbnail src={post.thumbnail} alt={`Thumbnail of ${post.title}`} />
+        <CardContent>
+					<CardTitle>{post.title}</CardTitle>
+					<CardSummary>
+						{post.summary.length > 200 ? `${post.summary.slice(0, 200)}...` : post.summary}
+					</CardSummary>
+					<CardDate dateTime={post.updatedAt}>
+						Updated: {new Date(post.updatedAt).toLocaleDateString()}
+					</CardDate>
+				</CardContent>
       </a>
-    </CardContainer>
+    </Container>
   );
 };
 

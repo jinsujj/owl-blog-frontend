@@ -6,92 +6,33 @@ import { setDarkMode, useSelector } from "./store";
 import { useDispatch } from 'react-redux';
 import palette from "./styles/palette";
 import styled from "styled-components";
+import CardList from "./components/card/CardList";
 
-interface EditorContainerProps {
-  $isDark: boolean;
+interface StyledProps {
+	$isDark: boolean;
 }
 
-export const Container = styled.div<EditorContainerProps>`
+const PageContainer = styled.div<StyledProps>`
   padding: 0;
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
   color: ${(props) => (props.$isDark ? "#fff" : "#333")};
 `;
-export const Main = styled.main`
+
+const Main = styled.main`
   padding: 20px;
 `;
 
-export const Title = styled.h1`
+const Title = styled.h1`
   font-size: 2rem;
   margin-bottom: 10px;
 `;
 
-export const Subtitle = styled.h2`
+const Subtitle = styled.h2`
   font-size: 1.5rem;
   margin-bottom: 20px;
 `;
-
-export const CardList = styled.ul`
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 0;
-  margin: 20px 0;
-`;
-
-export const Card = styled.li`
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  overflow: hidden;
-  width: 300px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
-`;
-
-export const Thumbnail = styled.img`
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-`;
-
-export const CardContent = styled.div`
-  padding: 15px;
-`;
-
-export const CardTitle = styled.h3`
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  color: #333;
-`;
-
-export const CardSummary = styled.p`
-  font-size: 0.95rem;
-  margin-bottom: 10px;
-	-webkit-line-clamp: 5; 
-	text-overflow: ellipsis;
-	word-wrap: break-word;
-  color: #666;
-`;
-
-export const CardDate = styled.time`
-  font-size: 0.85rem;
-  color: #999;
-`;
-
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -159,7 +100,7 @@ const HomePage = () => {
   ];
 
   return (
-    <Container>
+    <PageContainer $isDark={isDarkMode}>
       <Header />
 			<Main>
 				<Title>부엉이 개발자 블로그</Title>
@@ -168,26 +109,9 @@ const HomePage = () => {
 				<Button onClick={changeDarkMode} color={palette.green}>
 					다크모드 변경
 				</Button>
-				<CardList>
-          {posts.map((post) => (
-            <Card key={post.id}>
-              <a href={`/post/${post.id}`}>
-                <Thumbnail src={post.thumbnail} alt={`Thumbnail of ${post.title}`} />
-                <CardContent>
-                  <CardTitle>{post.title}</CardTitle>
-                  <CardSummary>
-										{post.summary.length > 200 ? `${post.summary.slice(0, 200)}...` : post.summary}
-									</CardSummary>
-                  <CardDate dateTime={post.updatedAt}>
-                    Updated: {new Date(post.updatedAt).toLocaleDateString()}
-                  </CardDate>
-                </CardContent>
-              </a>
-            </Card>
-          ))}
-        </CardList>
+				<CardList posts={posts}/>
 			</Main>
-    </Container>
+    </PageContainer>
   );
 };
 
