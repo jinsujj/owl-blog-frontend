@@ -1,8 +1,12 @@
-import { useSelector } from "@/app/store";
+import { setDarkMode, useSelector } from "@/app/store";
 import palette from "@/app/styles/palette";
 import styled, { css } from "styled-components";
 import Link from "next/link";
 import HeaderProfile from "./HeaderProfile";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
+import Button from "./Button";
+import { FaBell, FaSearch } from "react-icons/fa";
 
 interface StyledProps {
     $isDark: boolean;
@@ -27,9 +31,9 @@ const Inner = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: space-between; /* 영역을 3개로 나누기 위해 사용 */
-	max-width: 940px;
+	max-width: 1400px;
 	margin: 0 auto;
-	padding: 10px 20px;
+	padding: 5px 20px;
 	box-sizing: border-box;
 
 	@media only screen and (max-width: 768px) {
@@ -38,16 +42,8 @@ const Inner = styled.div`
 `;
 
 const Left = styled.div`
-	display: flex;
 	align-items: center;
 	gap: 10px;
-
-	.toggle-btn {
-		background: url("../img/toggle_blue.svg") no-repeat center/contain;
-		width: 27px;
-		height: 18px;
-		cursor: pointer;
-	}
 `;
 
 const Center = styled.div<StyledProps>`
@@ -75,6 +71,7 @@ const Center = styled.div<StyledProps>`
 `;
 
 const Right = styled.div<StyledProps>`
+	padding-right: 20px;
 	display: flex;
 	align-items: center;
 	gap: 15px; /* 버튼 간 간격 */
@@ -127,6 +124,35 @@ const LoginProvider = styled.div`
     }
   }
 `;
+
+const IconButton = styled.button<StyledProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: ${(props) =>
+    props.$isDark ? "#1e1e1e" : "#f9f9f9"}; /* 배경색과 거의 동일하게 */
+  color: ${(props) => (props.$isDark ? "#fff" : "#333")};
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${(props) =>
+      props.$isDark ? "#2a2a2a" : "#eeeeee"}; /* 살짝 강조된 색상 */
+  }
+
+  &:last-child {
+    margin-right: 0; /* 마지막 버튼은 margin-right 제거 */
+  }
+
+  box-shadow: ${(props) =>
+    props.$isDark
+      ? "0px 2px 4px rgba(0, 0, 0, 0.5)" /* 다크 모드 섀도우 */
+      : "0px 2px 4px rgba(0, 0, 0, 0.1)"}; /* 라이트 모드 섀도우 */
+`;
+
   
 
 const REST_API_KEY = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
@@ -135,14 +161,34 @@ const KAKAO_LOGIN_URI = `https://kauth.kakao.com/oauth/authorize?response_type=c
 
 
 const Header = () => {
+	const [isReadOnly, setIsReadOnly] = useState(false);
+	const dispatch = useDispatch();
 	const isLogged = useSelector((state) => state.common.isLogged);
   const isDarkMode = useSelector((state) => state.common.isDark);
+
+	const toggleMode = () => {
+		setIsReadOnly((prev) => !prev);
+	}
+
+	const changeDarkMode = () => {
+			dispatch(setDarkMode(!isDarkMode));
+	};
+
+	const handleBellClick = () => {
+    alert("알림 버튼 클릭!");
+  };
+
+  const handleSearchClick = () => {
+    alert("검색 버튼 클릭!");
+  };
 
   return (
     <Container $isDark={isDarkMode}>
       <Inner>
         <Left>
-          <div className="toggle-btn" />
+					<Button onClick={changeDarkMode} color={palette.green}>
+							Theme Change
+					</Button>
         </Left>
         <Center $isDark={isDarkMode}>
 					<Link href="/">
@@ -153,6 +199,12 @@ const Header = () => {
           </Link>
         </Center>
         <Right $isDark={isDarkMode}>
+					<IconButton $isDark={isDarkMode} onClick={handleBellClick}>
+						<FaBell size={20} />
+					</IconButton>
+					<IconButton $isDark={isDarkMode} onClick={handleSearchClick}>
+						<FaSearch size={20} />
+					</IconButton>
 					{!isLogged && 
 						<LoginProvider>
 							<a href={KAKAO_LOGIN_URI} className="kakao-login" type="button" />

@@ -1,12 +1,10 @@
 "use client";
 
-import Button from "./components/common/Button";
 import Header from "./components/common/Header";
-import { setDarkMode, useSelector } from "./store";
-import { useDispatch } from 'react-redux';
-import palette from "./styles/palette";
+import { useSelector } from "./store";
 import styled from "styled-components";
 import CardList from "./components/card/CardList";
+import { UserProfile } from "./components/common/UserProfile";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -35,18 +33,8 @@ const Main = styled.main`
   flex-direction: column;
 `;
 
-const Title = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 10px;
-`;
-
 const HomePage = () => {
-  const dispatch = useDispatch();
   const isDarkMode = useSelector((state) => state.common.isDark);
-
-  const changeDarkMode = () => {
-    dispatch(setDarkMode(!isDarkMode));
-  };
 
 	const posts = [
     {
@@ -110,10 +98,7 @@ const HomePage = () => {
       <Header />
 			<MainWrapper>
 				<Main>
-					<Title>부엉이 개발자 블로그</Title>
-					<Button onClick={changeDarkMode} color={palette.green}>
-						다크모드 변경
-					</Button>
+					<UserProfile/>
 					<CardList posts={posts}/>
 				</Main>
 			</MainWrapper>
