@@ -15,7 +15,7 @@ const ProfileWrapper = styled.div<StyledProps>`
   border-radius: 10px;
   padding: 20px 30px;
   width: 80%; /* 프로필 박스 크기 조정 */
-  max-width: 600px; /* 최대 크기 제한 */
+  max-width: 750px; /* 최대 크기 제한 */
   margin: 0 auto; /* 가운데 정렬 */
 `;
 
@@ -27,12 +27,12 @@ const ProfileImageWrapper = styled.div`
 `;
 
 const ProfileImage = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 20px;
-  border: 3px solid #4caf50; /* 감각적인 보더 추가 */
+  margin-right: 40px;
+  border: 3px solid #4caf50;
 `;
 
 const ProfileDetails = styled.div`

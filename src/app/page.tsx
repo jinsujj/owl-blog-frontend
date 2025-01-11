@@ -2,7 +2,7 @@
 
 import Header from "./components/common/Header";
 import { useSelector } from "./store";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import CardList from "./components/card/CardList";
 import { UserProfile } from "./components/common/UserProfile";
 import { useState } from "react";
@@ -11,6 +11,17 @@ import { HiMiniSquares2X2, HiBars3 } from "react-icons/hi2";
 interface StyledProps {
 	$isDark: boolean;
 }
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 const PageContainer = styled.div<StyledProps>`
   padding: 0;
@@ -64,6 +75,7 @@ const ListView = styled.div<StyledProps>`
   display: flex;
   flex-direction: column;
   gap: 20px;
+	animation: ${fadeIn} 0.3s ease-in-out;
 
   .list-item {
     display: flex;
