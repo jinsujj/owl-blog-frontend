@@ -136,7 +136,7 @@ export const UserProfile = () => {
   return (
     <ProfileWrapper $isDark={isDarkMode}>
       <ProfileImageWrapper>
-        <ProfileImage src="https://via.placeholder.com/100" alt="Profile" />
+        <ProfileImage src="https://avatars.githubusercontent.com/u/19955904?v=4" alt="Profile" />
         <ProfileDetails>
           <ProfileName>jinsujj</ProfileName>
           <ProfileStats>
