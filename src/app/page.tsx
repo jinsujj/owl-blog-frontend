@@ -26,7 +26,7 @@ const MainWrapper = styled.div`
 `;
 
 const Main = styled.main`
-	max-width: 1400px;
+	max-width: 1200px;
 	width: 100%;
   padding: 20px;
 	display: flex;

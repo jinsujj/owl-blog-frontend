@@ -5,9 +5,9 @@ import { Post } from "@/app/api/blogApi";
 
 
 export const CardListContainer = styled.ul`
-  list-style: none;
   display: flex;
   flex-wrap: wrap;
+	justify-content: center;
   gap: 20px;
   padding: 0;
   margin: 20px 0;

@@ -80,16 +80,16 @@ const TabContainer = styled.div`
   width: 100%;
 `;
 
-const TabButton = styled.button<{ isActive: boolean }>`
+const TabButton = styled.button<{ $isActive: boolean }>`
   flex: 1;
   text-align: center;
   padding: 10px 0;
   font-size: 1rem;
-  font-weight: ${(props) => (props.isActive ? "bold" : "normal")};
-  color: ${(props) => (props.isActive ? "#4caf50" : "#666")};
+  font-weight: ${(props) => (props.$isActive ? "bold" : "normal")};
+  color: ${(props) => (props.$isActive ? "#4caf50" : "#666")};
   border: none;
   border-bottom: ${(props) =>
-    props.isActive ? "3px solid #4caf50" : "3px solid transparent"};
+    props.$isActive ? "3px solid #4caf50" : "3px solid transparent"};
   background: none;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -150,7 +150,7 @@ export const UserProfile = () => {
         {["글", "시리즈", "소개"].map((tab) => (
           <TabButton
             key={tab}
-            isActive={activeTab === tab}
+            $isActive={activeTab === tab}
             onClick={() => setActiveTab(tab)}
           >
             {tab}

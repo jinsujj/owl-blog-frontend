@@ -4,9 +4,8 @@ import styled, { css } from "styled-components";
 import Link from "next/link";
 import HeaderProfile from "./HeaderProfile";
 import { useDispatch } from "react-redux";
-import { useState } from "react";
-import Button from "./Button";
-import { FaBell, FaSearch } from "react-icons/fa";
+import { RiKakaoTalkFill } from "react-icons/ri";
+import { HiOutlineMoon, HiOutlineSun, HiOutlineBell } from "react-icons/hi2";
 
 interface StyledProps {
     $isDark: boolean;
@@ -74,12 +73,12 @@ const Right = styled.div<StyledProps>`
 	padding-right: 20px;
 	display: flex;
 	align-items: center;
-	gap: 15px; /* 버튼 간 간격 */
+	gap: 8px; /* 버튼 간 간격 */
 
 	.home-button {
 		display: flex;
 		align-items: center;
-		background-color: ${(props) => (props.$isDark ? "#444" : "#f5f5f5")};
+		background-color: ${(props) => (props.$isDark ? palette.gray : "#fff")};
 		color: ${(props) => (props.$isDark ? "#fff" : "#333")};
 		border: none;
 		padding: 8px 15px;
@@ -99,32 +98,6 @@ const Right = styled.div<StyledProps>`
 	}
 `;
 
-const LoginProvider = styled.div`
-  margin-top: 5px;
-	display: flex;
-	justify-content: center;
-
-	.kakao-login {
-    border: none;
-    background: url("../img/kakao_login_medium.png");
-    background-repeat: no-repeat;
-    cursor: pointer;
-    display: center;
-    justify-content: center;
-    width: 100px;
-    height: 45px;
-
-		&:hover {
-      transform: scale(0.95); /* 크기 증가 */
-      opacity: 0.8; /* 약간 투명하게 */
-    }
-
-    &:active {
-      transform: scale(0.90); /* 클릭 시 크기 축소 */
-    }
-  }
-`;
-
 const IconButton = styled.button<StyledProps>`
   display: flex;
   align-items: center;
@@ -134,17 +107,20 @@ const IconButton = styled.button<StyledProps>`
   border: none;
   border-radius: 50%;
   background-color: ${(props) =>
-    props.$isDark ? "#1e1e1e" : "#f9f9f9"}; /* 배경색과 거의 동일하게 */
+    props.$isDark ? "#1e1e1e" : "#f9f9f9"}; /* 평소 배경색 */
   color: ${(props) => (props.$isDark ? "#fff" : "#333")};
   cursor: pointer;
 
+  transition: background-color 0.3s ease, transform 0.2s ease; /* 애니메이션 추가 */
+
   &:hover {
     background-color: ${(props) =>
-      props.$isDark ? "#2a2a2a" : "#eeeeee"}; /* 살짝 강조된 색상 */
+      props.$isDark ? "#2a2a2a" : "#eaeaea"}; /* 살짝 강조된 배경색 */
+    transform: scale(1.05); /* 약간 확대 */
   }
 
-  &:last-child {
-    margin-right: 0; /* 마지막 버튼은 margin-right 제거 */
+  &:active {
+    transform: scale(0.95); /* 클릭 시 살짝 축소 */
   }
 
   box-shadow: ${(props) =>
@@ -161,14 +137,9 @@ const KAKAO_LOGIN_URI = `https://kauth.kakao.com/oauth/authorize?response_type=c
 
 
 const Header = () => {
-	const [isReadOnly, setIsReadOnly] = useState(false);
 	const dispatch = useDispatch();
 	const isLogged = useSelector((state) => state.common.isLogged);
   const isDarkMode = useSelector((state) => state.common.isDark);
-
-	const toggleMode = () => {
-		setIsReadOnly((prev) => !prev);
-	}
 
 	const changeDarkMode = () => {
 			dispatch(setDarkMode(!isDarkMode));
@@ -178,17 +149,10 @@ const Header = () => {
     alert("알림 버튼 클릭!");
   };
 
-  const handleSearchClick = () => {
-    alert("검색 버튼 클릭!");
-  };
-
   return (
     <Container $isDark={isDarkMode}>
       <Inner>
         <Left>
-					<Button onClick={changeDarkMode} color={palette.green}>
-							Theme Change
-					</Button>
         </Left>
         <Center $isDark={isDarkMode}>
 					<Link href="/">
@@ -199,16 +163,16 @@ const Header = () => {
           </Link>
         </Center>
         <Right $isDark={isDarkMode}>
+					<IconButton $isDark={isDarkMode} onClick={changeDarkMode}>
+            {isDarkMode ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
+          </IconButton>
 					<IconButton $isDark={isDarkMode} onClick={handleBellClick}>
-						<FaBell size={20} />
-					</IconButton>
-					<IconButton $isDark={isDarkMode} onClick={handleSearchClick}>
-						<FaSearch size={20} />
+						<HiOutlineBell size={20} />
 					</IconButton>
 					{!isLogged && 
-						<LoginProvider>
-							<a href={KAKAO_LOGIN_URI} className="kakao-login" type="button" />
-						</LoginProvider>
+						<IconButton $isDark={isDarkMode} onClick={() => {window.location.href = KAKAO_LOGIN_URI;}} >
+							<RiKakaoTalkFill size={23}/>
+						</IconButton>
 					}
           {isLogged && <HeaderProfile/>}
         </Right>
