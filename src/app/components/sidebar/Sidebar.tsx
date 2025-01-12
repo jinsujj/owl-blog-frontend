@@ -1,8 +1,5 @@
 import { Post } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
-import  { commonAction } from "@/app/store/common";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { TagList } from "./TagList";
 import VisitorBox from "./VisitorBox";

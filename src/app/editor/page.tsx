@@ -3,14 +3,14 @@
 import React, {useState} from "react";
 import Button from "../components/common/Button";
 import palette from "../styles/palette";
-import WidthSlider from "../components/editor/WidthSlder";
+import WidthSlider from "../components/common/WidthSlder";
 import styled from "styled-components";
 import { BlogOutputData } from "../types/editor";
 import { createBlog } from "../api/blogApi";
 import dynamic from "next/dynamic";
 import useModal from "../hooks/useModal";
 import MessageModal from "../components/modal/MessageModal";
-import Header from "../components/common/Header";
+import Header from "../components/header/Header";
 import { useSelector } from "../store";
 
 interface StyledProps {

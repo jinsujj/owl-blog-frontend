@@ -4,7 +4,7 @@ import styled, { css } from "styled-components";
 import { useSelector } from "../../store";
 import { commonAction } from "../../store/common";
 import palette from "../../styles/palette";
-import Button from "./Button";
+import Button from "../common/Button";
 import Router from "next/router";
 
 

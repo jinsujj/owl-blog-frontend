@@ -15,7 +15,7 @@ const ProfileWrapper = styled.div<StyledProps>`
   border-radius: 10px;
   padding: 20px 30px;
   width: 80%; /* 프로필 박스 크기 조정 */
-  max-width: 750px; /* 최대 크기 제한 */
+  max-width: 1000px; /* 최대 크기 제한 */
   margin: 0 auto; /* 가운데 정렬 */
 `;
 

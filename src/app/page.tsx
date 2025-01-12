@@ -1,6 +1,6 @@
 "use client";
 
-import Header from "./components/common/Header";
+import Header from "./components/header/Header";
 import { useSelector } from "./store";
 import styled from "styled-components";
 import CardList from "./components/card/CardList";
@@ -11,6 +11,7 @@ import ListView from "./components/list/ListView";
 import { commonAction } from "./store/common";
 import { useDispatch } from "react-redux";
 import SideBar from "./components/sidebar/Sidebar";
+import WidthSlider from "./components/common/WidthSlder";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -33,12 +34,12 @@ const HeaderWrapper = styled.header`
   background-color: #fff;
 `;
 
-const LayoutWrapper = styled.main`
+const LayoutWrapper = styled.main<{width: string}>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center; 
-  max-width: 980px; 
+  max-width: ${(props) => props.width};
   width: 100%;
   margin: 0 auto;
   padding: 20px;
@@ -68,13 +69,26 @@ const ToggleButton = styled.button`
   }
 `;
 
+const SliderWrapper = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 100px;
+	z-index: 1000;
+
+	@media (max-width: 768px) {
+    display: none;
+  }
+`;
+
 
 const HomePage = () => {
   const dispatch = useDispatch();
 	const searchQuery = useSelector((state) => state.common.search);
   const isDarkMode = useSelector((state) => state.common.isDark);
 	const [isListView, setIsListView] = useState(false); 
+	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('980px');
 
+	// dynamic size effect
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
@@ -91,8 +105,11 @@ const HomePage = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [dispatch]);
   
+	const handleWidthChage = (width: number) =>{
+		setEditorMaxWidth(`${width}px`);
+	}
 
 	const posts = [
     {
@@ -172,7 +189,7 @@ const HomePage = () => {
         <Header />  
       </HeaderWrapper>
       <SideBar posts={posts} />
-      <LayoutWrapper>
+      <LayoutWrapper width={editorMaxWidth}>
         <UserProfile/>
         <ToggleWrapper>
           <ToggleButton onClick={() => setIsListView(!isListView)}>
@@ -182,6 +199,9 @@ const HomePage = () => {
         {isListView ? 
           (<ListView posts={filteredPosts}/>) : (<CardList posts={filteredPosts} />)}
       </LayoutWrapper>
+			<SliderWrapper>
+				<WidthSlider defaultWidth={980} onWidthChange={handleWidthChage}/>
+			</SliderWrapper>
     </PageContainer>
   );
 };

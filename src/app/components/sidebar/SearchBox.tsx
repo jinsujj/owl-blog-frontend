@@ -57,7 +57,7 @@ export const SearchBox = () => {
 		}, 300); 
 		return () => clearTimeout(timeoutId); 
 		
-	}, [searchQuery]);
+	}, [searchQuery, dispath]);
 	
 	return (
 		<SearchWrapper>
