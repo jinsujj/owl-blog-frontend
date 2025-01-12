@@ -14,13 +14,11 @@ const initDarkMode = () => {
   
 
 const initialState: CommonState = {
-		isLogged: false,
+    isLogged: false,
     isDark: initDarkMode(),
     postState: "read",
     toggle: false,
     search: "",
-    category: "",
-    subCategory: "",
 };
 
 
@@ -28,9 +26,9 @@ const common = createSlice({
     name: "common",
     initialState,
     reducers: {
-				setLogged(state, action: PayloadAction<boolean>){
-					state.isLogged = action.payload;
-				},
+        setLogged(state, action: PayloadAction<boolean>){
+            state.isLogged = action.payload;
+        },
         setToggle(state, action: PayloadAction<boolean>){
             state.toggle = action.payload;
         },
@@ -42,12 +40,6 @@ const common = createSlice({
         },
         setSearchFilter(state, action: PayloadAction<string>){
             state.search = action.payload;
-        },
-        setCategory(state , action: PayloadAction<string>){
-            state.category = action.payload;
-        },
-        setSubCategory(state, action: PayloadAction<string>){
-            state.subCategory = action.payload;
         },
         initCommonState(state){
             state = initialState;

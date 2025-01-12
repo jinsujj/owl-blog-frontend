@@ -8,10 +8,17 @@ import { UserProfile } from "./components/common/UserProfile";
 import { useState } from "react";
 import { HiMiniSquares2X2, HiBars3 } from "react-icons/hi2";
 import ListView from "./components/list/ListView";
+import palette from "@/app/styles/palette";
 
 interface StyledProps {
 	$isDark: boolean;
 }
+
+interface SideBarProps {
+  $isDark: boolean;
+  $isSidebarOpen: boolean; 
+}
+
 
 const PageContainer = styled.div<StyledProps>`
   padding: 0;
@@ -22,25 +29,30 @@ const PageContainer = styled.div<StyledProps>`
   color: ${(props) => (props.$isDark ? "#fff" : "#333")};
 `;
 
-const MainWrapper = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: center;
+const HeaderWrapper = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  background-color: #fff;
 `;
 
-const Main = styled.main`
-	max-width: 980px;
-	width: 100%;
-  padding: 20px;
-	display: flex;
+const LayoutWrapper = styled.main`
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  max-width: 980px; 
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
 `;
 
 const ToggleWrapper = styled.div`
  	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	padding: 0px 40px;
+	padding: 10px 40px;
 `;
 
 const ToggleButton = styled.button`
@@ -60,9 +72,75 @@ const ToggleButton = styled.button`
   }
 `;
 
+const SideBar = styled.div<SideBarProps>`
+  position: fixed;
+  left: ${(props) => (props.$isSidebarOpen ? "0" : "-240px")};
+  width: 180px;
+  height: calc(100vh - 50px);
+  background-color: ${(props) => (props.$isDark ? "#444" : "#f9f9f9")};
+  border-right: 1px solid ${(props) => (props.$isDark ? "#555" : "#ddd")};
+  overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 5; 
+  padding: 20px;
+`;
+
+const TagList = styled.ul`
+  list-style: none;
+  padding: 20px 0px;
+`;
+
+const H3 = styled.h3`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+`;
+
+const TagItem = styled.li<StyledProps>`
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${(props) => (props.$isDark ? "#fff" : "#333")};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    color: ${(props) => (props.$isDark ? "#ffcc00" : "#007bff")};
+    text-decoration: underline;
+    cursor: pointer;
+  };
+
+  span {
+    color: ${palette.green};
+    margin-left: 5px;
+  };
+`;
+
+const VisitorWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const VisitorInfo = styled.div<StyledProps>`
+  padding: 10px 0px;
+  border-radius: 10px;
+  background-color: ${(props) => (props.$isDark ? "#555" : "#f1f1f1")};
+  color: ${(props) => (props.$isDark ? "#fff": "#333")};
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+`;
+
+const VisitNumber = styled.div<StyledProps>`
+  font-size: 14px;
+  color : ${(props) => (props.$isDark ? "#ffcc00" : "#007bff")};
+`;
 
 const HomePage = () => {
   const isDarkMode = useSelector((state) => state.common.isDark);
+  const isSidebarOpen = useSelector((state) => state.common.toggle);
 	const [isListView, setIsListView] = useState(false); 
 
 	const posts = [
@@ -72,6 +150,7 @@ const HomePage = () => {
       title: "헥사고날 아키텍처 적용기",
       summary: "선했던 11월 초, 어색하기도 하고 조금은 설레기도 했던 워커힐 파티… 기억나? 아침부터 마라톤하고 정신없이 움직여서 슬슬 지쳐가던 찰나에,  따뜻한 커피를 손난로 삼아 손에 꼭 쥔 우아한 모습과는 다르게,   마치 13:1로 싸운 후 손에 붙인 것 같은 반창고와  아침에 계단에서 넘어졌다는 허당미는 짧은 시간이었지만 내 기억 속에 강렬하게 남았어. 우연인지 인연인지, 옆에서 같이 스테이크를 먹으면서 보기와는 다르게  장난기 있는 모습도 보고, 티키타카 했던 그날은  집으로 돌아가는 길에도 너에 대한 생각이 떠나질 않더라.사실, 엘리트 스펙을 본 후에 조금 망설이기도 했지만,  용기 있는 자가 미인을 얻는다잖아? 그래서 연락하려고 했는데, 또 먼저 연락을 줘서 내심 엄청 방방 뛰면서 좋아했던 것 같아. 만나서도 그렇고, 나의 호감이 확신으로 이어지기까지 오래 걸리진 않았지만, 먼저 고백해 본 적이 까마득해서 그런지, 고백 멘트를 찾아보다가 회사분들에게 걸려서 놀림과 응원을 받으며 망신살도 뻗치고… 참 다사다난했던 것 같아. 그래도 나는 항상 내가 하고 싶은 일을 해왔었고, 우여곡절은 있었지만 대부분 이뤄왔던 것 같아. 애늙은이 같은 면모도 있고 걱정도 많은 송현이지만,  나의 다음 목표는 송현이를 많이 웃게 하는 거야. 비록 장기 목표만큼 힘든 것도 없지만, 나는 항상 마음먹은 건 이뤄왔으니, 한 번 믿어보는 거 어때? 추운 날씨에 쉽게 손이 차가워지는 부엉이지만,  네가 있어서 내 마음은 따뜻해. 사랑해~!",
       updatedAt: "2025-01-10",
+      tags: ["React", "Next.js", "UI"],
     },
     {
       id: 2,
@@ -79,6 +158,7 @@ const HomePage = () => {
       title: "Post 2",
       summary: "This is a summary of Post 2.",
       updatedAt: "2025-01-09",
+      tags: ["아키텍처", "Spring", "리팩토링"],
     },
 		{
       id: 3,
@@ -86,6 +166,7 @@ const HomePage = () => {
       title: "헥사고날 아키텍처 적용기",
       summary: "선했던 11월 초, 어색하기도 하고 조금은 설레기도 했던 워커힐 파티… 기억나? 아침부터 마라톤하고 정신없이 움직여서 슬슬 지쳐가던 찰나에,  따뜻한 커피를 손난로 삼아 손에 꼭 쥔 우아한 모습과는 다르게,   마치 13:1로 싸운 후 손에 붙인 것 같은 반창고와  아침에 계단에서 넘어졌다는 허당미는 짧은 시간이었지만 내 기억 속에 강렬하게 남았어. 우연인지 인연인지, 옆에서 같이 스테이크를 먹으면서 보기와는 다르게  장난기 있는 모습도 보고, 티키타카 했던 그날은  집으로 돌아가는 길에도 너에 대한 생각이 떠나질 않더라.사실, 엘리트 스펙을 본 후에 조금 망설이기도 했지만,  용기 있는 자가 미인을 얻는다잖아? 그래서 연락하려고 했는데, 또 먼저 연락을 줘서 내심 엄청 방방 뛰면서 좋아했던 것 같아. 만나서도 그렇고, 나의 호감이 확신으로 이어지기까지 오래 걸리진 않았지만, 먼저 고백해 본 적이 까마득해서 그런지, 고백 멘트를 찾아보다가 회사분들에게 걸려서 놀림과 응원을 받으며 망신살도 뻗치고… 참 다사다난했던 것 같아. 그래도 나는 항상 내가 하고 싶은 일을 해왔었고, 우여곡절은 있었지만 대부분 이뤄왔던 것 같아. 애늙은이 같은 면모도 있고 걱정도 많은 송현이지만,  나의 다음 목표는 송현이를 많이 웃게 하는 거야. 비록 장기 목표만큼 힘든 것도 없지만, 나는 항상 마음먹은 건 이뤄왔으니, 한 번 믿어보는 거 어때? 추운 날씨에 쉽게 손이 차가워지는 부엉이지만,  네가 있어서 내 마음은 따뜻해. 사랑해~!",
       updatedAt: "2025-01-10",
+      tags: ["React", "Next.js", "UI"],
     },
     {
       id: 4,
@@ -93,12 +174,14 @@ const HomePage = () => {
       title: "Post 2",
       summary: "This is a summary of Post 2.",
       updatedAt: "2025-01-09",
+      tags: ["아키텍처", "Spring", "리팩토링"],
     },{
       id: 5,
       thumbnail: "https://backend.owl-dev.me/files/substation2.0.png",
       title: "헥사고날 아키텍처 적용기",
       summary: "선했던 11월 초, 어색하기도 하고 조금은 설레기도 했던 워커힐 파티… 기억나? 아침부터 마라톤하고 정신없이 움직여서 슬슬 지쳐가던 찰나에,  따뜻한 커피를 손난로 삼아 손에 꼭 쥔 우아한 모습과는 다르게,   마치 13:1로 싸운 후 손에 붙인 것 같은 반창고와  아침에 계단에서 넘어졌다는 허당미는 짧은 시간이었지만 내 기억 속에 강렬하게 남았어. 우연인지 인연인지, 옆에서 같이 스테이크를 먹으면서 보기와는 다르게  장난기 있는 모습도 보고, 티키타카 했던 그날은  집으로 돌아가는 길에도 너에 대한 생각이 떠나질 않더라.사실, 엘리트 스펙을 본 후에 조금 망설이기도 했지만,  용기 있는 자가 미인을 얻는다잖아? 그래서 연락하려고 했는데, 또 먼저 연락을 줘서 내심 엄청 방방 뛰면서 좋아했던 것 같아. 만나서도 그렇고, 나의 호감이 확신으로 이어지기까지 오래 걸리진 않았지만, 먼저 고백해 본 적이 까마득해서 그런지, 고백 멘트를 찾아보다가 회사분들에게 걸려서 놀림과 응원을 받으며 망신살도 뻗치고… 참 다사다난했던 것 같아. 그래도 나는 항상 내가 하고 싶은 일을 해왔었고, 우여곡절은 있었지만 대부분 이뤄왔던 것 같아. 애늙은이 같은 면모도 있고 걱정도 많은 송현이지만,  나의 다음 목표는 송현이를 많이 웃게 하는 거야. 비록 장기 목표만큼 힘든 것도 없지만, 나는 항상 마음먹은 건 이뤄왔으니, 한 번 믿어보는 거 어때? 추운 날씨에 쉽게 손이 차가워지는 부엉이지만,  네가 있어서 내 마음은 따뜻해. 사랑해~!",
       updatedAt: "2025-01-10",
+      tags: ["React", "Next.js", "UI"],
     },
     {
       id: 7,
@@ -106,12 +189,14 @@ const HomePage = () => {
       title: "Post 2",
       summary: "This is a summary of Post 2.",
       updatedAt: "2025-01-09",
+      tags: ["아키텍처", "Spring", "리팩토링"],
     },{
       id: 6,
       thumbnail: "https://backend.owl-dev.me/files/substation2.0.png",
       title: "헥사고날 아키텍처 적용기",
       summary: "선했던 11월 초, 어색하기도 하고 조금은 설레기도 했던 워커힐 파티… 기억나? 아침부터 마라톤하고 정신없이 움직여서 슬슬 지쳐가던 찰나에,  따뜻한 커피를 손난로 삼아 손에 꼭 쥔 우아한 모습과는 다르게,   마치 13:1로 싸운 후 손에 붙인 것 같은 반창고와  아침에 계단에서 넘어졌다는 허당미는 짧은 시간이었지만 내 기억 속에 강렬하게 남았어. 우연인지 인연인지, 옆에서 같이 스테이크를 먹으면서 보기와는 다르게  장난기 있는 모습도 보고, 티키타카 했던 그날은  집으로 돌아가는 길에도 너에 대한 생각이 떠나질 않더라.사실, 엘리트 스펙을 본 후에 조금 망설이기도 했지만,  용기 있는 자가 미인을 얻는다잖아? 그래서 연락하려고 했는데, 또 먼저 연락을 줘서 내심 엄청 방방 뛰면서 좋아했던 것 같아. 만나서도 그렇고, 나의 호감이 확신으로 이어지기까지 오래 걸리진 않았지만, 먼저 고백해 본 적이 까마득해서 그런지, 고백 멘트를 찾아보다가 회사분들에게 걸려서 놀림과 응원을 받으며 망신살도 뻗치고… 참 다사다난했던 것 같아. 그래도 나는 항상 내가 하고 싶은 일을 해왔었고, 우여곡절은 있었지만 대부분 이뤄왔던 것 같아. 애늙은이 같은 면모도 있고 걱정도 많은 송현이지만,  나의 다음 목표는 송현이를 많이 웃게 하는 거야. 비록 장기 목표만큼 힘든 것도 없지만, 나는 항상 마음먹은 건 이뤄왔으니, 한 번 믿어보는 거 어때? 추운 날씨에 쉽게 손이 차가워지는 부엉이지만,  네가 있어서 내 마음은 따뜻해. 사랑해~!",
       updatedAt: "2025-01-10",
+      tags: ["React", "Next.js", "UI"],
     },
     {
       id: 8,
@@ -119,24 +204,53 @@ const HomePage = () => {
       title: "Post 2",
       summary: "This is a summary of Post 2.",
       updatedAt: "2025-01-09",
+      tags: ["아키텍처", "Spring", "리팩토링"],
     },
   ];
 
+  const tagCounts = posts
+    .flatMap((post) => post.tags)
+    .reduce((acc,tag) => {
+      acc[tag] = (acc[tag] || 0) + 1;
+      return acc;
+  }, {} as Record<string,number>);
+
+  const allTags = Object.keys(tagCounts);
+
+  const totalVisit = 472312;
+  const todayVisit = 54;
+
   return (
     <PageContainer $isDark={isDarkMode}>
-      <Header />
-			<MainWrapper>
-				<Main>
-					<UserProfile/>
-					<ToggleWrapper>
-						<ToggleButton onClick={() => setIsListView(!isListView)}>
-							{isListView ? <HiMiniSquares2X2 size={20} /> : <HiBars3 size={20} />}
-						</ToggleButton>
-					</ToggleWrapper>
-          {isListView ? 
-            (<ListView posts={posts}/>) : (<CardList posts={posts} />)}
-				</Main>
-			</MainWrapper>
+      <HeaderWrapper>
+        <Header />  
+      </HeaderWrapper>
+      <SideBar $isDark={isDarkMode} $isSidebarOpen={isSidebarOpen}>
+          <H3>Tags</H3>
+          <TagList>
+            {allTags.map((tag, index) => (
+              <TagItem key={index} $isDark={isDarkMode}>
+                {tag} <span>({tagCounts[tag]})</span>
+              </TagItem>
+            ))}
+          </TagList>
+          <VisitorWrapper>
+            <VisitorInfo $isDark={isDarkMode}>
+              Total <VisitNumber $isDark={isDarkMode}>{totalVisit.toLocaleString()}</VisitNumber>
+              Today <VisitNumber $isDark={isDarkMode}>{todayVisit.toLocaleString()}</VisitNumber>
+            </VisitorInfo>
+          </VisitorWrapper>
+      </SideBar>
+      <LayoutWrapper>
+        <UserProfile/>
+        <ToggleWrapper>
+          <ToggleButton onClick={() => setIsListView(!isListView)}>
+            {isListView ? <HiMiniSquares2X2 size={20} /> : <HiBars3 size={20} />}
+          </ToggleButton>
+        </ToggleWrapper>
+        {isListView ? 
+          (<ListView posts={posts}/>) : (<CardList posts={posts} />)}
+      </LayoutWrapper>
     </PageContainer>
   );
 };

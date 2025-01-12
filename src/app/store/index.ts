@@ -27,4 +27,4 @@ export type AppDispatch = typeof store.dispatch;
 export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
 
 // 공통 액션들을 외부에서 쉽게 import할 수 있도록 export
-export const { setToggle, setDarkMode, setPostState, setSearchFilter, setCategory, setSubCategory, initCommonState } = common.actions;
+export const { setToggle, setDarkMode, setPostState, setSearchFilter, initCommonState } = common.actions;

@@ -5,7 +5,8 @@ import Link from "next/link";
 import HeaderProfile from "./HeaderProfile";
 import { useDispatch } from "react-redux";
 import { RiKakaoTalkFill } from "react-icons/ri";
-import { HiOutlineMoon, HiOutlineSun, HiOutlineBell } from "react-icons/hi2";
+import { HiOutlineMoon, HiOutlineSun, HiOutlineBell, HiOutlineH1, HiBars3 } from "react-icons/hi2";
+import { commonAction } from "@/app/store/common";
 
 interface StyledProps {
     $isDark: boolean;
@@ -24,6 +25,7 @@ const Container = styled.div<StyledProps>`
   border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
   position: relative;
+  z-index: 10;
 `;
 
 const Inner = styled.div`
@@ -43,6 +45,21 @@ const Inner = styled.div`
 const Left = styled.div`
 	align-items: center;
 	gap: 10px;
+`;
+
+const SidebarToggleIcon = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 const Center = styled.div<StyledProps>`
@@ -107,26 +124,26 @@ const IconButton = styled.button<StyledProps>`
   border: none;
   border-radius: 50%;
   background-color: ${(props) =>
-    props.$isDark ? "#1e1e1e" : "#f9f9f9"}; /* 평소 배경색 */
+    props.$isDark ? "#1e1e1e" : "#f9f9f9"}; 
   color: ${(props) => (props.$isDark ? "#fff" : "#333")};
   cursor: pointer;
 
-  transition: background-color 0.3s ease, transform 0.2s ease; /* 애니메이션 추가 */
+  transition: background-color 0.3s ease, transform 0.2s ease; 
 
   &:hover {
     background-color: ${(props) =>
-      props.$isDark ? "#2a2a2a" : "#eaeaea"}; /* 살짝 강조된 배경색 */
-    transform: scale(1.05); /* 약간 확대 */
+      props.$isDark ? "#2a2a2a" : "#eaeaea"};
+    transform: scale(1.05); 
   }
 
   &:active {
-    transform: scale(0.95); /* 클릭 시 살짝 축소 */
+    transform: scale(0.95); 
   }
 
   box-shadow: ${(props) =>
     props.$isDark
-      ? "0px 2px 4px rgba(0, 0, 0, 0.5)" /* 다크 모드 섀도우 */
-      : "0px 2px 4px rgba(0, 0, 0, 0.1)"}; /* 라이트 모드 섀도우 */
+      ? "0px 2px 4px rgba(0, 0, 0, 0.5)" 
+      : "0px 2px 4px rgba(0, 0, 0, 0.1)"};
 `;
 
   
@@ -139,42 +156,50 @@ const KAKAO_LOGIN_URI = `https://kauth.kakao.com/oauth/authorize?response_type=c
 const Header = () => {
 	const dispatch = useDispatch();
 	const isLogged = useSelector((state) => state.common.isLogged);
-  const isDarkMode = useSelector((state) => state.common.isDark);
+	const isDarkMode = useSelector((state) => state.common.isDark);
+  const toggle = useSelector((state) => state.common.toggle);
 
 	const changeDarkMode = () => {
 			dispatch(setDarkMode(!isDarkMode));
 	};
 
 	const handleBellClick = () => {
-    alert("알림 버튼 클릭!");
-  };
+		alert("알림 버튼 클릭!");
+	};
+
+  const setToggle = (toggle: boolean) => {
+    dispatch(commonAction.setToggle(!toggle));
+  }
 
   return (
     <Container $isDark={isDarkMode}>
       <Inner>
         <Left>
+          <SidebarToggleIcon onClick={() => setToggle(toggle)}>
+            {toggle ? <HiOutlineH1 /> : <HiBars3 />}
+          </SidebarToggleIcon>
         </Left>
         <Center $isDark={isDarkMode}>
-					<Link href="/">
-            <div className="logo">
-              <div className="logo-icon"></div>
-              <span className="logo-text">Owl Dev.</span>
-            </div>
-          </Link>
+              <Link href="/">
+          <div className="logo">
+          <div className="logo-icon"></div>
+          <span className="logo-text">Owl Dev.</span>
+          </div>
+        </Link>
         </Center>
         <Right $isDark={isDarkMode}>
-					<IconButton $isDark={isDarkMode} onClick={changeDarkMode}>
-            {isDarkMode ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
-          </IconButton>
-					<IconButton $isDark={isDarkMode} onClick={handleBellClick}>
-						<HiOutlineBell size={20} />
-					</IconButton>
-					{!isLogged && 
-						<IconButton $isDark={isDarkMode} onClick={() => {window.location.href = KAKAO_LOGIN_URI;}} >
-							<RiKakaoTalkFill size={23}/>
-						</IconButton>
-					}
-          {isLogged && <HeaderProfile/>}
+              <IconButton $isDark={isDarkMode} onClick={changeDarkMode}>
+          {isDarkMode ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
+        </IconButton>
+              <IconButton $isDark={isDarkMode} onClick={handleBellClick}>
+                <HiOutlineBell size={20} />
+              </IconButton>
+              {!isLogged && 
+                <IconButton $isDark={isDarkMode} onClick={() => {window.location.href = KAKAO_LOGIN_URI;}} >
+                  <RiKakaoTalkFill size={23}/>
+                </IconButton>
+              }
+        {isLogged && <HeaderProfile/>}
         </Right>
       </Inner>
     </Container>
