@@ -8,20 +8,13 @@ import { UserProfile } from "./components/common/UserProfile";
 import { useEffect, useState } from "react";
 import { HiMiniSquares2X2, HiBars3 } from "react-icons/hi2";
 import ListView from "./components/list/ListView";
-import palette from "@/app/styles/palette";
-import { HiSearch } from "react-icons/hi";
 import { commonAction } from "./store/common";
 import { useDispatch } from "react-redux";
+import SideBar from "./components/sidebar/Sidebar";
 
 interface StyledProps {
 	$isDark: boolean;
 }
-
-interface SideBarProps {
-  $isDark: boolean;
-  $isSidebarOpen: boolean; 
-}
-
 
 const PageContainer = styled.div<StyledProps>`
   padding: 0;
@@ -75,120 +68,12 @@ const ToggleButton = styled.button`
   }
 `;
 
-const SideBar = styled.div<SideBarProps>`
-  position: fixed;
-  left: ${(props) => (props.$isSidebarOpen ? "0" : "-240px")};
-  width: 230px;
-  height: calc(100vh - 50px);
-  background-color: ${(props) => (props.$isDark ? "#444" : "#f9f9f9")};
-  border-right: 1px solid ${(props) => (props.$isDark ? "#555" : "#ddd")};
-  overflow-y: auto;
-  transition: left 0.3s ease;
-  z-index: 5; 
-  padding: 20px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const TagList = styled.ul`
-  list-style: none;
-  padding: 20px 0px;
-`;
-
-const H3 = styled.h3`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-`;
-
-const TagItem = styled.li<StyledProps>`
-  margin-bottom: 12px;
-  font-size: 16px;
-  font-weight: 500;
-  color: ${(props) => (props.$isDark ? "#fff" : "#333")};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:hover {
-    color: ${(props) => (props.$isDark ? "#ffcc00" : "#007bff")};
-    text-decoration: underline;
-    cursor: pointer;
-  };
-
-  span {
-    color: ${palette.green};
-    margin-left: 5px;
-  };
-`;
-
-const VisitorWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-
-const VisitorInfo = styled.div<StyledProps>`
-  width: 80%;
-  padding: 10px 0px;
-  border-radius: 10px;
-  background-color: ${(props) => (props.$isDark ? "#555" : "#f1f1f1")};
-  color: ${(props) => (props.$isDark ? "#fff": "#333")};
-  font-size: 14px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-`;
-
-const VisitNumber = styled.div<StyledProps>`
-  font-size: 14px;
-  color : ${(props) => (props.$isDark ? "#ffcc00" : "#007bff")};
-`;
-
-const SearchWrapper = styled.div`
-  padding: 0px;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  position: relative;
-`;
-
-const SearchIcon = styled(HiSearch)`
-  position: absolute;
-  left: 10px;
-  top:50px;
-  transform: translateY(-150%);
-  color: #ccc;
-  font-size: 20px;
-`;
-
-const SearchInput = styled.input<StyledProps>`
-  width: 100%;
-  height: 38px;
-  margin-top:10px;
-  margin-bottom: 20px;
-  padding: 0 10px 0 40px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size:16px;
-  color: ${(props) => (props.$isDark ? "#eee" : "#333")};
-  background-color: ${(props) => (props.$isDark ? "#444" : "fff")};
-  transition: background-color 0.3s, border-color 0.3s;
-
-  &:foucs {
-    outline: none;
-    border-color: #007bff;
-    background-color: ${(props) => (props.$isDark ? "#555" : "#f1f1f1")};
-  }
-`;
 
 const HomePage = () => {
   const dispatch = useDispatch();
+	const searchQuery = useSelector((state) => state.common.search);
   const isDarkMode = useSelector((state) => state.common.isDark);
-  const isSidebarOpen = useSelector((state) => state.common.toggle);
 	const [isListView, setIsListView] = useState(false); 
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const handleResize = () => {
@@ -274,17 +159,6 @@ const HomePage = () => {
     },
   ];
 
-  const tagCounts = posts
-    .flatMap((post) => post.tags)
-    .reduce((acc,tag) => {
-      acc[tag] = (acc[tag] || 0) + 1;
-      return acc;
-  }, {} as Record<string,number>);
-
-  const allTags = Object.keys(tagCounts);
-
-  const totalVisit = 472312;
-  const todayVisit = 54;
 
   const filteredPosts = searchQuery
     ? posts.filter((post) => 
@@ -297,31 +171,7 @@ const HomePage = () => {
       <HeaderWrapper>
         <Header />  
       </HeaderWrapper>
-      <SideBar $isDark={isDarkMode} $isSidebarOpen={isSidebarOpen}>
-        <SearchWrapper>
-          <SearchIcon/>
-          <SearchInput
-            $isDark={isDarkMode}
-            placeholder="검색어를 입력하세요"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            />
-        </SearchWrapper>
-          <H3>Tag List</H3>
-          <TagList>
-            {allTags.map((tag, index) => (
-              <TagItem key={index} $isDark={isDarkMode}>
-                {tag} <span>({tagCounts[tag]})</span>
-              </TagItem>
-            ))}
-          </TagList>
-          <VisitorWrapper>
-            <VisitorInfo $isDark={isDarkMode}>
-              Total <VisitNumber $isDark={isDarkMode}>{totalVisit.toLocaleString()}</VisitNumber>
-              Today <VisitNumber $isDark={isDarkMode}>{todayVisit.toLocaleString()}</VisitNumber>
-            </VisitorInfo>
-          </VisitorWrapper>
-      </SideBar>
+      <SideBar posts={posts} />
       <LayoutWrapper>
         <UserProfile/>
         <ToggleWrapper>

@@ -1,7 +1,6 @@
 import { Post } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import styled, { keyframes } from "styled-components";
-import Image from "next/image"; 
 
 interface StyledProps {
 	$isDark: boolean;

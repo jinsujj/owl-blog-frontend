@@ -8,6 +8,7 @@ export type Post = {
 	title: string;
 	summary: string;
 	updatedAt: string;
+	tags: string[];
 }
 
 export const createBlog = async (title:string, content: string) => {
