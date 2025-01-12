@@ -40,36 +40,36 @@ const ProfileDetails = styled.div`
   flex-direction: column;
 `;
 
-const ProfileName = styled.h2`
+const ProfileName = styled.h2<StyledProps>`
   font-size: 1.5rem;
   font-weight: bold;
-  color: #333;
+  color: ${(props) => (props.$isDark ? "#eee" : "#333")};
   margin-bottom: 5px;
 `;
 
-const ProfileStats = styled.div`
+const ProfileStats = styled.div<StyledProps>`
 	padding-top: 5px;
   display: flex;
   gap: 15px;
   font-size: 0.9rem;
-  color: #666;
+  color: ${(props) => (props.$isDark? "#bbb" : "#666")};
   margin-bottom: 10px;
 `;
 
-const FollowButton = styled.button`
+const FollowButton = styled.button<StyledProps>`
   margin-top: 10px;
   padding: 7px 20px;
-  border: 1px solid #4caf50;
-  background-color: #4caf50;
-  color: #fff;
+  border: 1px solid ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
+  background-color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
+  color: ${(props) => (props.$isDark ? "#333" : "#fff")};
   border-radius: 20px;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: transparent;
-    color: #4caf50;
+    background-color: ${(props) => (props.$isDark ? "#333" : "transparent")};
+    color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
   }
 `;
 
@@ -80,13 +80,16 @@ const TabContainer = styled.div`
   width: 100%;
 `;
 
-const TabButton = styled.button<{ $isActive: boolean }>`
+const TabButton = styled.button<{ $isActive: boolean , $isDark: boolean}>`
   flex: 1;
   text-align: center;
   padding: 10px 0;
   font-size: 1rem;
   font-weight: ${(props) => (props.$isActive ? "bold" : "normal")};
-  color: ${(props) => (props.$isActive ? "#4caf50" : "#666")};
+  color: ${(props) =>
+    props.$isActive
+      ? (props.$isDark ? "#88c57f" : "#4caf50")
+      : (props.$isDark ? "#bbb" : "#666")};
   border: none;
   border-bottom: ${(props) =>
     props.$isActive ? "3px solid #4caf50" : "3px solid transparent"};
@@ -95,7 +98,7 @@ const TabButton = styled.button<{ $isActive: boolean }>`
   transition: all 0.3s ease;
 
   &:hover {
-    color: #4caf50;
+    color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
   }
 `;
 
@@ -138,17 +141,17 @@ export const UserProfile = () => {
       <ProfileImageWrapper>
         <ProfileImage src="https://avatars.githubusercontent.com/u/19955904?v=4" alt="Profile" />
         <ProfileDetails>
-          <ProfileName>jinsujj</ProfileName>
-          <ProfileStats>
+          <ProfileName $isDark={isDarkMode}>jinsujj</ProfileName>
+          <ProfileStats $isDark={isDarkMode}>
             <span>3 팔로워</span>
             <span>0 팔로잉</span>
           </ProfileStats>
-          <FollowButton>팔로우</FollowButton>
+          <FollowButton $isDark={isDarkMode}>팔로우</FollowButton>
         </ProfileDetails>
       </ProfileImageWrapper>
       <TabContainer>
         {["글", "시리즈", "소개"].map((tab) => (
-          <TabButton
+          <TabButton $isDark={isDarkMode}
             key={tab}
             $isActive={activeTab === tab}
             onClick={() => setActiveTab(tab)}

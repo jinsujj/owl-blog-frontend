@@ -2,6 +2,7 @@ import React from "react";
 import Card from "./Card";
 import styled, { keyframes } from "styled-components";
 import { Post } from "@/app/api/blogApi";
+import { useSelector } from "@/app/store";
 
 const fadeIn = keyframes`
 	from {
@@ -29,6 +30,8 @@ interface CardListProps {
 }
 
 const CardList = ({posts}:CardListProps) => {
+  const isDarkMode = useSelector(state => state.common.isDark);
+
   return (
     <CardListContainer>
       {posts.map((post) => (

@@ -32,7 +32,7 @@ const ListViewContainer = styled.div<StyledProps>`
         gap:20px;
         padding: 15px;
         border-radius: 10px;
-        background-color: ${(props) => (props.$isDark? "#444" : "#fff")};
+        background-color: ${(props) => (props.$isDark? "#444" : "#FAFAFA")};
         box-shadow: 0 4px 6px rgba(0,0,0, 0.1);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
 
@@ -88,7 +88,7 @@ const ListView = ({posts}: ListViewProps) => {
         <ListViewContainer $isDark={isDarkMode}>
             {posts.map((post) => (
                 <div className="list-item" key={post.id}>
-                    <div className="thumbnail" style={{ backgroundImage: `url(${post.thumbnail})` }}/>
+                    <img className="thumbnail" src={post.thumbnail} alt={`Thumbnail of ${post.title}`} />
                     <div className="content">
                         <div className="title">{post.title}</div>
                         <div className="summary">	{post.summary.length > 250 ? `${post.summary.slice(0,250)}...` : post.summary}</div>

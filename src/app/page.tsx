@@ -134,7 +134,7 @@ const HomePage = () => {
 						</ToggleButton>
 					</ToggleWrapper>
           {isListView ? 
-          (<ListView posts={posts}/>) : (<CardList posts={posts} />)}
+            (<ListView posts={posts}/>) : (<CardList posts={posts} />)}
 				</Main>
 			</MainWrapper>
     </PageContainer>
