@@ -17,7 +17,7 @@ const initialState: CommonState = {
     isLogged: false,
     isDark: initDarkMode(),
     postState: "read",
-    toggle: false,
+    toggle: true,
     search: "",
 };
 

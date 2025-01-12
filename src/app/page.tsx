@@ -9,6 +9,7 @@ import { useState } from "react";
 import { HiMiniSquares2X2, HiBars3 } from "react-icons/hi2";
 import ListView from "./components/list/ListView";
 import palette from "@/app/styles/palette";
+import { HiSearch } from "react-icons/hi";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -75,7 +76,7 @@ const ToggleButton = styled.button`
 const SideBar = styled.div<SideBarProps>`
   position: fixed;
   left: ${(props) => (props.$isSidebarOpen ? "0" : "-240px")};
-  width: 180px;
+  width: 230px;
   height: calc(100vh - 50px);
   background-color: ${(props) => (props.$isDark ? "#444" : "#f9f9f9")};
   border-right: 1px solid ${(props) => (props.$isDark ? "#555" : "#ddd")};
@@ -83,6 +84,8 @@ const SideBar = styled.div<SideBarProps>`
   transition: left 0.3s ease;
   z-index: 5; 
   padding: 20px;
+  align-items: center;
+  justify-content: center;
 `;
 
 const TagList = styled.ul`
@@ -99,7 +102,7 @@ const H3 = styled.h3`
 
 const TagItem = styled.li<StyledProps>`
   margin-bottom: 12px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: ${(props) => (props.$isDark ? "#fff" : "#333")};
   display: flex;
@@ -121,9 +124,12 @@ const TagItem = styled.li<StyledProps>`
 const VisitorWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 const VisitorInfo = styled.div<StyledProps>`
+  width: 80%;
   padding: 10px 0px;
   border-radius: 10px;
   background-color: ${(props) => (props.$isDark ? "#555" : "#f1f1f1")};
@@ -138,10 +144,48 @@ const VisitNumber = styled.div<StyledProps>`
   color : ${(props) => (props.$isDark ? "#ffcc00" : "#007bff")};
 `;
 
+const SearchWrapper = styled.div`
+  padding: 0px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+`;
+
+const SearchIcon = styled(HiSearch)`
+  position: absolute;
+  left: 10px;
+  top:50px;
+  transform: translateY(-150%);
+  color: #ccc;
+  font-size: 20px;
+`;
+
+const SearchInput = styled.input<StyledProps>`
+  width: 100%;
+  height: 38px;
+  margin-top:10px;
+  margin-bottom: 20px;
+  padding: 0 10px 0 40px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size:16px;
+  color: ${(props) => (props.$isDark ? "#eee" : "#333")};
+  background-color: ${(props) => (props.$isDark ? "#444" : "fff")};
+  transition: background-color 0.3s, border-color 0.3s;
+
+  &:foucs {
+    outline: none;
+    border-color: #007bff;
+    background-color: ${(props) => (props.$isDark ? "#555" : "#f1f1f1")};
+  }
+`;
+
 const HomePage = () => {
   const isDarkMode = useSelector((state) => state.common.isDark);
   const isSidebarOpen = useSelector((state) => state.common.toggle);
 	const [isListView, setIsListView] = useState(false); 
+  const [searchQuery, setSearchQuery] = useState("");
 
 	const posts = [
     {
@@ -220,13 +264,28 @@ const HomePage = () => {
   const totalVisit = 472312;
   const todayVisit = 54;
 
+  const filteredPosts = searchQuery
+    ? posts.filter((post) => 
+        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))) 
+      : posts;
+
   return (
     <PageContainer $isDark={isDarkMode}>
       <HeaderWrapper>
         <Header />  
       </HeaderWrapper>
       <SideBar $isDark={isDarkMode} $isSidebarOpen={isSidebarOpen}>
-          <H3>Tags</H3>
+        <SearchWrapper>
+          <SearchIcon/>
+          <SearchInput
+            $isDark={isDarkMode}
+            placeholder="검색어를 입력하세요"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            />
+        </SearchWrapper>
+          <H3>Tag List</H3>
           <TagList>
             {allTags.map((tag, index) => (
               <TagItem key={index} $isDark={isDarkMode}>
@@ -249,7 +308,7 @@ const HomePage = () => {
           </ToggleButton>
         </ToggleWrapper>
         {isListView ? 
-          (<ListView posts={posts}/>) : (<CardList posts={posts} />)}
+          (<ListView posts={filteredPosts}/>) : (<CardList posts={filteredPosts} />)}
       </LayoutWrapper>
     </PageContainer>
   );
