@@ -5,7 +5,7 @@ import Link from "next/link";
 import HeaderProfile from "./HeaderProfile";
 import { useDispatch } from "react-redux";
 import { RiKakaoTalkFill } from "react-icons/ri";
-import { HiOutlineMoon, HiOutlineSun, HiOutlineBell, HiOutlineH1, HiBars3 } from "react-icons/hi2";
+import { HiOutlineMoon, HiOutlineSun, HiOutlineBell, HiBars2, HiBars3 } from "react-icons/hi2";
 import { commonAction } from "@/app/store/common";
 
 interface StyledProps {
@@ -176,7 +176,7 @@ const Header = () => {
       <Inner>
         <Left>
           <SidebarToggleIcon onClick={() => setToggle(toggle)}>
-            {toggle ? <HiOutlineH1 /> : <HiBars3 />}
+            {toggle ? <HiBars2 /> : <HiBars3 />}
           </SidebarToggleIcon>
         </Left>
         <Center $isDark={isDarkMode}>

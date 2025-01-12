@@ -91,10 +91,10 @@ const ListView = ({posts}: ListViewProps) => {
                     <Image
                         src={post.thumbnail || "/img/owl.svg"}
                         alt={`Thumbnail of ${post.title}`}
-                        width={200} // 적절한 크기를 지정하세요
-                        height={150} // 적절한 크기를 지정하세요
-                        layout="intrinsic" // 크기를 자동으로 조정
-                        priority={true} // 성능 최적화를 위해 우선 로드
+                        width={200} 
+                        height={150}
+                        layout="intrinsic" 
+                        priority={true} 
                         />
                     <div className="content">
                         <div className="title">{post.title}</div>
