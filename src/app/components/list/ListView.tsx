@@ -1,7 +1,7 @@
 import { Post } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import styled, { keyframes } from "styled-components";
-
+import Image from "next/image"; 
 
 interface StyledProps {
 	$isDark: boolean;
@@ -88,7 +88,14 @@ const ListView = ({posts}: ListViewProps) => {
         <ListViewContainer $isDark={isDarkMode}>
             {posts.map((post) => (
                 <div className="list-item" key={post.id}>
-                    <img className="thumbnail" src={post.thumbnail} alt={`Thumbnail of ${post.title}`} />
+                    <Image
+                        src={post.thumbnail || "/img/owl.svg"}
+                        alt={`Thumbnail of ${post.title}`}
+                        width={200} // 적절한 크기를 지정하세요
+                        height={150} // 적절한 크기를 지정하세요
+                        layout="intrinsic" // 크기를 자동으로 조정
+                        priority={true} // 성능 최적화를 위해 우선 로드
+                        />
                     <div className="content">
                         <div className="title">{post.title}</div>
                         <div className="summary">	{post.summary.length > 250 ? `${post.summary.slice(0,250)}...` : post.summary}</div>

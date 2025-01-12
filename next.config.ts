@@ -6,8 +6,11 @@ const nextConfig: NextConfig = {
 		CSS class stability: Generates consistent class names for server and client.
 		Improved performance: Faster compilation with SWC instead of Babel.
 	*/
-	compiler: {
+  compiler: {
     styledComponents: true,  
+  },
+  images: {
+    domains: ["backend.owl-dev.me"], // 외부 URL의 호스트네임 추가
   },
 };
 

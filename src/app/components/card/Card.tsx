@@ -77,7 +77,7 @@ const Card = ({ post }: CardProps) => {
   return (
     <Container $isDark={isDarkMode}>
       <a href={`/post/${post.id}`}>
-				<Thumbnail src={post.thumbnail} alt={`Thumbnail of ${post.title}`} />
+				<Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy"/>
         <CardContent>
 					<CardTitle $isDark={isDarkMode}>{post.title}</CardTitle>
 					<CardSummary $isDark={isDarkMode}>
