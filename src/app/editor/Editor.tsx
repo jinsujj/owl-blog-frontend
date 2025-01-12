@@ -20,10 +20,12 @@ import RawTool from '@editorjs/raw';
 import ImageTool from '@editorjs/image';
 import AttachesTool from '@editorjs/attaches';
 import { BlogOutputData } from '../types/editor';
+import { useSelector } from '../store';
 
 interface EditorContainerProps {
   $isReadOnly: boolean;
   $maxWidth: string;
+	$isDark:boolean;
 }
 
 export const EditorContainer = styled.div<EditorContainerProps>`
@@ -57,6 +59,14 @@ export const EditorContainer = styled.div<EditorContainerProps>`
 		text-align: center;
 		border: none;
 		color: ${palette.gray}
+	}
+
+	.ce-toolbar__plus {
+		color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
+	}
+
+	.ce-toolbar__settings-btn {
+		color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
 	}
 `;
 
@@ -93,6 +103,7 @@ interface EditorProps {
 }
 
 const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData, editorMaxWidth, onSave }) => {
+	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [title , setTitle] = useState('');
   const editorRef = useRef<EditorJS | null>(null);
 
@@ -123,34 +134,19 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData, editorMaxWidth
 				data: initialData,
 				autofocus: true,
 				tools: {
-					raw:{
-						class: RawTool,
-						shortcut: 'OPTION+R',
-					},
-					code:{
-						class: CodeTool,
-						shortcut: 'OPTION+C',
-					},
-					list: {
-						class: List as unknown as BlockToolConstructable,
-						inlineToolbar: true,
-						shortcut: 'OPTION+O', 
-					},
-					delimiter:{
-						class: Delimiter as unknown as BlockToolConstructable,
-						shortcut: 'OPTION+D', 
-					},
-					warning: {
-						class: Warning,
-						inlineToolbar: true,
-						shortcut: 'OPTION+W',
+					raw:{class: RawTool,shortcut: 'OPTION+R'},
+					code:{class: CodeTool,shortcut: 'OPTION+C'},
+					list: {class: List as unknown as BlockToolConstructable,inlineToolbar: true,shortcut: 'OPTION+O'},
+					delimiter:{class: Delimiter as unknown as BlockToolConstructable,shortcut: 'OPTION+D'},
+					embed: {class: Embed,config: {services: {youtube: true}}},
+					Marker: {class: Marker,shortcut: 'OPTION+M'},
+					warning: {class: Warning,inlineToolbar: true,shortcut: 'OPTION+W',
 						config: { 
 							titlePlaceholder: 'Title',
 							messagePlaceholder: 'Message',
 						},
 					},
-					image: {
-						class: ImageTool,
+					image: {class: ImageTool,
 						config: {
 							endpoints: {
 								byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
@@ -158,28 +154,12 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData, editorMaxWidth
 							}
 						}
 					},
-					embed: {
-						class: Embed,
-						config: {
-							services: {
-								youtube: true,
-							}
-						}
-					},
-					Marker: {
-						class: Marker,
-						shortcut: 'OPTION+M',
-					},
-					linkTool: {
-						class: LinkTool,
-						shortcut: 'OPTION+L',
+					linkTool: {class: LinkTool,shortcut: 'OPTION+L',
 						config: {
 							endpoint: 'https://api.microlink.io?url=', // Your backend endpoint for url data fetching,
 						},
 					},
-					table: {
-						class: Table as unknown as BlockToolConstructable,
-						shortcut: 'OPTION+T',
+					table: {class: Table as unknown as BlockToolConstructable,shortcut: 'OPTION+T', 
 						inlineToolbar: true,
 						config: {
 							rows: 2,
@@ -188,16 +168,12 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData, editorMaxWidth
 							maxCols: 5,
 						},
 					},
-					attaches: {
-						class: AttachesTool,
-						shortcut: 'OPTION+A',
+					attaches: {class: AttachesTool,shortcut: 'OPTION+A',
 						config: {
 							endpoint: 'http://localhost:8008/uploadFile'
 						}
 					},
-					header: {
-						class: Header as unknown as BlockToolConstructable,
-						shortcut: 'OPTION+H',
+					header: {class: Header as unknown as BlockToolConstructable,shortcut: 'OPTION+H',
 						config: {
 							levels: [1, 2, 3, 4, 5], 
 							defaultLevel: 2, 
@@ -234,7 +210,7 @@ const Editor: React.FC<EditorProps> = ({ isReadOnly, initialData, editorMaxWidth
 	
   return (
 		<>
-			<EditorContainer $isReadOnly={isReadOnly} $maxWidth={editorMaxWidth}>
+			<EditorContainer $isReadOnly={isReadOnly} $maxWidth={editorMaxWidth} $isDark={isDarkMode}>
 				<TitleInputWrapper>
 					<TitleInput 
 								type="text"

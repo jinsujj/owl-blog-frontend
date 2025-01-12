@@ -23,7 +23,7 @@ const PageContainer = styled.div<StyledProps>`
 	min-height: 100vh;
   font-family: Arial, sans-serif;
   background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
-  color: ${(props) => (props.$isDark ? "#fff" : "#333")};
+  color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
 `;
 
 const HeaderWrapper = styled.header`

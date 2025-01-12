@@ -21,6 +21,7 @@ const Container = styled.div<StyledProps>`
    min-height: 100vh;
 	 margin: 0 auto;
 	 background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
+	 color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
 `;
 
 const SliderWrapper = styled.div`
