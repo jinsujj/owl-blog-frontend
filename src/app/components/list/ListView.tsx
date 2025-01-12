@@ -77,6 +77,14 @@ const ListViewContainer = styled.div<StyledProps>`
     }
 `;
 
+export const Thumbnail = styled.img`
+  width: 200px;
+  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+`;
+
 interface ListViewProps {
   posts: Post[]; 
 }
@@ -88,14 +96,7 @@ const ListView = ({posts}: ListViewProps) => {
         <ListViewContainer $isDark={isDarkMode}>
             {posts.map((post) => (
                 <div className="list-item" key={post.id}>
-                    <Image
-                        src={post.thumbnail || "/img/owl.svg"}
-                        alt={`Thumbnail of ${post.title}`}
-                        width={200} 
-                        height={150}
-                        layout="intrinsic" 
-                        priority={true} 
-                        />
+                    <Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy"/>
                     <div className="content">
                         <div className="title">{post.title}</div>
                         <div className="summary">	{post.summary.length > 250 ? `${post.summary.slice(0,250)}...` : post.summary}</div>
