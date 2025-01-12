@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "caddy_mac": "caddy reverse-proxy --from localhost:3030 --to localhost:3000"
   },
   "dependencies": {
     "@editorjs/attaches": "^1.3.0",

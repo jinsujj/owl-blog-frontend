@@ -46,8 +46,8 @@ const ListViewContainer = styled.div<StyledProps>`
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 120px;
-        height: 120px;
+        max-width: 200px;
+        width: 100%;
         flex-shrink: 0;
         border-radius: 8px;
         background-size: cover;
