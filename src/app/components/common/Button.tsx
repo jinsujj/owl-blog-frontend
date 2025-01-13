@@ -5,7 +5,7 @@ import styled, { css } from "styled-components";
 interface StyledProps {
   width: string;
   color?: string;
-  variant?: "default" | "outlined" | "text";
+  $variant?: "default" | "outlined" | "text"; // $ 접두사 사용
 }
 
 const Container = styled.button<StyledProps>`
@@ -27,7 +27,7 @@ const Container = styled.button<StyledProps>`
   transition: all 0.3s ease;
 
   ${(props) =>
-    props.variant === "default" &&
+    props.$variant === "default" &&
     css`
       background: ${props.color || palette.blue};
       color: white;
@@ -40,7 +40,7 @@ const Container = styled.button<StyledProps>`
     `}
 
   ${(props) =>
-    props.variant === "outlined" &&
+    props.$variant === "outlined" &&
     css`
       background: transparent;
       color: ${props.color || palette.blue};
@@ -53,7 +53,7 @@ const Container = styled.button<StyledProps>`
     `}
 
   ${(props) =>
-    props.variant === "text" &&
+    props.$variant === "text" &&
     css`
       background: transparent;
       color: ${props.color || palette.blue};
@@ -85,7 +85,12 @@ const Button = ({
   ...props
 }: IProps) => {
   return (
-    <Container {...props} width={width} color={color} variant={variant}>
+    <Container
+      {...props}
+      width={width}
+      color={color}
+      $variant={variant} // $ 접두사로 변경
+    >
       {children}
     </Container>
   );
