@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import styled from 'styled-components';
 import Button from '../components/common/Button';
 import palette from '../styles/palette';
-import EditorJS, { BlockToolConstructable } from '@editorjs/editorjs';
+import EditorJS, { BlockToolConstructable, OutputData } from '@editorjs/editorjs';
 import CodeTool from '@editorjs/code';
 import Header from '@editorjs/header';
 import List from '@editorjs/list';
@@ -19,10 +19,8 @@ import Delimiter from '@editorjs/delimiter';
 import RawTool from '@editorjs/raw';
 import ImageTool from '@editorjs/image';
 import AttachesTool from '@editorjs/attaches';
-import { BlogOutputData } from '../types/editor';
 import { useSelector } from '../store';
-import { ThumbnailUploader } from '../components/editor/ThumbnailUploader';
-import { PostTitle } from '../components/editor/PostTitle';
+import { Thumbnail } from '../components/editor/Thumbnail';
 
 interface EditorContainerProps {
   $isReadOnly: boolean;
@@ -87,16 +85,15 @@ const BlogActionWrapper = styled.div`
 `;
 
 interface EditorProps {
-  initialData?: BlogOutputData;
+  initialData?: OutputData;
 	editorMaxWidth: string;
-  onSave?: (data: BlogOutputData) => void;
+  onSave?: (data: OutputData) => void;
+	isReadOnly: boolean;
 }
 
-const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave }) => {
+const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly }) => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
-	const [isReadOnly, setIsReadOnly] = useState(false);
   const editorRef = useRef<EditorJS | null>(null);
-	const [title, setTitle] = useState('');
 
   const renderHighlightedCode = () => {
     const editorElement = document.querySelector('#editorjs');
@@ -177,7 +174,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave }) 
     if (!editorRef.current) return;
 		
     const savedData = await editorRef.current.save();
-		const blog: BlogOutputData = {...savedData,title,}
+		const blog: OutputData = {...savedData,}
     if (onSave) onSave(blog);
   };
 
@@ -185,11 +182,10 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave }) 
   return (
 		<>
 			<EditorContainer $isReadOnly={isReadOnly} $maxwidth={editorMaxWidth} $isDark={isDarkMode}>
-				<PostTitle editorMaxWidth={editorMaxWidth} setTitle={setTitle} title={title} isReadOnly={isReadOnly} setIsReadOnly={setIsReadOnly}/>
 				<StyledEditor id="editorjs"></StyledEditor>
 				<BlogActionWrapper>
 					{!isReadOnly && (
-						<ThumbnailUploader editorMaxWidth={editorMaxWidth}/>
+						<Thumbnail editorMaxWidth={editorMaxWidth}/>
 					)}
 					{!isReadOnly && (
 						<Button onClick={handleSave} color={palette.blue} width='120px'>

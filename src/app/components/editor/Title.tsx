@@ -65,7 +65,7 @@ interface TitleProps {
 	setIsReadOnly:(isReadOnly: boolean) => void;
 }
 
-export const PostTitle :React.FC<TitleProps> = ({editorMaxWidth, title, isReadOnly, setTitle, setIsReadOnly}) => {
+export const Title :React.FC<TitleProps> = ({editorMaxWidth, title, isReadOnly, setTitle, setIsReadOnly}) => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
 
 	const toggleMode = () => {
@@ -76,7 +76,7 @@ export const PostTitle :React.FC<TitleProps> = ({editorMaxWidth, title, isReadOn
 		<TitleInputWrapper>
 			<TitleInput $isDark={isDarkMode}
 						type="text"
-						placeholder="제목을 입력하세요 ..."
+						placeholder="Write a Title..."
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
 						readOnly={isReadOnly}
@@ -89,4 +89,4 @@ export const PostTitle :React.FC<TitleProps> = ({editorMaxWidth, title, isReadOn
 	);
 }
 
-export default PostTitle;
+export default Title;

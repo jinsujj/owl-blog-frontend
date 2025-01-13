@@ -10,7 +10,7 @@ interface StyledProps {
 }
 
 const ThumbnailWrapper = styled.div<StyledProps>`
-  width: 50%;
+  width: 40%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -88,7 +88,7 @@ interface ThumbnailProps {
 	editorMaxWidth: string;
 }
 
-export const ThumbnailUploader: React.FC<ThumbnailProps>= ({editorMaxWidth}) => {
+export const Thumbnail: React.FC<ThumbnailProps>= ({editorMaxWidth}) => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [thumbnail, setThumbnail] = useState<string | null>(null);
 	const [fileName, setFileName] = useState<string>('선택된 파일 없음');
@@ -150,7 +150,7 @@ export const ThumbnailUploader: React.FC<ThumbnailProps>= ({editorMaxWidth}) => 
 					<RemoveThumbnailIcon $isDark={isDarkMode} onClick={handleRemoveThumbnail} />
 				)}
 			</ThumbnailInputWrapper>
-			<FileName $isDark={isDarkMode}>{truncateFileName(fileName, 40)}</FileName>
+			<FileName $isDark={isDarkMode}>{truncateFileName(fileName, 30)}</FileName>
 		</ThumbnailWrapper>
 	);
 };

@@ -4,7 +4,6 @@ import React, {useState} from "react";
 import palette from "../styles/palette";
 import WidthSlider from "../components/common/WidthSlder";
 import styled from "styled-components";
-import { BlogOutputData } from "../types/editor";
 import { createBlog } from "../api/blogApi";
 import dynamic from "next/dynamic";
 import useModal from "../hooks/useModal";
@@ -12,16 +11,24 @@ import MessageModal from "../components/modal/MessageModal";
 import Header from "../components/header/Header";
 import { useSelector } from "../store";
 import SideBar from "../components/sidebar/Sidebar";
+import { MultiValue } from "react-select";
+import Title from "../components/editor/Title";
+import { OutputData } from "@editorjs/editorjs";
 
 interface StyledProps {
 	$isDark: boolean;
 }
 
 const Container = styled.div<StyledProps>`
-   min-height: 100vh;
-	 margin: 0 auto;
-	 background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
-	 color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
+	min-height: 100vh;
+	margin: 0 auto;
+	background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
+	color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
+
+	// tags priorities
+	.css-1nmdiq5-menu {
+  	z-index: 100 !important;
+	}
 `;
 
 const SliderWrapper = styled.div`
@@ -31,22 +38,50 @@ const SliderWrapper = styled.div`
 	z-index: 1000;
 `;
 
+const TagsWrapper = styled.div<{ width:string }>`
+	display: columns;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto;
+	max-width: ${(props) => props.width};
+	padding-bottom: 10px;
+`;
+
+interface TagOption {
+  value: string;
+  label: string;
+}
+
 const Editor = dynamic(() => import("./Editor"), { ssr: false });
+const CreatableSelect = dynamic(() => import('react-select/creatable'), { ssr: false });
+
 
 const EditorPage: React.FC = () => {
+	const { openModal, closeModal, ModalPortal } = useModal();
   const isDarkMode = useSelector((state) => state.common.isDark);
+
 	const [modalMessage, setModalMessage] = useState('');
 	const [alertColor, setAlertColor] = useState('');
-	const [editorData, setEditorData] = useState<BlogOutputData>({title: '', version: undefined, time: undefined, blocks: []});
+
+	const [editorData, setEditorData] = useState<OutputData>({version: undefined, time: undefined, blocks: []});
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
-	const { openModal, closeModal, ModalPortal } = useModal();
 
-	const handleSave = async (data:BlogOutputData) => {
-		console.log("Saved Data:", data);
+	const [selectedTags, setSelectedTags] = useState<TagOption[]>();
+  const [availableTags, setAvailableTags] = useState<TagOption[]>([
+    { value: "React", label: "React" },
+    { value: "Next.js", label: "Next.js" },
+    { value: "UI", label: "UI" },
+    { value: "Spring", label: "Spring" },
+    { value: "리팩토링", label: "리팩토링" },
+  ]);
+
+	const [title, setTitle] = useState('');
+	const [isReadOnly, setIsReadOnly] = useState(false);
+
+	const handleSave = async (data: OutputData) => {
 		setEditorData(data);
-
-		const {title, blocks} = data;
-		const content = JSON.stringify(blocks);
+	
+		const content = JSON.stringify(data);
 
 		try{
 			const result = await createBlog(title, content);
@@ -66,6 +101,29 @@ const EditorPage: React.FC = () => {
 	const handleWidthChage = (width: number) =>{
 		setEditorMaxWidth(`${width}px`);
 	}
+
+	const handleTagChange = (newValue: MultiValue<TagOption>) => {
+    setSelectedTags(newValue as TagOption[]);
+  };
+
+  const handleCreateTag = (inputValue: string) => {
+		const newTag: TagOption = { value: inputValue, label: inputValue };
+		 // 기존 태그 목록에 새 태그 추가
+		setAvailableTags((prev) => {
+			if (!prev.some((tag) => tag.value === inputValue)) {
+				return [...prev, newTag];
+			}
+			return prev;
+		});
+	
+		// 선택된 태그 목록에 새 태그 추가
+		setSelectedTags((prev) => {
+			if (!prev?.some((tag) => tag.value === inputValue)) {
+				return [...(prev || []), newTag]; // prev가 undefined면 빈 배열 사용
+			}
+			return prev;
+		});
+	};
 
 	const posts = [
     {
@@ -132,8 +190,6 @@ const EditorPage: React.FC = () => {
     },
   ];
 
-
-
 	return (
     <Container $isDark={isDarkMode}>
 			<Header />
@@ -141,7 +197,58 @@ const EditorPage: React.FC = () => {
 				<MessageModal message={modalMessage} onClose={closeModal} color={alertColor} />
 			</ModalPortal>
 			<SideBar posts={posts} />
-      <Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} />
+			<TagsWrapper width={editorMaxWidth}>
+				<Title editorMaxWidth={editorMaxWidth} title={title} setTitle={setTitle} isReadOnly={isReadOnly} setIsReadOnly={setIsReadOnly}/>
+        <CreatableSelect
+					isMulti
+					options={availableTags}
+					value={selectedTags}
+					onChange={(newValue) => {
+						handleTagChange(newValue as MultiValue<TagOption>); 
+					}}
+					onCreateOption={handleCreateTag}
+					placeholder="Select or create tags..."
+					isClearable
+					menuPortalTarget={typeof window !== 'undefined' ? document.body : null} 
+					styles={{
+						control: (baseStyles) => ({
+							...baseStyles,
+							backgroundColor: isDarkMode ? "#333" : "#fff",
+							borderColor: isDarkMode ? "#555" : "#ccc",
+							color: isDarkMode ? "#ddd" : "#333",
+						}),
+						menu: (baseStyles) => ({
+							...baseStyles,
+							backgroundColor: isDarkMode ? "#444" : "#fff",
+							color: isDarkMode ? "#ddd" : "#333",
+						}),
+						option: (baseStyles, { isFocused }) => ({
+							...baseStyles,
+							backgroundColor: isFocused
+								? isDarkMode
+									? "#555"
+									: "#eee"
+								: isDarkMode
+								? "#444"
+								: "#fff",
+							color: isDarkMode ? "#ddd" : "#333",
+						}),
+						singleValue: (baseStyles) => ({
+							...baseStyles,
+							color: isDarkMode ? "#ddd" : "#333",
+						}),
+						multiValue: (baseStyles) => ({
+							...baseStyles,
+							backgroundColor: isDarkMode ? "#555" : "#eee",
+						}),
+						multiValueLabel: (baseStyles) => ({
+							...baseStyles,
+							color: isDarkMode ? "#ddd" : "#333",
+						}),
+					}}
+				/>
+      </TagsWrapper>
+      <Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} />
 			<SliderWrapper>
 				<WidthSlider defaultWidth={650} onWidthChange={handleWidthChage}/>
 			</SliderWrapper>
