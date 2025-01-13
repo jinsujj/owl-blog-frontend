@@ -19,7 +19,6 @@ const Divider = styled.div<StyledProps>`
   width: 80%;
   height: 1px;
   background-color: ${(props) => (props.$isDark ? "#555" : "#ddd")};
-  margin: 10px 0;
 `;
 
 

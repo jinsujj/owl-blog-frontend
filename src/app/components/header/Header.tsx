@@ -188,17 +188,17 @@ const Header = () => {
         </Link>
         </Center>
         <Right $isDark={isDarkMode}>
-              <IconButton $isDark={isDarkMode} onClick={changeDarkMode}>
+				<IconButton $isDark={isDarkMode} onClick={changeDarkMode}>
           {isDarkMode ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
         </IconButton>
-              <IconButton $isDark={isDarkMode} onClick={handleBellClick}>
-                <HiOutlineBell size={20} />
-              </IconButton>
-              {!isLogged && 
-                <IconButton $isDark={isDarkMode} onClick={() => {window.location.href = KAKAO_LOGIN_URI;}} >
-                  <RiKakaoTalkFill size={23}/>
-                </IconButton>
-              }
+				<IconButton $isDark={isDarkMode} onClick={handleBellClick}>
+					<HiOutlineBell size={20} />
+				</IconButton>
+				{!isLogged && 
+					<IconButton $isDark={isDarkMode} onClick={() => {window.location.href = KAKAO_LOGIN_URI;}} >
+						<RiKakaoTalkFill size={23}/>
+					</IconButton>
+				}
         {isLogged && <HeaderProfile/>}
         </Right>
       </Inner>
