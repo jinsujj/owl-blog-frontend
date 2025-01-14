@@ -29,6 +29,11 @@ const Container = styled.div<StyledProps>`
 	.css-1nmdiq5-menu {
   	z-index: 100 !important;
 	}
+	
+	.css-1cfo1cf {
+		color:  ${(props) => (props.$isDark ? "#ddd" : "#333")};
+	}
+	
 `;
 
 const SliderWrapper = styled.div`
