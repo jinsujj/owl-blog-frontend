@@ -23,9 +23,9 @@ import { useSelector } from '../store';
 import { Thumbnail } from '../components/editor/Thumbnail';
 
 interface EditorContainerProps {
-  $isReadOnly: boolean;
-  $maxwidth: string;
-	$isDark:boolean;
+	$isReadOnly: boolean;
+	$maxwidth: string;
+	$isDark: boolean;
 }
 
 export const EditorContainer = styled.div<EditorContainerProps>`
@@ -85,51 +85,52 @@ const BlogActionWrapper = styled.div`
 `;
 
 interface EditorProps {
-  initialData?: OutputData;
+	initialData?: OutputData;
 	editorMaxWidth: string;
-  onSave?: (data: OutputData) => void;
+	onSave?: (data: OutputData) => void;
 	isReadOnly: boolean;
 }
 
 const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly }) => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
-  const editorRef = useRef<EditorJS | null>(null);
+	const editorRef = useRef<EditorJS | null>(null);
 
-  const renderHighlightedCode = () => {
-    const editorElement = document.querySelector('#editorjs');
-    if (!editorElement) return;
+	const renderHighlightedCode = () => {
+		const editorElement = document.querySelector('#editorjs');
+		if (!editorElement) return;
 
-    const codeBlocks = editorElement.querySelectorAll('.ce-code__textarea');
-    codeBlocks.forEach((textarea) => {
-      const codeContent = (textarea as HTMLTextAreaElement).value;
-      const pre = document.createElement('pre');
-      const code = document.createElement('code');
+		const codeBlocks = editorElement.querySelectorAll('.ce-code__textarea');
+		codeBlocks.forEach((textarea) => {
+			const codeContent = (textarea as HTMLTextAreaElement).value;
+			const pre = document.createElement('pre');
+			const code = document.createElement('code');
 
-      code.textContent = codeContent;
-      hljs.highlightElement(code);
+			code.textContent = codeContent;
+			hljs.highlightElement(code);
 
-      pre.appendChild(code);
-      textarea.parentNode?.replaceChild(pre, textarea); // `<textarea>` -> `<pre>`
-    });
-  };
+			pre.appendChild(code);
+			textarea.parentNode?.replaceChild(pre, textarea); // `<textarea>` -> `<pre>`
+		});
+	};
 
-  useEffect(() => {    
+	useEffect(() => {
 		if (!editorRef.current) {
 			editorRef.current = new EditorJS({
 				holder: 'editorjs',
 				readOnly: isReadOnly,
-				placeholder :'Hello world!',
+				placeholder: 'Hello world!',
 				data: initialData,
 				autofocus: true,
 				tools: {
-					raw:{class: RawTool,shortcut: 'OPTION+R'},
-					code:{class: CodeTool,shortcut: 'OPTION+C'},
-					list: {class: List as unknown as BlockToolConstructable,inlineToolbar: true,shortcut: 'OPTION+O'},
-					delimiter:{class: Delimiter as unknown as BlockToolConstructable,shortcut: 'OPTION+D'},
-					embed: {class: Embed,config: {services: {youtube: true}}},
-					Marker: {class: Marker,shortcut: 'OPTION+M'},
-					warning: {class: Warning,inlineToolbar: true,shortcut: 'OPTION+W', config: { titlePlaceholder: 'Title',messagePlaceholder: 'Message',},},
-					image: {class: ImageTool,
+					raw: { class: RawTool, shortcut: 'OPTION+R' },
+					code: { class: CodeTool, shortcut: 'OPTION+C' },
+					list: { class: List as unknown as BlockToolConstructable, inlineToolbar: true, shortcut: 'OPTION+O' },
+					delimiter: { class: Delimiter as unknown as BlockToolConstructable, shortcut: 'OPTION+D' },
+					embed: { class: Embed, config: { services: { youtube: true } } },
+					Marker: { class: Marker, shortcut: 'OPTION+M' },
+					warning: { class: Warning, inlineToolbar: true, shortcut: 'OPTION+W', config: { titlePlaceholder: 'Title', messagePlaceholder: 'Message', }, },
+					image: {
+						class: ImageTool,
 						config: {
 							endpoints: {
 								byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
@@ -137,55 +138,68 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 							}
 						}
 					},
-					linkTool: {class: LinkTool,shortcut: 'OPTION+L',
-						config: {endpoint: 'https://api.microlink.io?url=',}
+					linkTool: {
+						class: LinkTool, shortcut: 'OPTION+L',
+						config: { endpoint: 'https://api.microlink.io?url=', }
 					},
-					table: {class: Table as unknown as BlockToolConstructable,shortcut: 'OPTION+T', 
+					table: {
+						class: Table as unknown as BlockToolConstructable, shortcut: 'OPTION+T',
 						inlineToolbar: true,
-						config: {rows: 2,cols: 3,maxRows: 5,maxCols: 5,},
+						config: { rows: 2, cols: 3, maxRows: 5, maxCols: 5, },
 					},
-					attaches: {class: AttachesTool,shortcut: 'OPTION+A',
-						config: {endpoint: 'http://localhost:8008/uploadFile'}
+					attaches: {
+						class: AttachesTool, shortcut: 'OPTION+A',
+						config: { endpoint: 'http://localhost:8008/uploadFile' }
 					},
-					header: {class: Header as unknown as BlockToolConstructable,shortcut: 'OPTION+H',
-						config: {levels: [1, 2, 3, 4, 5], defaultLevel: 2, placeholder: 'Write a header',},
+					header: {
+						class: Header as unknown as BlockToolConstructable, shortcut: 'OPTION+H',
+						config: { levels: [1, 2, 3, 4, 5], defaultLevel: 2, placeholder: 'Write a header', },
 						sanitize: {
-							level: true, 
+							level: true,
 						},
 					},
 				},
 				onReady: () => {
 					if (isReadOnly) {
-						renderHighlightedCode(); 
+						renderHighlightedCode();
 					}
 				},
 			});
-	}
+		}
 
-    return () => {
-      if (editorRef.current && typeof editorRef.current.destroy === "function") {
-        editorRef.current.destroy();
-        editorRef.current = null;
-      }
-    };
-  }, [isReadOnly, initialData]);
+		return () => {
+			if (editorRef.current && typeof editorRef.current.destroy === "function") {
+				editorRef.current.destroy();
+				editorRef.current = null;
+			}
+		};
+	}, []);
 
-  const handleSave = async () => {
-    if (!editorRef.current) return;
-		
-    const savedData = await editorRef.current.save();
-		const blog: OutputData = {...savedData,}
-    if (onSave) onSave(blog);
-  };
+	useEffect(() => {
+		if (editorRef.current) {
+			editorRef.current.readOnly?.toggle(isReadOnly);
+			if (isReadOnly) {
+				renderHighlightedCode();
+			}
+		}
+	}, [isReadOnly]);
 
-	
-  return (
+	const handleSave = async () => {
+		if (!editorRef.current) return;
+
+		const savedData = await editorRef.current.save();
+		const blog: OutputData = { ...savedData, }
+		if (onSave) onSave(blog);
+	};
+
+
+	return (
 		<>
 			<EditorContainer $isReadOnly={isReadOnly} $maxwidth={editorMaxWidth} $isDark={isDarkMode}>
 				<StyledEditor id="editorjs"></StyledEditor>
 				<BlogActionWrapper>
 					{!isReadOnly && (
-						<Thumbnail editorMaxWidth={editorMaxWidth}/>
+						<Thumbnail editorMaxWidth={editorMaxWidth} />
 					)}
 					{!isReadOnly && (
 						<Button onClick={handleSave} color={palette.blue} width='120px'>
@@ -195,7 +209,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 				</BlogActionWrapper>
 			</EditorContainer>
 		</>
-  );
+	);
 };
 
 export default Editor;
