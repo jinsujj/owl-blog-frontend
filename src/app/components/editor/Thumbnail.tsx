@@ -4,6 +4,8 @@ import { FaTimes } from "react-icons/fa";
 import { useState } from "react";
 import Image from 'next/image';
 import { useSelector } from "../../store";
+import useModal from "@/app/hooks/useModal";
+import ConfirmModal from "../modal/ConfirmModal";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -16,7 +18,7 @@ const ThumbnailWrapper = styled.div<StyledProps>`
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: ${(props) =>props.$isDark ? palette.darkGray : palette.lightGray}; 
+  background-color: ${(props) => props.$isDark ? palette.darkGray : palette.lightGray}; 
   border: 1px solid ${(props) => (props.$isDark ? palette.gray : palette.darkGray)};
   border-radius: 8px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -27,7 +29,7 @@ const ThumbnailWrapper = styled.div<StyledProps>`
   }
 `;
 
-const ThumbnailPreview = styled.div<{maxwidth: string}>`
+const ThumbnailPreview = styled.div<{ maxwidth: string }>`
 	width: 90%;
 	max-width: ${(props) => props.maxwidth || '200px'};
 	margin-bottom: 10px;
@@ -47,7 +49,7 @@ const ThumbnailInputWrapper = styled.div`
 	justify-content: center;
 `;
 
-const RemoveThumbnailIcon = styled(FaTimes)<StyledProps>`
+const RemoveThumbnailIcon = styled(FaTimes) <StyledProps>`
   color: ${(props) => (props.$isDark ? palette.lightGray : palette.gray)};
   font-size: 20px; 
   cursor: pointer;
@@ -88,10 +90,21 @@ interface ThumbnailProps {
 	editorMaxWidth: string;
 }
 
-export const Thumbnail: React.FC<ThumbnailProps>= ({editorMaxWidth}) => {
+export const Thumbnail: React.FC<ThumbnailProps> = ({ editorMaxWidth }) => {
+	const { openModal, closeModal, ModalPortal } = useModal();
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [thumbnail, setThumbnail] = useState<string | null>(null);
 	const [fileName, setFileName] = useState<string>('선택된 파일 없음');
+	const modalMessage = '해당 이미지를 삭제하시겠습니까?';
+
+	const handleConfirm = () => {
+		setThumbnail(null);
+		setFileName('선택된 파일 없음');
+	}
+
+	const handleCancel = () => {
+		console.log("cancel");
+	}
 
 	const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -108,23 +121,23 @@ export const Thumbnail: React.FC<ThumbnailProps>= ({editorMaxWidth}) => {
 		}
 	};
 
-	const handleRemoveThumbnail = () => {
-		setThumbnail(null);
-		setFileName('선택된 파일 없음'); 
-	};
-
 	const truncateFileName = (fileName: string, maxLength: number): string => {
 		if (fileName.length <= maxLength) return fileName;
-	
-		const fileExtension = fileName.substring(fileName.lastIndexOf('.')); 
-		const baseName = fileName.substring(0, fileName.lastIndexOf('.')); 
-	
-		const truncatedBaseName = baseName.slice(0, maxLength - fileExtension.length - 3); 
+
+		const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+		const baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+
+		const truncatedBaseName = baseName.slice(0, maxLength - fileExtension.length - 3);
 		return `${truncatedBaseName}...${fileExtension}`;
 	};
 
+
+
 	return (
 		<ThumbnailWrapper $isDark={isDarkMode}>
+			<ModalPortal>
+				<ConfirmModal message={modalMessage} onClose={closeModal} onConfirm={handleConfirm} onCancel={handleCancel} />
+			</ModalPortal>
 			{thumbnail && (
 				<ThumbnailPreview maxwidth={editorMaxWidth}>
 					<Image
@@ -147,7 +160,7 @@ export const Thumbnail: React.FC<ThumbnailProps>= ({editorMaxWidth}) => {
 					{thumbnail ? 'Change Thumbnail' : 'Upload Thumbnail'}
 				</ThumbnailLabel>
 				{thumbnail && (
-					<RemoveThumbnailIcon $isDark={isDarkMode} onClick={handleRemoveThumbnail} />
+					<RemoveThumbnailIcon $isDark={isDarkMode} onClick={openModal} />
 				)}
 			</ThumbnailInputWrapper>
 			<FileName $isDark={isDarkMode}>{truncateFileName(fileName, 30)}</FileName>
