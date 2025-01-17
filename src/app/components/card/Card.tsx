@@ -81,7 +81,7 @@ const Card = ({ post }: CardProps) => {
         <CardContent>
 					<CardTitle $isDark={isDarkMode}>{post.title}</CardTitle>
 					<CardSummary $isDark={isDarkMode}>
-						{post.summary.length > 100 ? `${post.summary.slice(0,100)}...` : post.summary}
+						{post.summary?.length > 100 ? `${post.summary.slice(0,100)}...` : post.summary}
 					</CardSummary>
 					<CardDate $isDark={isDarkMode} dateTime={post.updatedAt}>
 						Updated: {new Date(post.updatedAt).toLocaleDateString()}
