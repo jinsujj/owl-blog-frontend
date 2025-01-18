@@ -56,7 +56,6 @@ function ExternalScripts() {
       <Script 
         src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js" 
         strategy="lazyOnload" />
-      <Script src="/js/summernote-ext-syntax.js" strategy="lazyOnload" />
       {/* Google Analytics */}
       <Script 
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} 

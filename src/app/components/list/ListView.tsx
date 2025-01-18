@@ -1,5 +1,6 @@
 import { Post } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
+import Link from "next/link";
 import styled, { keyframes } from "styled-components";
 
 interface StyledProps {
@@ -95,12 +96,14 @@ const ListView = ({posts}: ListViewProps) => {
         <ListViewContainer $isDark={isDarkMode}>
             {posts.map((post) => (
                 <div className="list-item" key={post.id}>
+									<Link href={`/blog/${post.id}`}>
                     <Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy"/>
                     <div className="content">
                         <div className="title">{post.title}</div>
-                        <div className="summary">	{post.summary.length > 250 ? `${post.summary.slice(0,250)}...` : post.summary}</div>
+                        <div className="summary">	{post.summary?.length > 250 ? `${post.summary.slice(0,250)}...` : post.summary}</div>
                         <div className="meta">Updated at: {post.updatedAt}</div>
                     </div>
+									</Link>
                 </div>
             ))}
         </ListViewContainer>

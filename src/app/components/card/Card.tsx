@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Post } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
+import Link from "next/link";
 
 interface StyledProps {
   $isDark: boolean;
@@ -76,7 +77,7 @@ const Card = ({ post }: CardProps) => {
   const isDarkMode = useSelector(state => state.common.isDark);
   return (
     <Container $isDark={isDarkMode}>
-      <a href={`/post/${post.id}`}>
+      <Link href={`/blog/${post.id}`}>
 				<Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy"/>
         <CardContent>
 					<CardTitle $isDark={isDarkMode}>{post.title}</CardTitle>
@@ -87,7 +88,7 @@ const Card = ({ post }: CardProps) => {
 						Updated: {new Date(post.updatedAt).toLocaleDateString()}
 					</CardDate>
 				</CardContent>
-      </a>
+      </Link>
     </Container>
   );
 };
