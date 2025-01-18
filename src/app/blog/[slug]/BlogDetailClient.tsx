@@ -85,8 +85,7 @@ const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post }) => {
 		};
 
 		fetchBlogTags();
-		console.log(selectedTags);
-	},[post.id, selectedTags])
+	},[post.id])
 		
   return (
     <Container $isDark={isDarkMode}>
