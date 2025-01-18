@@ -1,9 +1,10 @@
-import { Post } from "@/app/api/blogApi";
+import { getBlogSummary, PostSummary } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import styled from "styled-components";
 import { TagList } from "./TagList";
 import VisitorBox from "./VisitorBox";
 import { SearchBox } from "./SearchBox";
+import { useEffect, useState } from "react";
 
 interface SideBarStyledProps {
   $isDark: boolean;
@@ -25,18 +26,29 @@ const SideBarContainer = styled.div<SideBarStyledProps>`
 	justify-content: center;
 `;
 
-interface SideBarProps {
-	posts: Post[]; 
-}
 
-export const SideBar= ({posts}:SideBarProps) => {
+export const SideBar= () => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const isSidebarOpen = useSelector((state) => state.common.toggle);
+	const [postSummary, setPostSummary] = useState<PostSummary[]>([]);
+
+	useEffect(() => {
+			const fetchPosts = async () => {
+				try {
+					const posts = await getBlogSummary();
+					setPostSummary(posts);
+				} catch (error) {
+					console.error("Failed to fetch posts:", error);
+				}
+			};
+		
+			fetchPosts();
+		}, []);
 
 	return (
 		<SideBarContainer $isDark={isDarkMode} $isSidebarOpen={isSidebarOpen}>
 			<SearchBox/>
-			<TagList posts={posts}/>
+			<TagList posts={postSummary}/>
 			<VisitorBox/>
 		</SideBarContainer>
 	)

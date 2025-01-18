@@ -203,7 +203,7 @@ const HomePage = () => {
       <HeaderWrapper>
         <Header />  
       </HeaderWrapper>
-      <SideBar posts={posts} />
+      <SideBar/>
       <LayoutWrapper width={editorMaxWidth}>
         <UserProfile/>
         <ToggleWrapper>

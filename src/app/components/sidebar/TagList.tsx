@@ -1,4 +1,4 @@
-import { Post } from "@/app/api/blogApi";
+import { PostSummary } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import palette from "@/app/styles/palette";
 import styled from "styled-components";
@@ -57,7 +57,7 @@ const TagItem = styled.li<StyledProps>`
 
 
 interface TagListProps {
-	posts: Post[];
+	posts: PostSummary[];
 }
 
 export const TagList =({posts}: TagListProps) => {

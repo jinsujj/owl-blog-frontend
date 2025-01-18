@@ -207,7 +207,7 @@ const EditorPage: React.FC = () => {
 			<ModalPortal>
 				<MessageModal message={modalMessage} onClose={closeModal} color={alertColor} />
 			</ModalPortal>
-			<SideBar posts={posts} />
+			<SideBar/>
 			<TagsWrapper width={editorMaxWidth}>
 				<Title editorMaxWidth={editorMaxWidth} title={title} setTitle={setTitle} isReadOnly={isReadOnly} setIsReadOnly={setIsReadOnly} />
 				<CreatableSelect
