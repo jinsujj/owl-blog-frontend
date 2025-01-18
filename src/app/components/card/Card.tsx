@@ -1,38 +1,65 @@
 import React from "react";
 import styled from "styled-components";
-import { Post } from "@/app/api/blogApi";
+import { PostSummary } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import Link from "next/link";
 
 interface StyledProps {
-  $isDark: boolean;
+	$isDark: boolean;
+	$isPublished?: boolean;
 }
 
-export const Container = styled.li<StyledProps>`
-  background: ${(props) => (props.$isDark ? "#444" : "#FAFAFA")};
-  border: ${(props) => (props.$isDark ? "1px solid #555" : "1px solid #ddd")};
-  border-radius: 10px;
-  overflow: hidden;
-  width: 250px;
-  box-shadow: ${(props) =>
-    props.$isDark
-      ? "0 2px 5px rgba(0, 0, 0, 0.4)"
-      : "0 2px 5px rgba(0, 0, 0, 0.1)"};
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+const Container = styled.li<StyledProps>`
+	background: ${(props) =>
+		props.$isPublished
+			? props.$isDark
+				? "#666"
+				: "#F5F5F5" :
+			props.$isDark
+				? "#444"
+				: "#FAFAFA"};
+	border: ${(props) =>
+		props.$isPublished
+			? props.$isDark
+				? "1px dashed #666"
+				: "1px dashed #bbb"
+			: props.$isDark
+				? "1px solid #555"
+				: "1px solid #ddd"
+	};
+	border-radius: 10px;
+	overflow: hidden;
+	width: 250px;
+	box-shadow: ${(props) =>
+		props.$isPublished
+			? props.$isDark
+				? "0 2px 5px rgba(0, 0, 0, 0.2)"
+				: "0 2px 5px rgba(0, 0, 0, 0.05)"
+			: props.$isDark
+				? "0 2px 5px rgba(0, 0, 0, 0.4)"
+				: "0 2px 5px rgba(0, 0, 0, 0.1)"
+	};
+	opacity: ${(props) => (props.$isPublished ? "0.6" : "1")};
+	transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
 
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: ${(props) =>
-      props.$isDark
-        ? "0 4px 10px rgba(0, 0, 0, 0.6)"
-        : "0 4px 10px rgba(0, 0, 0, 0.2)"};
-  }
+	&:hover {
+		transform: translateY(-5px);
+		box-shadow: ${(props) =>
+		props.$isPublished
+			? props.$isDark
+				? "0 4px 10px rgba(0, 0, 0, 0.4)"
+				: "0 4px 10px rgba(0, 0, 0, 0.1)" :
+			props.$isDark
+				? "0 4px 10px rgba(0, 0, 0, 0.6)"
+				: "0 4px 10px rgba(0, 0, 0, 0.2)"
+	};
+	}
 
-  a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
+	a {
+		text-decoration: none;
+		color: inherit;
+		display: block;
+	}
 `;
 
 export const Thumbnail = styled.img`
@@ -51,7 +78,7 @@ export const CardContent = styled.div`
 export const CardTitle = styled.h3<StyledProps>`
   font-size: 1.2rem;
   margin-bottom: 10px;
-  color: ${(props) => (props.$isDark? "#eee" : "#333")};
+  color: ${(props) => (props.$isDark ? "#eee" : "#333")};
 `;
 
 export const CardSummary = styled.p<StyledProps>`
@@ -60,7 +87,7 @@ export const CardSummary = styled.p<StyledProps>`
 	-webkit-line-clamp: 5; 
 	text-overflow: ellipsis;
 	word-wrap: break-word;
-  color: ${(props) => (props.$isDark? "#aaa" : "999")};
+  color: ${(props) => (props.$isDark ? "#aaa" : "999")};
 `;
 
 export const CardDate = styled.time<StyledProps>`
@@ -70,27 +97,27 @@ export const CardDate = styled.time<StyledProps>`
 
 
 interface CardProps {
-  post: Post;
+	post: PostSummary;
 }
 
 const Card = ({ post }: CardProps) => {
-  const isDarkMode = useSelector(state => state.common.isDark);
-  return (
-    <Container $isDark={isDarkMode}>
-      <Link href={`/blog/${post.id}`}>
-				<Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy"/>
-        <CardContent>
+	const isDarkMode = useSelector(state => state.common.isDark);
+	return (
+		<Container $isDark={isDarkMode} $isPublished={!!!post.publishedAt}>
+			<Link href={`/blog/${post.id}`}>
+				<Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy" />
+				<CardContent>
 					<CardTitle $isDark={isDarkMode}>{post.title}</CardTitle>
 					<CardSummary $isDark={isDarkMode}>
-						{post.summary?.length > 100 ? `${post.summary.slice(0,100)}...` : post.summary}
+						{post.summary?.length > 100 ? `${post.summary.slice(0, 100)}...` : post.summary}
 					</CardSummary>
 					<CardDate $isDark={isDarkMode} dateTime={post.updatedAt}>
 						Updated: {new Date(post.updatedAt).toLocaleDateString()}
 					</CardDate>
 				</CardContent>
-      </Link>
-    </Container>
-  );
+			</Link>
+		</Container>
+	);
 };
 
 export default Card;

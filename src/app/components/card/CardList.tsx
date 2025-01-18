@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "./Card";
 import styled, { keyframes } from "styled-components";
-import { Post } from "@/app/api/blogApi";
+import { PostSummary } from "@/app/api/blogApi";
 
 const fadeIn = keyframes`
 	from {
@@ -25,7 +25,7 @@ export const CardListContainer = styled.ul`
 `;
 
 interface CardListProps {
-  posts: Post[]; 
+  posts: PostSummary[]; 
 }
 
 const CardList = ({posts}:CardListProps) => {

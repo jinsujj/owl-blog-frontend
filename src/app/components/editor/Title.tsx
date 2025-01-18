@@ -24,7 +24,8 @@ const TitleInput = styled.input<{width: string, $isDark:boolean}>`
   background-color: ${(props) => (props.$isDark ? "#333" : "#fff")} !important; 
 	width: 100%;
 	max-width: ${(props) => props.width};
-	font-size: 24px;
+	font-size: 32px;
+	font-weight: bold;
 	padding: 10px;
 	border: none;
 	border-radius: 4px;

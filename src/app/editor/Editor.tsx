@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import styled from 'styled-components';
@@ -21,6 +20,7 @@ import ImageTool from '@editorjs/image';
 import AttachesTool from '@editorjs/attaches';
 import { useSelector } from '../store';
 import { Thumbnail } from '../components/editor/Thumbnail';
+import { useEffect, useMemo, useRef } from 'react';
 
 interface EditorContainerProps {
 	$isReadOnly: boolean;
@@ -28,7 +28,7 @@ interface EditorContainerProps {
 	$isDark: boolean;
 }
 
-export const EditorContainer = styled.div<EditorContainerProps>`
+const EditorContainer = styled.div<EditorContainerProps>`
 	max-width: ${(props) => props.$maxwidth};
 	margin: 0 auto;
 	width: 100%;
@@ -95,6 +95,18 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const editorRef = useRef<EditorJS | null>(null);
 
+	const parsedInitialData = useMemo(() => {
+    if (typeof initialData === 'string') {
+      try {
+        return JSON.parse(initialData);
+      } catch (error) {
+        console.error('Error parsing initialData:', error);
+        return null;
+      }
+    }
+    return initialData;
+  }, [initialData]);
+
 	const renderHighlightedCode = () => {
 		const editorElement = document.querySelector('#editorjs');
 		if (!editorElement) return;
@@ -114,66 +126,63 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 	};
 
 	useEffect(() => {
-		if (!editorRef.current) {
-			editorRef.current = new EditorJS({
-				holder: 'editorjs',
-				readOnly: isReadOnly,
-				placeholder: 'Hello world!',
-				data: initialData,
-				autofocus: true,
-				tools: {
-					raw: { class: RawTool, shortcut: 'OPTION+R' },
-					code: { class: CodeTool, shortcut: 'OPTION+C' },
-					list: { class: List as unknown as BlockToolConstructable, inlineToolbar: true, shortcut: 'OPTION+O' },
-					delimiter: { class: Delimiter as unknown as BlockToolConstructable, shortcut: 'OPTION+D' },
-					embed: { class: Embed, config: { services: { youtube: true } } },
-					Marker: { class: Marker, shortcut: 'OPTION+M' },
-					warning: { class: Warning, inlineToolbar: true, shortcut: 'OPTION+W', config: { titlePlaceholder: 'Title', messagePlaceholder: 'Message', }, },
-					image: {
-						class: ImageTool,
-						config: {
-							endpoints: {
-								byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
-								byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
+		const initEditor = async () => {
+			if (!editorRef.current && parsedInitialData) {
+				editorRef.current = new EditorJS({
+					holder: 'editorjs',
+					readOnly: isReadOnly,
+					placeholder: 'Hello world!',
+					data: parsedInitialData,
+					autofocus: true,
+					tools: {
+						raw: { class: RawTool, shortcut: 'OPTION+R' },
+						code: { class: CodeTool, shortcut: 'OPTION+C' },
+						list: { class: List as unknown as BlockToolConstructable, inlineToolbar: true, shortcut: 'OPTION+O' },
+						delimiter: { class: Delimiter as unknown as BlockToolConstructable, shortcut: 'OPTION+D' },
+						embed: { class: Embed, config: { services: { youtube: true } } },
+						Marker: { class: Marker, shortcut: 'OPTION+M' },
+						warning: { class: Warning, inlineToolbar: true, shortcut: 'OPTION+W', config: { titlePlaceholder: 'Title', messagePlaceholder: 'Message', }, },
+						image: {
+							class: ImageTool,
+							config: {
+								endpoints: {
+									byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
+									byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
+								}
 							}
-						}
-					},
-					linkTool: {
-						class: LinkTool, shortcut: 'OPTION+L',
-						config: { endpoint: 'https://api.microlink.io?url=', }
-					},
-					table: {
-						class: Table as unknown as BlockToolConstructable, shortcut: 'OPTION+T',
-						inlineToolbar: true,
-						config: { rows: 2, cols: 3, maxRows: 5, maxCols: 5, },
-					},
-					attaches: {
-						class: AttachesTool, shortcut: 'OPTION+A',
-						config: { endpoint: 'http://localhost:8008/uploadFile' }
-					},
-					header: {
-						class: Header as unknown as BlockToolConstructable, shortcut: 'OPTION+H',
-						config: { levels: [1, 2, 3, 4, 5], defaultLevel: 2, placeholder: 'Write a header', },
-						sanitize: {
-							level: true,
+						},
+						linkTool: {
+							class: LinkTool, shortcut: 'OPTION+L',
+							config: { endpoint: 'https://api.microlink.io?url=', }
+						},
+						table: {
+							class: Table as unknown as BlockToolConstructable, shortcut: 'OPTION+T',
+							inlineToolbar: true,
+							config: { rows: 2, cols: 3, maxRows: 5, maxCols: 5, },
+						},
+						attaches: {
+							class: AttachesTool, shortcut: 'OPTION+A',
+							config: { endpoint: 'http://localhost:8008/uploadFile' }
+						},
+						header: {
+							class: Header as unknown as BlockToolConstructable, shortcut: 'OPTION+H',
+							config: { levels: [1, 2, 3, 4, 5], defaultLevel: 2, placeholder: 'Write a header', },
+							sanitize: {
+								level: true,
+							},
 						},
 					},
-				},
-				onReady: () => {
-					if (isReadOnly) {
-						renderHighlightedCode();
-					}
-				},
-			});
-		}
-
-		return () => {
-			if (editorRef.current && typeof editorRef.current.destroy === "function") {
-				editorRef.current.destroy();
-				editorRef.current = null;
+					onReady: () => {
+						if (isReadOnly) {
+							renderHighlightedCode();
+						}
+					},
+				});
+				await editorRef.current.isReady;
 			}
 		};
-	}, []);
+		initEditor();
+	}, [parsedInitialData]);
 
 	useEffect(() => {
 		if (editorRef.current) {

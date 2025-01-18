@@ -201,6 +201,7 @@ const EditorPage: React.FC = () => {
 	// 	},
 	// ];
 
+
 	return (
 		<Container $isDark={isDarkMode}>
 			<Header />

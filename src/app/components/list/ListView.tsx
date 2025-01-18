@@ -1,10 +1,11 @@
-import { Post } from "@/app/api/blogApi";
+import { PostSummary } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import Link from "next/link";
 import styled, { keyframes } from "styled-components";
 
 interface StyledProps {
 	$isDark: boolean;
+	$isPublished?: boolean;
 }
 
 const fadeIn = keyframes`
@@ -28,86 +29,115 @@ const ListViewContainer = styled.div<StyledProps>`
 
     .list-item {
         display: flex;
-        align-items: center;
-        gap:20px;
+        align-items: center; 
+        gap: 20px;
         padding: 15px;
         border-radius: 10px;
-        background-color: ${(props) => (props.$isDark? "#444" : "#FAFAFA")};
-        box-shadow: 0 4px 6px rgba(0,0,0, 0.1);
+        background-color: ${(props) => (props.$isDark ? "#444" : "#FAFAFA")};
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
 
         &:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0, 0.15);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
-    }
-
-    .thumbnail {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        max-width: 200px;
-        width: 100%;
-        flex-shrink: 0;
-        border-radius: 8px;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        box-shadow: 0 2px 4px rgba(0,0,0 0.1);
-        margin-bottom: -2px;
-    }
-
-    .content {
-        flex-grow: 18px;
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: ${(props: StyledProps) => (props.$isDark ? "#fff": "#333")};
-    }
-
-    .summary {
-        font-size: 14px;
-        line-height: 1.4;
-        color: ${(props: StyledProps) => (props.$isDark ? "#ddd" : "#666") };
-    }
-
-    .meta {
-        font-size: 12px ;
-        color: ${(props: StyledProps) => (props.$isDark ? "#aaa" : "#999")};
-        margin-top: 10px;
     }
 `;
 
-export const Thumbnail = styled.img`
+const ListItem = styled.div<StyledProps>`
+	display: flex;
+	align-items: center; 
+	gap: 20px;
+	padding: 15px;
+	border-radius: 10px;
+	background-color: ${(props) =>
+		props.$isPublished
+			? props.$isDark
+				? "#444"
+				: "#FAFAFA"
+			: props.$isDark
+				? "#666"
+				: "#F5F5F5"
+	};
+
+	box-shadow: ${(props) =>
+		props.$isPublished
+			? props.$isDark
+				? "0 2px 5px rgba(0, 0, 0, 0.4)"
+				: "0 2px 5px rgba(0, 0, 0, 0.1)"
+			: props.$isDark
+				? "0 2px 5px rgba(0, 0, 0, 0.2)"
+				: "0 2px 5px rgba(0, 0, 0, 0.05)"
+
+	};
+	opacity: ${(props) => (props.$isPublished ? "0.6" : "1")};
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+	&:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+	}
+`;
+
+const Thumbnail = styled.img`
   width: 200px;
+  height: 120px;
   object-fit: cover;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 8px;
 `;
 
+const Content = styled.div<StyledProps>`
+	display: flex;
+	flex-direction: column; 
+	gap: 10px;
+	flex-grow: 1; 
+	color: ${(props: StyledProps) => (props.$isDark ? "#fff" : "#333")};
+`;
+
+const Title = styled.div<StyledProps>`
+	font-weight: bold;
+	font-size: 18px; 
+	color: ${(props: StyledProps) => (props.$isDark ? "#fff" : "#333")};
+`;
+
+const Summary = styled.div<StyledProps>`
+	font-size: 14px;
+	line-height: 1.6;
+	color: ${(props: StyledProps) => (props.$isDark ? "#ddd" : "#666")};
+`;
+
+const Meta = styled.div<StyledProps>`
+	font-size: 12px;
+	color: ${(props: StyledProps) => (props.$isDark ? "#aaa" : "#999")};
+`;
+
+
 interface ListViewProps {
-  posts: Post[]; 
+	posts: PostSummary[];
 }
 
-const ListView = ({posts}: ListViewProps) => {
-    const isDarkMode = useSelector((state) => state.common.isDark);
-    
-    return (
-        <ListViewContainer $isDark={isDarkMode}>
-            {posts.map((post) => (
-                <div className="list-item" key={post.id}>
-									<Link href={`/blog/${post.id}`}>
-                    <Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy"/>
-                    <div className="content">
-                        <div className="title">{post.title}</div>
-                        <div className="summary">	{post.summary?.length > 250 ? `${post.summary.slice(0,250)}...` : post.summary}</div>
-                        <div className="meta">Updated at: {post.updatedAt}</div>
-                    </div>
-									</Link>
-                </div>
-            ))}
-        </ListViewContainer>
-    )
+const ListView = ({ posts }: ListViewProps) => {
+	const isDarkMode = useSelector((state) => state.common.isDark);
+
+	return (
+		<ListViewContainer $isDark={isDarkMode}>
+			{posts.map((post) => (
+				<Link href={`/blog/${post.id}`} key={post.id}>
+					<ListItem $isDark={isDarkMode} $isPublished={!!!post.publishedAt} key={post.id}>
+						<Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy" />
+						<Content $isDark={isDarkMode}>
+							<Title $isDark={isDarkMode}>{post.title}</Title>
+							<Summary $isDark={isDarkMode}>{post.summary?.length > 250 ? `${post.summary.slice(0, 250)}...` : post.summary}</Summary>
+							<Meta $isDark={isDarkMode}>Updated at: {post.updatedAt}</Meta>
+						</Content>
+					</ListItem>
+				</Link>
+			))}
+		</ListViewContainer>
+	)
 }
 
 export default ListView;

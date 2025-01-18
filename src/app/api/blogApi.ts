@@ -16,6 +16,7 @@ export type Post = {
 	summary: string;
 	createdAt: string;
 	updatedAt: string;
+	publishedAt: string;
 	tags: TagOption[];
 }
 
@@ -25,6 +26,7 @@ export type PostSummary = {
 	title: string;
 	summary: string;
 	updatedAt: string;
+	publishedAt: string;
 	tags: TagOption[];
 }
 
