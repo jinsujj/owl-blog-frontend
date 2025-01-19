@@ -48,14 +48,15 @@ const TagsWrapper = styled.div<{ width: string }>`
 `;
 
 
-interface BlogDetailClientProps {
+interface BlogDetailProps {
   post: Post;
 }
 
-const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post }) => {
+const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [selectedTags, setSelectedTags] = useState<TagOption[]>();
+	const [isReadOnly, setIsReadOnly] = useState(false);
 
 	const handleWidthChage = (width: number) => {
 		setEditorMaxWidth(`${width}px`);
@@ -66,10 +67,6 @@ const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post }) => {
 	}
 
 	const setTitle = () => {
-		console.log("nothing work");
-	}
-
-	const setIsReadOnly = () => {
 		console.log("nothing work");
 	}
 
@@ -92,7 +89,7 @@ const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post }) => {
 			<Header />
 			<SideBar/>
 			<TagsWrapper width={editorMaxWidth}>
-				<Title editorMaxWidth={editorMaxWidth} title={post.title} setTitle={setTitle} isReadOnly={true} setIsReadOnly={setIsReadOnly} />
+				<Title editorMaxWidth={editorMaxWidth} title={post.title} setTitle={setTitle} isReadOnly={isReadOnly} setIsReadOnly={setIsReadOnly} />
 				<CreatableSelect
 									isMulti
 									isDisabled={true}
@@ -138,7 +135,7 @@ const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post }) => {
 									}}
 								/>
 			</TagsWrapper>
-			<Editor initialData={post?.content} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={true} />
+			<Editor initialData={post?.content} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly}/>
 			<SliderWrapper>
 				<WidthSlider defaultWidth={650} onWidthChange={handleWidthChage} />
 			</SliderWrapper>
@@ -146,4 +143,4 @@ const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post }) => {
   );
 };
 
-export default BlogDetailClient;
+export default BlogDetail;

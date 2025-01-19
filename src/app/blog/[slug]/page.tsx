@@ -1,6 +1,6 @@
 import { getBlogById } from "@/app/api/blogApi";
-import BlogDetailClient from "./BlogDetailClient";
 import { NotPublishedPage } from "./NotPublishedPage";
+import BlogDetail from "./BlogDetail";
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -14,5 +14,5 @@ export default async function BlogDetailPage({params}: BlogDetailPageProps) {
     return <NotPublishedPage/>;
   }
 
-  return <BlogDetailClient post={post} />;
+  return <BlogDetail post={post} />;
 }
