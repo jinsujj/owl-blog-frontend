@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useSelector } from "../../store";
 import useModal from "@/app/hooks/useModal";
 import ConfirmModal from "../modal/ConfirmModal";
+import { removeThumbnail, uploadThumbnail } from "@/app/api/thumbnailApi";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -97,7 +98,14 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ editorMaxWidth }) => {
 	const [fileName, setFileName] = useState<string>('선택된 파일 없음');
 	const modalMessage = '해당 이미지를 삭제하시겠습니까?';
 
-	const handleConfirm = () => {
+	const handleConfirm = async () => {
+		try{
+		const newLocal = removeThumbnail(fileName);
+		console.log(newLocal);
+		}
+		catch(error){
+			console.log(error);
+		}
 		setThumbnail(null);
 		setFileName('선택된 파일 없음');
 	}
@@ -106,11 +114,11 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ editorMaxWidth }) => {
 		console.log("cancel");
 	}
 
-	const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
+			// preview
 			setFileName(file.name);
-			console.log(file);
 			const reader = new FileReader();
 			reader.onload = () => {
 				if (typeof reader.result === 'string') {
@@ -118,6 +126,14 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ editorMaxWidth }) => {
 				}
 			};
 			reader.readAsDataURL(file);
+
+			try{
+				const response = await uploadThumbnail(file);
+				console.log('Upload successful:', response);
+			} catch(error){
+				console.error('Upload failed:', error);
+				throw error;
+			}
 		}
 	};
 
@@ -143,7 +159,6 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ editorMaxWidth }) => {
 					<Image
 						src={thumbnail}
 						alt="Thumbnail preview"
-						layout="responsive"
 						width={400}
 						height={200}
 					/>
