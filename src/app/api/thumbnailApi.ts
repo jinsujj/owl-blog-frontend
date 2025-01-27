@@ -10,7 +10,7 @@ const apiClient = axios.create({
   },
 });
 
-export const uploadThumbnail = async (file: File):Promise<any> => {
+export const uploadThumbnail = async (file: File):Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
     for (const pair of formData.entries()) {

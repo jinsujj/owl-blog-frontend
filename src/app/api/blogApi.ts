@@ -99,6 +99,24 @@ export const getBlogById = async (id: string): Promise<Post | undefined> => {
   }
 };
 
+
+export const getTagsAll = async(): Promise<TagOption[] | undefined> => {
+	try{
+		const response = await axios.get(`${BASE_URL}/blogs/tags`);
+		if(response.status == 200)
+			return response.data;
+
+		else {
+			console.log("Blog Tags not found");
+			return undefined; 
+		}
+	}
+	catch(error){
+		console.error("Error fetching tags: "+ error);
+		return undefined;
+	}
+}
+
 export const getTagsByBlogId = async (id: string): Promise<TagOption[] | undefined> => {
 	try{
 		const response = await axios.get(`${BASE_URL}/blogs/${id}/tags`);
@@ -107,7 +125,7 @@ export const getTagsByBlogId = async (id: string): Promise<TagOption[] | undefin
 
 		else {
 			console.log("Blog Tags not found");
-      return undefined; 
+			return undefined; 
 		}
 	}
 	catch(error){

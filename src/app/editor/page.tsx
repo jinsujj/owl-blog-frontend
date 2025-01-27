@@ -4,16 +4,19 @@ import React, { useState } from "react";
 import palette from "../styles/palette";
 import WidthSlider from "../components/common/WidthSlder";
 import styled from "styled-components";
-import { createBlog, TagOption } from "../api/blogApi";
+import { createBlog } from "../api/blogApi";
 import dynamic from "next/dynamic";
 import useModal from "../hooks/useModal";
 import MessageModal from "../components/modal/MessageModal";
 import Header from "../components/header/Header";
 import { useSelector } from "../store";
 import SideBar from "../components/sidebar/Sidebar";
-import { MultiValue } from "react-select";
+import { ActionMeta, MultiValue } from "react-select";
 import Title from "../components/editor/Title";
 import { OutputData } from "@editorjs/editorjs";
+import { useEffect } from 'react';
+import { getTagsAll, TagOption } from "@/app/api/blogApi";
+
 
 interface StyledProps {
 	$isDark: boolean;
@@ -52,7 +55,7 @@ const TagsWrapper = styled.div<{ width: string }>`
 `;
 
 const Editor = dynamic(() => import("./Editor"), { ssr: false });
-const CreatableSelect = dynamic(() => import('react-select/creatable'), { ssr: false });
+const CreatableSelect = dynamic(() => import('react-select/creatable'), { ssr: false }) as typeof import('react-select/creatable').default;
 
 
 const EditorPage: React.FC = () => {
@@ -69,14 +72,8 @@ const EditorPage: React.FC = () => {
 	// blog
 	const [editorData, setEditorData] = useState<OutputData>({ version: undefined, time: undefined, blocks: [] });
 	const [title, setTitle] = useState('');
-	const [selectedTags, setSelectedTags] = useState<TagOption[]>();
-	const [availableTags, setAvailableTags] = useState<TagOption[]>([
-		{ name: "React", label: "React" },
-		{ name: "Next.js", label: "Next.js" },
-		{ name: "UI", label: "UI" },
-		{ name: "Spring", label: "Spring" },
-		{ name: "리팩토링", label: "리팩토링" },
-	]);
+	const [availableTags, setAvailableTags] = useState<TagOption[]>([]);
+	const [selectedTags, setSelectedTags] = useState<TagOption[]>([]);
 
 
 	const handleSave = async (data: OutputData) => {
@@ -115,26 +112,65 @@ const EditorPage: React.FC = () => {
 		setEditorMaxWidth(`${width}px`);
 	}
 
-	const handleTagChange = (newValue: MultiValue<TagOption>) => {
-		setSelectedTags(newValue as TagOption[]);
-	};
 
 	const handleCreateTag = (inputValue: string) => {
 		const newTag: TagOption = { name: inputValue, label: inputValue };
-		setAvailableTags((prev) => {
-			if (!prev.some((tag) => tag.name === inputValue)) {
-				return [...prev, newTag];
-			}
-			return prev;
-		});
-
-		setSelectedTags((prev) => {
-			if (!prev?.some((tag) => tag.name === inputValue)) {
-				return [...(prev || []), newTag]; // prev가 undefined면 빈 배열 사용
-			}
-			return prev;
-		});
+		setAvailableTags((prev) => [...(prev || []) ,newTag]);
+		setSelectedTags((prev) => [...(prev || []), newTag]);
 	};
+
+	useEffect(() => {
+		const tagsAll = async () => {
+			try {
+				const tags = await getTagsAll()||[];
+				setAvailableTags((prev) => {
+					const newTags = tags.filter(
+						(tag) => !prev.some((existingTag) => existingTag.name === tag.name)
+					);
+					return [...prev, ...newTags];
+				});
+			}
+			catch (error) {
+				console.error("Failed to fetch tags: " + error);
+			}
+		}
+		tagsAll();
+	},[]);
+
+
+	const handleTagChange = (newValue: MultiValue<TagOption>, actionMeta: ActionMeta<TagOption>) => {
+		switch (actionMeta.action) {
+			case "select-option": {
+				console.log("Tag selected:", newValue);
+				setSelectedTags(newValue as TagOption[]);
+				setAvailableTags((prev) =>
+					prev?.filter((tag) => !(newValue as TagOption[]).some((selectedTag) => selectedTag.name === tag.name))
+				);
+				break;
+			}
+			case "remove-value": {
+				console.log("New value from react-select (newValue):", actionMeta.removedValue);
+				setSelectedTags((prev) => prev?.filter((tag) => tag.name !== actionMeta.removedValue?.name));
+				setAvailableTags((prev) => {
+					const removedTag = actionMeta.removedValue;
+					if (removedTag) {
+						return [...(prev || []), removedTag];
+					}
+					return prev;
+				});
+				break;
+			}
+			case "clear": {
+				console.log("All tags cleared");
+				setSelectedTags([]);
+				setAvailableTags((prev) => [...(prev || []), ...(selectedTags || [])]);
+				break;
+			}
+		}
+	};
+
+
+
 
 	// const posts = [
 	// 	{
@@ -213,12 +249,12 @@ const EditorPage: React.FC = () => {
 				<Title editorMaxWidth={editorMaxWidth} title={title} setTitle={setTitle} isReadOnly={isReadOnly} setIsReadOnly={setIsReadOnly} />
 				<CreatableSelect
 					isMulti
-					options={availableTags}
 					value={selectedTags}
-					onChange={(newValue) => {
-						handleTagChange(newValue as MultiValue<TagOption>);
-					}}
+					onChange={(newValue, actionMeta) => handleTagChange(newValue as MultiValue<TagOption>, actionMeta as ActionMeta<TagOption>)}
 					onCreateOption={handleCreateTag}
+					options={availableTags}
+					getOptionValue={(option) => option.name} 
+					getOptionLabel={(option) => option.label}
 					placeholder="Select or create tags..."
 					isClearable
 					menuPortalTarget={typeof window !== 'undefined' ? document.body : null}
