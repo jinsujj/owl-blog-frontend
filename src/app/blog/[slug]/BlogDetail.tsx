@@ -188,7 +188,12 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 						multiValueLabel: (baseStyles) => ({
 							...baseStyles,
 							color: isDarkMode ? "#ddd" : "#333",
+							paddingRight: isReadOnly ? "8px" : "1pxC",
 						}),
+						multiValueRemove: (baseStyles) => ({
+							...baseStyles,
+							display: isReadOnly ? "none" : "flex", 
+						})
 					}}
 				/>
 			</TagsWrapper>
