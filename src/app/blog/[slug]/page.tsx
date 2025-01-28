@@ -10,7 +10,7 @@ export default async function BlogDetailPage({params}: BlogDetailPageProps) {
 	const { slug } = await params;
   const post = await getBlogById(slug);
 
-	if (!post) {
+	if (post == null) {
     return <NotPublishedPage/>;
   }
 

@@ -37,7 +37,7 @@ function FontLinks() {
 
 
 function ExternalScripts() {
-  const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID || '';
+  // const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID || '';
   const NAVER_MAP_CLIENT_ID = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '';
 
   return (
@@ -57,10 +57,10 @@ function ExternalScripts() {
         src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js" 
         strategy="lazyOnload" />
       {/* Google Analytics */}
-      <Script 
+      {/* <Script 
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} 
-        strategy="afterInteractive" />
-      <Script id="google-analytics" strategy="afterInteractive">
+        strategy="afterInteractive" /> */}
+      {/* <Script id="google-analytics" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -68,12 +68,12 @@ function ExternalScripts() {
           gtag('config', '${GA_TRACKING_ID}', {
             page_path: window.location.pathname,
           });
-        `}</Script>
+        `}</Script> */}
       {/* Google AdSense */}
-      <Script 
+      {/* <Script 
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2309486098831986" 
         strategy="afterInteractive" 
-        crossOrigin="anonymous" />
+        crossOrigin="anonymous" /> */}
       {/* Naver Map */}
       <Script 
         src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${NAVER_MAP_CLIENT_ID}`} 

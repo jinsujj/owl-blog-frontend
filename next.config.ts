@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
   },
   images: {
     domains: ["backend.owl-dev.me"], // 외부 URL의 호스트네임 추가
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080', 
+        pathname: '/images/**',
+      },
+    ],
   },
 };
 

@@ -26,9 +26,8 @@ const Container = styled.div<StyledProps>`
 	background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
 	color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
 
-	// tags priorities
-	.css-1nmdiq5-menu {
-  	z-index: 100 !important;
+	.css-1nmdiq5-menu { 
+  		z-index: 100 !important; // tags priorities
 	}
 
 	.css-1cfo1cf {
@@ -97,12 +96,12 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		}
 		try{
 			const result = await updateBlog(post.id, title, content, imageUrl, selectedTags);
-			setModalMessage("Blog update successfully!");
+			setModalMessage("Blog update successfully! "+ result.id);
 			setAlertColor(palette.green);
 			openModal();
 		}
 		catch(error){
-			setModalMessage("Failed to update blog. Please try again.");
+			setModalMessage("Failed to update blog. Please try again. "+ error);
 			setAlertColor(palette.red);
 			openModal();
 		}

@@ -96,12 +96,12 @@ const EditorPage: React.FC = () => {
 
 		try {
 			const result = await createBlog(title, content, imageUrl, selectedTags || []);
-			setModalMessage("Blog created successfully!");
+			setModalMessage("Blog created successfully! "+ result.id);
 			setAlertColor(palette.green);
 			openModal();
 		}
 		catch (error) {
-			setModalMessage("Failed to create blog. Please try again.");
+			setModalMessage("Failed to create blog. Please try again. "+ error);
 			setAlertColor(palette.red);
 			openModal();
 		}
