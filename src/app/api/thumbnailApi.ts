@@ -10,13 +10,13 @@ const apiClient = axios.create({
   },
 });
 
-export const uploadThumbnail = async (file: File):Promise<string> => {
+export interface thumbnailResponse {
+  fileUrl: string;
+}
+
+export const uploadThumbnail = async (file: File):Promise<thumbnailResponse> => {
     const formData = new FormData();
     formData.append('file', file);
-    for (const pair of formData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-    }
-
     try{
         const response = await apiClient.post(`/files/upload`,formData);
         return response.data;

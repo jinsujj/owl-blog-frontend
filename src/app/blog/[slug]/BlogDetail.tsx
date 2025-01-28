@@ -1,12 +1,16 @@
 "use client";
 
-import { getTagsAll, getTagsByBlogId, Post, TagOption } from "@/app/api/blogApi";
+import { getTagsAll, getTagsByBlogId, Post, TagOption, updateBlog } from "@/app/api/blogApi";
 import WidthSlider from "@/app/components/common/WidthSlder";
 import Title from "@/app/components/editor/Title";
 import Header from "@/app/components/header/Header";
+import MessageModal from "@/app/components/modal/MessageModal";
 import SideBar from "@/app/components/sidebar/Sidebar";
 import Editor from "@/app/editor/Editor";
+import useModal from "@/app/hooks/useModal";
 import { useSelector } from "@/app/store";
+import palette from "@/app/styles/palette";
+import { OutputData } from "@editorjs/editorjs";
 import { useEffect, useState } from "react";
 import { ActionMeta, MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
@@ -26,7 +30,7 @@ const Container = styled.div<StyledProps>`
 	.css-1nmdiq5-menu {
   	z-index: 100 !important;
 	}
-	
+
 	.css-1cfo1cf {
 		color:  ${(props) => (props.$isDark ? "#ddd" : "#333")};
 	}
@@ -54,29 +58,66 @@ interface BlogDetailProps {
 }
 
 const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
+	// modal 
+	const {openModal, closeModal, ModalPortal} = useModal();
+	const [modalMessage, setModalMessage] = useState('');
+	const [alertColor, setAlertColor] = useState('');
+
+	// state 
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
+	const [isReadOnly, setIsReadOnly] = useState(false);
 	const isDarkMode = useSelector((state) => state.common.isDark);
+
+	// blog 
+	const [title, setTitle] = useState('');
+	const [editorData, setEditordata] = useState<OutputData>();
 	const [availableTags, setAvailableTags] = useState<TagOption[]>();
 	const [selectedTags, setSelectedTags] = useState<TagOption[]>();
-	const [isReadOnly, setIsReadOnly] = useState(false);
-	const [title, setTitle] = useState('');
+	const [imageUrl, setImageUrl] = useState<string>('');
 
 	const handleWidthChage = (width: number) => {
 		setEditorMaxWidth(`${width}px`);
 	}
 
-	const handleSave = () => {
+	const handleSave = async (data : OutputData) => {
+		setEditordata(data);
+		const content = JSON.stringify(data);
+
+		if(title.length == 0){
+			setModalMessage("제목이 비어있습니다.");
+			setAlertColor(palette.red);
+			openModal();
+			return;
+		}
+		if(data.blocks.length == 0){
+			setModalMessage("내용이 비어있습니다.");
+			setAlertColor(palette.red);
+			openModal();
+			return;
+		}
+		try{
+			const result = await updateBlog(post.id, title, content, imageUrl, selectedTags);
+			setModalMessage("Blog update successfully!");
+			setAlertColor(palette.green);
+			openModal();
+		}
+		catch(error){
+			setModalMessage("Failed to update blog. Please try again.");
+			setAlertColor(palette.red);
+			openModal();
+		}
 	}
 
 
 	useEffect(() => {
 		setTitle(post.title);
+		setEditordata(post.content);
+		setImageUrl(post.thumbnailUrl);
 
 		const tagsAll = async () => {
 			try {
 				const availableTags = await getTagsAll();
 				setAvailableTags(availableTags);
-				console.log(availableTags);
 			}
 			catch (error) {
 				console.error("Failed to fetch tags: " + error);
@@ -100,7 +141,6 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	const handleTagChange = (newValue: MultiValue<TagOption>, actionMeta: ActionMeta<TagOption>) => {
 		switch (actionMeta.action) {
 			case "select-option": {
-				console.log("Tag selected:", newValue);
 				setSelectedTags(newValue as TagOption[]);
 				setAvailableTags((prev) =>
 					prev?.filter((tag) => !(newValue as TagOption[]).some((selectedTag) => selectedTag.name === tag.name))
@@ -108,7 +148,6 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 				break;
 			}
 			case "remove-value": {
-				console.log("New value from react-select (newValue):", actionMeta.removedValue);
 				setSelectedTags((prev) => prev?.filter((tag) => tag.name !== actionMeta.removedValue?.name));
 				setAvailableTags((prev) => {
 					const removedTag = actionMeta.removedValue;
@@ -120,7 +159,6 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 				break;
 			}
 			case "clear": {
-				console.log("All tags cleared");
 				setSelectedTags([]);
 				setAvailableTags((prev) => [...(prev || []), ...(selectedTags || [])]);
 				break;
@@ -139,6 +177,9 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	return (
 		<Container $isDark={isDarkMode}>
 			<Header />
+			<ModalPortal>
+				<MessageModal message={modalMessage} onClose={closeModal} color={alertColor}/>
+			</ModalPortal>
 			<SideBar />
 			<TagsWrapper width={editorMaxWidth}>
 				<Title editorMaxWidth={editorMaxWidth} title={title} setTitle={setTitle} isReadOnly={isReadOnly} setIsReadOnly={setIsReadOnly} />
@@ -197,7 +238,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 					}}
 				/>
 			</TagsWrapper>
-			<Editor initialData={post?.content} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} />
+			<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} imageUrl={imageUrl} setImageUrl={setImageUrl}/>
 			<SliderWrapper>
 				<WidthSlider defaultWidth={650} onWidthChange={handleWidthChage} />
 			</SliderWrapper>

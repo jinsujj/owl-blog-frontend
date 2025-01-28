@@ -89,9 +89,11 @@ interface EditorProps {
 	editorMaxWidth: string;
 	onSave?: (data: OutputData) => void;
 	isReadOnly: boolean;
+	imageUrl: string;
+	setImageUrl?: (imageUrl: string) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly }) => {
+const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly ,imageUrl, setImageUrl }) => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const editorRef = useRef<EditorJS | null>(null);
 
@@ -208,7 +210,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 				<StyledEditor id="editorjs"></StyledEditor>
 				<BlogActionWrapper>
 					{!isReadOnly && (
-						<Thumbnail editorMaxWidth={editorMaxWidth} />
+						<Thumbnail editorMaxWidth={editorMaxWidth} imageUrl={imageUrl} setImageUrl={setImageUrl}/>
 					)}
 					{!isReadOnly && (
 						<Button onClick={handleSave} color={palette.blue} width='120px'>

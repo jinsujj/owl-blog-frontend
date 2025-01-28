@@ -89,9 +89,11 @@ const FileName = styled.span<StyledProps>`
 
 interface ThumbnailProps {
 	editorMaxWidth: string;
+	imageUrl: string;
+	setImageUrl?: (imageUrl: string) => void;
 }
 
-export const Thumbnail: React.FC<ThumbnailProps> = ({ editorMaxWidth }) => {
+export const Thumbnail: React.FC<ThumbnailProps> = ({ editorMaxWidth, imageUrl, setImageUrl }) => {
 	const { openModal, closeModal, ModalPortal } = useModal();
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [thumbnail, setThumbnail] = useState<string | null>(null);
@@ -129,7 +131,9 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ editorMaxWidth }) => {
 
 			try{
 				const response = await uploadThumbnail(file);
+				setImageUrl?.(response.fileUrl);
 				console.log('Upload successful:', response);
+				console.log(imageUrl);
 			} catch(error){
 				console.error('Upload failed:', error);
 				throw error;

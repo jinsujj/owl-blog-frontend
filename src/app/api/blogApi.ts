@@ -10,7 +10,7 @@ export type TagOption ={
 
 export type Post = {
 	id: number;
-	thumbnail: string;
+	thumbnailUrl: string;
 	title: string;
 	content: OutputData;
 	summary: string;
@@ -22,7 +22,7 @@ export type Post = {
 
 export type PostSummary = {
 	id: number,
-	thumbnail: string;
+	thumbnailUrl: string;
 	title: string;
 	summary: string;
 	updatedAt: string;
@@ -40,9 +40,9 @@ export interface BlogResponse {
 }
 
 
-export const createBlog = async (title: string, content: string, tags?: TagOption[]): Promise<BlogResponse> => {
+export const createBlog = async (title: string, content: string, thumbnailUrl: string, tags?: TagOption[]): Promise<BlogResponse> => {
   try {
-    const response = await axios.post(`${BASE_URL}/blogs`, { title, content, tags });
+    const response = await axios.post(`${BASE_URL}/blogs`, { title, content, thumbnailUrl, tags });
     return response.data; 
   } catch (error) {
     console.error("Error creating blog:", error);
@@ -64,6 +64,26 @@ export const createBlog = async (title: string, content: string, tags?: TagOptio
     throw new Error("An unexpected error occurred");
   }
 };
+
+export const updateBlog = async(id: number, title: string, content: string, thumbnailUrl: string, tags?: TagOption[]) => {
+	try{
+		const response = await axios.put(`${BASE_URL}/blogs/${id}`,{title, content, thumbnailUrl, tags});
+		return response.data;
+	}
+	catch(error){
+		console.error("Error updating blog:", error);		
+		if(axios.isAxiosError(error)){
+			if(error.response){
+				console.error("Response error:", error.response.data);
+				throw new Error(error.response.data.message || "Failed to update blog");
+			}
+			if(error.request){
+				console.error("No response received:", error.request);
+				throw new Error("No response from the server");
+			}
+		}
+	}
+}
 
 
 export const getBlogSummary = async() => {

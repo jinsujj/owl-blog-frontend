@@ -127,7 +127,7 @@ const ListView = ({ posts }: ListViewProps) => {
 			{posts.map((post) => (
 				<Link href={`/blog/${post.id}`} key={post.id}>
 					<ListItem $isDark={isDarkMode} $isPublished={!!!post.publishedAt} key={post.id}>
-						<Thumbnail src={post.thumbnail || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy" />
+						<Thumbnail src={post.thumbnailUrl || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy" />
 						<Content $isDark={isDarkMode}>
 							<Title $isDark={isDarkMode}>{post.title}</Title>
 							<Summary $isDark={isDarkMode}>{post.summary?.length > 250 ? `${post.summary.slice(0, 250)}...` : post.summary}</Summary>
