@@ -20,8 +20,10 @@ import ImageTool from '@editorjs/image';
 import AttachesTool from '@editorjs/attaches';
 import { useSelector } from '../store';
 import { Thumbnail } from '../components/editor/Thumbnail';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { publishBlog, unPublishBlog } from '../api/blogApi';
+import useModal from '../hooks/useModal';
+import ConfirmModal from '../components/modal/ConfirmModal';
 
 interface EditorContainerProps {
 	$isReadOnly: boolean;
@@ -99,11 +101,16 @@ interface EditorProps {
 }
 
 const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly ,imageUrl, setImageUrl }) => {
+	// modal
+	const {openModal, closeModal, ModalPortal} = useModal();
+	const [modalMessage, setModalMessage] = useState('');
+	// blog
 	const blogId = useSelector((state) => state.common.postId);
 	const postState = useSelector((state) => state.common.postState);
+	// state 
 	const isDarkMode = useSelector((state) => state.common.isDark);
-	const editorRef = useRef<EditorJS | null>(null);
 	const isPublished = postState === 'published'
+	const editorRef = useRef<EditorJS | null>(null);
 
 	const parsedInitialData = useMemo(() => {
     if (typeof initialData === 'string') {
@@ -209,18 +216,28 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 		const savedData = await editorRef.current.save();
 		const blog: OutputData = { ...savedData, }
 		if (onSave) onSave(blog);
+
+		window.location.href = '/';
 	};
 
 	const handlePublish = async () => {
-		console.log(blogId);
-		const response = await publishBlog(blogId);
-		console.log(response);
+		setModalMessage("해당글을 게시하시겠습니까?");
+		openModal();
 	}
 
 	const handleUnPublish = async () => {
-		console.log(blogId);
-		const response = await unPublishBlog(blogId);
-		console.log(response);
+		setModalMessage("게시를 취소하겠습니까?");
+		openModal();
+	}
+
+	const onConfirmPublish = async() => {
+		if(isPublished === true)
+			await unPublishBlog(blogId);
+
+		if(isPublished === false)
+			await publishBlog(blogId);
+
+		window.location.href = '/';
 	}
 
 
@@ -228,6 +245,9 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 		<>
 			<EditorContainer $isReadOnly={isReadOnly} $maxwidth={editorMaxWidth} $isDark={isDarkMode}>
 				<StyledEditor id="editorjs"></StyledEditor>
+				<ModalPortal>
+					<ConfirmModal message={modalMessage} onClose={closeModal} onCancel={() =>{}} onConfirm={onConfirmPublish}/>
+				</ModalPortal>
 				<BlogActionWrapper>
 					{!isReadOnly && (
 						<Thumbnail editorMaxWidth={editorMaxWidth} imageUrl={imageUrl} setImageUrl={setImageUrl}/>
