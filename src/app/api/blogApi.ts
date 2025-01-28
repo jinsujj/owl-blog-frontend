@@ -85,6 +85,43 @@ export const updateBlog = async(id: number, title: string, content: string, thum
 	}
 }
 
+export const publishBlog = async(id: number) => {
+	try{
+		const response = await axios.post(`${BASE_URL}/blogs/${id}/publish`, {id});
+		return response.data;
+	}
+	catch(error){
+		if(axios.isAxiosError(error)){
+			if(error.response){
+				console.error("Response error:", error.response.data);
+				throw new Error(error.response.data.message || "Failed to publish blog");
+			}
+			if(error.request){
+				console.error("No response received:", error.request);
+				throw new Error("No response from the server");
+			}
+		}
+	}
+}
+
+export const unPublishBlog = async(id:number) => {
+	try{
+		const response = await axios.post(`${BASE_URL}/blogs/${id}/unpublish`,{id});
+		return response.data;
+	}
+	catch(error){
+		if(axios.isAxiosError(error)){
+			if(error.response){
+				console.error("Response error:", error.response.data);
+				throw new Error(error.response.data.message || "Failed to unPublish blog");
+			}
+			if(error.request){
+				console.error("No response received:", error.request);
+				throw new Error("No response from the server");
+			}
+		}
+	}
+}
 
 export const getBlogSummary = async() => {
 	try{
@@ -118,7 +155,6 @@ export const getBlogById = async (id: string): Promise<Post | undefined> => {
     return undefined; 
   }
 };
-
 
 export const getTagsAll = async(): Promise<TagOption[] | undefined> => {
 	try{

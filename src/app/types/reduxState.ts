@@ -1,7 +1,8 @@
 export type CommonState = {
 		isLogged: boolean;
     isDark: boolean;
-    postState: "write" | "modify" | "read";
+    postState: "created" | "modify" | "published";
+    postId: number;
     toggle: boolean;
     search: string;
   };

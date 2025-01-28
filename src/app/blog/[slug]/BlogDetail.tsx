@@ -9,9 +9,11 @@ import SideBar from "@/app/components/sidebar/Sidebar";
 import Editor from "@/app/editor/Editor";
 import useModal from "@/app/hooks/useModal";
 import { useSelector } from "@/app/store";
+import { commonAction } from "@/app/store/common";
 import palette from "@/app/styles/palette";
 import { OutputData } from "@editorjs/editorjs";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { ActionMeta, MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import styled from "styled-components";
@@ -66,6 +68,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
 	const [isReadOnly, setIsReadOnly] = useState(false);
 	const isDarkMode = useSelector((state) => state.common.isDark);
+	const dispatch = useDispatch();
 
 	// blog 
 	const [title, setTitle] = useState('');
@@ -109,6 +112,15 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 
 
 	useEffect(() => {
+		dispatch(commonAction.setPostId(post?.id || 0));
+		if (post?.publishedAt) {
+			dispatch(commonAction.setPostState("published"));
+		} else if (post?.updatedAt) {
+			dispatch(commonAction.setPostState("modify"));
+		} else {
+			dispatch(commonAction.setPostState("created"));
+		}
+
 		setTitle(post.title);
 		setEditordata(post.content);
 		setImageUrl(post.thumbnailUrl);

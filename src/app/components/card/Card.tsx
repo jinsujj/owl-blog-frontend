@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { PostSummary } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import Link from "next/link";
+import Image from "next/image";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -62,12 +63,13 @@ const Container = styled.li<StyledProps>`
 	}
 `;
 
-export const Thumbnail = styled.img`
+
+export const Thumbnail = styled.div`
+  position: relative;
   width: 100%;
-  object-fit: cover;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  height: 150px; 
+  overflow: hidden;
+  background: #ccc; 
 `;
 
 export const CardContent = styled.div`
@@ -105,7 +107,16 @@ const Card = ({ post }: CardProps) => {
 	return (
 		<Container $isDark={isDarkMode} $isPublished={!!!post.publishedAt}>
 			<Link href={`/blog/${post.id}`}>
-				<Thumbnail src={post.thumbnailUrl || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy" />
+				<Thumbnail>
+					<Image
+						src={post.thumbnailUrl || "/img/owl.svg"}
+						alt={`Thumbnail of ${post.title}`}
+						style={{objectFit: "cover"}}
+						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+						priority={true}
+						fill 
+					/>
+				</Thumbnail>
 				<CardContent>
 					<CardTitle $isDark={isDarkMode}>{post.title}</CardTitle>
 					<CardSummary $isDark={isDarkMode}>

@@ -21,6 +21,7 @@ import AttachesTool from '@editorjs/attaches';
 import { useSelector } from '../store';
 import { Thumbnail } from '../components/editor/Thumbnail';
 import { useEffect, useMemo, useRef } from 'react';
+import { publishBlog, unPublishBlog } from '../api/blogApi';
 
 interface EditorContainerProps {
 	$isReadOnly: boolean;
@@ -84,6 +85,10 @@ const BlogActionWrapper = styled.div`
   margin-top: 20px; 
 `;
 
+const ButtonWrapper = styled.div`
+	display: flex;
+`;
+
 interface EditorProps {
 	initialData?: OutputData;
 	editorMaxWidth: string;
@@ -94,8 +99,11 @@ interface EditorProps {
 }
 
 const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly ,imageUrl, setImageUrl }) => {
+	const blogId = useSelector((state) => state.common.postId);
+	const postState = useSelector((state) => state.common.postState);
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const editorRef = useRef<EditorJS | null>(null);
+	const isPublished = postState === 'published'
 
 	const parsedInitialData = useMemo(() => {
     if (typeof initialData === 'string') {
@@ -203,6 +211,18 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 		if (onSave) onSave(blog);
 	};
 
+	const handlePublish = async () => {
+		console.log(blogId);
+		const response = await publishBlog(blogId);
+		console.log(response);
+	}
+
+	const handleUnPublish = async () => {
+		console.log(blogId);
+		const response = await unPublishBlog(blogId);
+		console.log(response);
+	}
+
 
 	return (
 		<>
@@ -212,11 +232,23 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 					{!isReadOnly && (
 						<Thumbnail editorMaxWidth={editorMaxWidth} imageUrl={imageUrl} setImageUrl={setImageUrl}/>
 					)}
-					{!isReadOnly && (
-						<Button onClick={handleSave} color={palette.blue} width='120px'>
-							Save
-						</Button>
-					)}
+					<ButtonWrapper>
+						{!isReadOnly && (
+							<Button onClick={handleSave} color={palette.blue} width='100px'>
+								Save
+							</Button>
+						)}
+						{!isReadOnly && !isPublished && (
+							<Button onClick={handlePublish} color={palette.green} width='100px'>
+								Publish
+							</Button>
+						)}
+						{!isReadOnly && isPublished && (
+							<Button onClick={handleUnPublish} color={palette.darkRed} width='100px'>
+								unPublish
+							</Button>
+						)}
+					</ButtonWrapper>
 				</BlogActionWrapper>
 			</EditorContainer>
 		</>

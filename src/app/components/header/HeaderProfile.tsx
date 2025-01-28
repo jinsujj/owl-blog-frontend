@@ -83,8 +83,8 @@ const HeaderProfile = () => {
   const isDarkMode = useSelector((state) => state.common.isDark);
 
   const onClickPostBlog = () => {
-    if (postState === "write" || postState === "modify") {
-      dispatch(commonAction.setPostState("read"));
+    if (postState === "modify" || postState === "published") {
+      dispatch(commonAction.setPostState("created"));
       Router.push("../");
     }
   };
@@ -93,17 +93,17 @@ const HeaderProfile = () => {
   return (
     <Container $isdark={isDarkMode}>
       <div className="btn-group">
-        {postState === "read" && (
+        {postState === "created" && (
           <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
             Edit
           </Button>
         )}
-        {postState !== "write" && (
+        {postState !== "published" && (
           <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
             Write
           </Button>
         )}
-        {postState !== "read" && (
+        {postState !== "created" && (
           <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
             Back
           </Button>

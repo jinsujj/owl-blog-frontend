@@ -16,7 +16,8 @@ const initDarkMode = () => {
 const initialState: CommonState = {
     isLogged: false,
     isDark: initDarkMode(),
-    postState: "read",
+    postId: 0,
+    postState: "created",
     toggle: true,
     search: "",
 };
@@ -35,7 +36,10 @@ const common = createSlice({
         setDarkMode(state , action: PayloadAction<boolean>){
             state.isDark = action.payload;
         },
-        setPostState(state, action: PayloadAction<"write" | "modify" | "read">) {
+        setPostId(state, action:PayloadAction<number>){
+            state.postId = action.payload;
+        },
+        setPostState(state, action: PayloadAction<"created" | "modify" | "published">) {
             state.postState = action.payload;
         },
         setSearchFilter(state, action: PayloadAction<string>){
