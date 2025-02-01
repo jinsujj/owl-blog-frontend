@@ -1,6 +1,8 @@
 import { PostSummary } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
+import { commonAction } from "@/app/store/common";
 import palette from "@/app/styles/palette";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
 
 interface StyledProps {
@@ -61,6 +63,7 @@ interface TagListProps {
 }
 
 export const TagList =({posts}: TagListProps) => {
+	const dispatch = useDispatch();
 	const isDarkMode = useSelector((state) => state.common.isDark);
 
 	const tagCounts = posts
@@ -72,6 +75,10 @@ export const TagList =({posts}: TagListProps) => {
   }, {} as Record<string,number>);
 
   const allTags = Object.keys(tagCounts);
+
+  const handleClick = (tag:string) =>{
+	dispatch(commonAction.setSearchFilter(tag));
+  }
 	
 	return (
 		<TagWrapper>
@@ -79,7 +86,7 @@ export const TagList =({posts}: TagListProps) => {
 		<Divider $isDark={isDarkMode} />
 		<TagListContainer>
 			{allTags.map((tag, index) => (
-				<TagItem key={index} $isDark={isDarkMode}>
+				<TagItem key={index} $isDark={isDarkMode} onClick={() => handleClick(tag)}>
 					{tag} <span>({tagCounts[tag]})</span>
 				</TagItem>
 			))}
