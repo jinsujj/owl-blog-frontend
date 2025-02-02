@@ -14,8 +14,7 @@ import SideBar from "./components/sidebar/Sidebar";
 import WidthSlider from "./components/common/WidthSlder";
 import { getBlogSummary, Post } from "./api/blogApi";
 import { useRouter } from "next/navigation";
-import { getKakaoToken } from "./api/loginApi";
-import { authAction } from "./store/auth";
+import { checkTokenValidity, getKakaoToken } from "./api/loginApi";
 import SearchParamsHandler from "./components/SearchParamhandler";
 
 interface StyledProps {
@@ -121,13 +120,17 @@ const HomePage = () => {
 
 	// login token 
 	useEffect(() => {
-		if (!code) return;
+		if (!code){
+			checkTokenValidity().then((validToken) => {
+				if(validToken) dispatch(commonAction.setLogged(true));
+			});
+			return;
+		}
 
 		const handleKakaoLogin = async () => {
 			try {
 				const kakaoToken = await getKakaoToken(code);
 				if (kakaoToken !== null) {
-					dispatch(authAction.setJwtToken(kakaoToken));
 					dispatch(commonAction.setLogged(true));
 				}
 			} catch (error) {

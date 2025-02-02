@@ -11,27 +11,30 @@ export const requestKakaoLogin = () => {
     window.location.href = KAKAO_AUTH_URL;
 }
 
-export const getKakaoToken = async (code: string): Promise<string | null> => {
+export const getKakaoToken = async (code: string): Promise<boolean> => {
     try {
-        const response = await axios.post(`${BASE_URL}/auth/kakao/login`, { code }, {withCredentials: true}
-        );
-        return response.data;
+        const response = await axios.post(`${BASE_URL}/auth/kakao/login`, { code }, {withCredentials: true});
+        return response.status === 200;
     }
     catch (error) {
         console.error("Error getting kakao token:", error);
-        return null;
+        return false;
     }
 }
 
-export const checkLoginStatus = async (): Promise<boolean> => {
+export const checkTokenValidity = async ():Promise<boolean> => {
     try {
-        const response = await axios.get(`${BASE_URL}/auth/kakao/login/status`, {withCredentials: true});
-        return response.data.isLoggedIn;
+      const response = await axios.get(`${BASE_URL}/auth/token/validate`, {withCredentials: true});
+  
+      if (response.status === 200 && response.data.isValid) {
+        return true;
+      }
     } catch (error) {
-        console.error("Error checking login status:", error);
-        return false;
+      console.error("Error checking token validity:", error);
     }
-};
+    return false; 
+  };
+  
 
 export const logout = async (): Promise<boolean> => {
     try {
