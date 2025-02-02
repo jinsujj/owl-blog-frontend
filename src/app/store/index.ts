@@ -5,13 +5,13 @@ import auth from "./auth";
 
 const rootReducer = {
     common: common.reducer,
-		auth: auth.reducer,
+    auth: auth.reducer,
 };
 
 export const store = configureStore({
     reducer: rootReducer,
     devTools: process.env.NODE_ENV !== 'production',
-    middleware: (getDefaultMiddleware) => 
+    middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: false
         })

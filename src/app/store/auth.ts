@@ -1,15 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-const initialState : {authMode: "signup" | "login"} ={
-    authMode: "signup",
+interface AuthState {
+    jwtToken: string;
+}
+
+const initialState: AuthState={
+    jwtToken: '',
 }
 
 const auth = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setAuthMode(state, acition: PayloadAction<"signup"|"login">){
-            state.authMode = acition.payload;
+        setJwtToken(state, action: PayloadAction<string>){
+            state.jwtToken = action.payload;
+        },
+        clearJwtToken(state){
+            state.jwtToken = '';
         }
     }
 });

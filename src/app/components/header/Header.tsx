@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { HiOutlineMoon, HiOutlineSun, HiOutlineBell, HiBars2, HiBars3 } from "react-icons/hi2";
 import { commonAction } from "@/app/store/common";
+import { requestKakaoLogin } from "@/app/api/loginApi";
 
 interface StyledProps {
     $isDark: boolean;
@@ -146,12 +147,6 @@ const IconButton = styled.button<StyledProps>`
       : "0px 2px 4px rgba(0, 0, 0, 0.1)"};
 `;
 
-  
-
-const REST_API_KEY = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
-const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI;
-const KAKAO_LOGIN_URI = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
-
 
 const Header = () => {
 	const dispatch = useDispatch();
@@ -169,6 +164,10 @@ const Header = () => {
 
   const setToggle = (toggle: boolean) => {
     dispatch(commonAction.setToggle(!toggle));
+  }
+
+  const handleKakaoLogin = async () => {
+    await requestKakaoLogin();
   }
 
   return (
@@ -195,7 +194,7 @@ const Header = () => {
 					<HiOutlineBell size={20} />
 				</IconButton>
 				{!isLogged && 
-					<IconButton $isDark={isDarkMode} onClick={() => {window.location.href = KAKAO_LOGIN_URI;}} >
+					<IconButton $isDark={isDarkMode} onClick={handleKakaoLogin} >
 						<RiKakaoTalkFill size={23}/>
 					</IconButton>
 				}

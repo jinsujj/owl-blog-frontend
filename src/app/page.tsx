@@ -5,7 +5,7 @@ import { useSelector } from "./store";
 import styled from "styled-components";
 import CardList from "./components/card/CardList";
 import { UserProfile } from "./components/common/UserProfile";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { HiMiniSquares2X2, HiBars3 } from "react-icons/hi2";
 import ListView from "./components/list/ListView";
 import { commonAction } from "./store/common";
@@ -13,6 +13,10 @@ import { useDispatch } from "react-redux";
 import SideBar from "./components/sidebar/Sidebar";
 import WidthSlider from "./components/common/WidthSlder";
 import { getBlogSummary, Post } from "./api/blogApi";
+import { useRouter } from "next/navigation";
+import { getKakaoToken } from "./api/loginApi";
+import { authAction } from "./store/auth";
+import SearchParamsHandler from "./components/SearchParamhandler";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -83,11 +87,16 @@ const SliderWrapper = styled.div`
 
 
 const HomePage = () => {
+	// router
+	const router = useRouter();
+	// status
 	const dispatch = useDispatch();
 	const searchQuery = useSelector((state) => state.common.search);
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [isListView, setIsListView] = useState(false);
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('980px');
+	const [code, setCode] = useState<string | null>(null);
+	// posts
 	const [posts, setPosts] = useState<Post[]>([]);
 
 	// dynamic size effect
@@ -110,6 +119,30 @@ const HomePage = () => {
 		};
 	}, [dispatch]);
 
+	// login token 
+	useEffect(() => {
+		if (!code) return;
+
+		const handleKakaoLogin = async () => {
+			try {
+				const kakaoToken = await getKakaoToken(code);
+				if (kakaoToken !== null) {
+					dispatch(authAction.setJwtToken(kakaoToken));
+					dispatch(commonAction.setLogged(true));
+				}
+			} catch (error) {
+				console.error("Error in kakao login process:", error);
+			} finally {
+				const newParams = new URLSearchParams();
+				newParams.delete("code");
+				if (typeof window !== "undefined") {
+					window.history.replaceState({}, "", `/?${newParams.toString()}`);
+				}
+			}
+		};
+		handleKakaoLogin();
+	}, [code, router]);
+
 	const handleWidthChage = (width: number) => {
 		setEditorMaxWidth(`${width}px`);
 	}
@@ -127,7 +160,7 @@ const HomePage = () => {
 		fetchPosts();
 	}, []);
 
-	
+
 	const filteredPosts = searchQuery
 		? posts.filter((post) =>
 			post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -139,20 +172,23 @@ const HomePage = () => {
 			<HeaderWrapper>
 				<Header />
 			</HeaderWrapper>
-			<SideBar />
-			<LayoutWrapper width={editorMaxWidth}>
-				<UserProfile />
-				<ToggleWrapper>
-					<ToggleButton onClick={() => setIsListView(!isListView)}>
-						{isListView ? <HiMiniSquares2X2 size={20} /> : <HiBars3 size={20} />}
-					</ToggleButton>
-				</ToggleWrapper>
-				{isListView ?
-					(<ListView posts={filteredPosts} />) : (<CardList posts={filteredPosts} />)}
-			</LayoutWrapper>
-			<SliderWrapper>
-				<WidthSlider defaultWidth={980} onWidthChange={handleWidthChage} />
-			</SliderWrapper>
+			<Suspense fallback={<div>인증 처리 중...</div>}>
+				<SearchParamsHandler onCodeReceived={setCode} />
+				<SideBar />
+				<LayoutWrapper width={editorMaxWidth}>
+					<UserProfile />
+					<ToggleWrapper>
+						<ToggleButton onClick={() => setIsListView(!isListView)}>
+							{isListView ? <HiMiniSquares2X2 size={20} /> : <HiBars3 size={20} />}
+						</ToggleButton>
+					</ToggleWrapper>
+					{isListView ?
+						(<ListView posts={filteredPosts} />) : (<CardList posts={filteredPosts} />)}
+				</LayoutWrapper>
+				<SliderWrapper>
+					<WidthSlider defaultWidth={980} onWidthChange={handleWidthChage} />
+				</SliderWrapper>
+			</Suspense>
 		</PageContainer>
 	);
 };
