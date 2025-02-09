@@ -150,7 +150,7 @@ const IconButton = styled.button<StyledProps>`
 
 const Header = () => {
 	const dispatch = useDispatch();
-	const isLogged = useSelector((state) => state.common.isLogged);
+	const isLogged = useSelector((state) => state.auth.isLogged);
 	const isDarkMode = useSelector((state) => state.common.isDark);
   const toggle = useSelector((state) => state.common.toggle);
 

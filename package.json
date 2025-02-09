@@ -23,6 +23,7 @@
     "@editorjs/raw": "^2.5.1",
     "@editorjs/table": "^2.4.3",
     "@editorjs/warning": "^1.4.1",
+    "@radix-ui/react-popover": "^1.1.6",
     "@reduxjs/toolkit": "^2.5.0",
     "@types/react-select": "^5.0.1",
     "axios": "^1.7.9",

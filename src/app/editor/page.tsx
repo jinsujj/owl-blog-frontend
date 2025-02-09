@@ -16,6 +16,7 @@ import Title from "../components/editor/Title";
 import { OutputData } from "@editorjs/editorjs";
 import { useEffect } from 'react';
 import { getTagsAll, TagOption } from "@/app/api/blogApi";
+import { NotAuthrizedPage } from "./NotAuthrizedPage";
 
 
 interface StyledProps {
@@ -54,7 +55,7 @@ const TagsWrapper = styled.div<{ width: string }>`
 	padding-bottom: 10px;
 `;
 
-const Editor = dynamic(() => import("./Editor"), { ssr: false });
+const Editor = dynamic(() => import("./Editor"), { ssr: true });
 const CreatableSelect = dynamic(() => import('react-select/creatable'), { ssr: false }) as typeof import('react-select/creatable').default;
 
 
@@ -68,6 +69,7 @@ const EditorPage: React.FC = () => {
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
 	const [isReadOnly, setIsReadOnly] = useState(false);
 	const isDarkMode = useSelector((state) => state.common.isDark);
+	const isLogged = useSelector((state) => state.auth.isLogged);
 
 	// blog
 	const [editorData, setEditorData] = useState<OutputData>({ version: undefined, time: undefined, blocks: [] });
@@ -75,7 +77,6 @@ const EditorPage: React.FC = () => {
 	const [availableTags, setAvailableTags] = useState<TagOption[]>([]);
 	const [selectedTags, setSelectedTags] = useState<TagOption[]>([]);
 	const [imageUrl, setImageUrl] = useState<string>('');
-
 
 	const handleSave = async (data: OutputData) => {
 		setEditorData(data);
@@ -164,6 +165,10 @@ const EditorPage: React.FC = () => {
 			}
 		}
 	};
+
+	if(!isLogged){
+		return <NotAuthrizedPage/>
+	}
 
 	return (
 		<Container $isDark={isDarkMode}>

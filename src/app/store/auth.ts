@@ -1,22 +1,37 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 interface AuthState {
-    jwtToken: string;
+    isLogged: boolean;
+    userName: string;
+    imageUrl?: string;
+    email?: string;
 }
 
 const initialState: AuthState={
-    jwtToken: '',
+    isLogged: false,
+    userName: '',
+    imageUrl: '',
+    email: '',
 }
 
 const auth = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setJwtToken(state, action: PayloadAction<string>){
-            state.jwtToken = action.payload;
+        setLogged(state, action: PayloadAction<boolean>){
+            state.isLogged = action.payload;
         },
-        clearJwtToken(state){
-            state.jwtToken = '';
+        setUserName(state, action: PayloadAction<string>){
+            state.userName = action.payload;
+        },
+        setImageUrl(state, action: PayloadAction<string>){
+            state.imageUrl = action.payload;
+        },
+        setEmail(state, action: PayloadAction<string>){
+            state.email = action.payload;
+        },
+        setLogout(state) {
+            Object.assign(state, initialState);
         }
     }
 });

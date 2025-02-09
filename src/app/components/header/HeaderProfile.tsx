@@ -1,11 +1,11 @@
+"use client";
+
 import React from "react";
-import { useDispatch } from "react-redux";
 import styled, { css } from "styled-components";
 import { useSelector } from "../../store";
-import { commonAction } from "../../store/common";
 import palette from "../../styles/palette";
-import Button from "../common/Button";
-import Router from "next/router";
+import UserProfile from "./UserProfile";
+
 
 
 interface StyledProps {
@@ -13,7 +13,7 @@ interface StyledProps {
 }
 
 const media = {
-    mobile: "@media only screen and (max-width: 768px)",
+  mobile: "@media only screen and (max-width: 768px)",
 };
 
 const buttonGroupStyles = css`
@@ -78,36 +78,12 @@ const Container = styled.div<StyledProps>`
 
 
 const HeaderProfile = () => {
-  const dispatch = useDispatch();
-  const postState = useSelector((state) => state.common.postState);
   const isDarkMode = useSelector((state) => state.common.isDark);
-
-  const onClickPostBlog = () => {
-    if (postState === "modify" || postState === "published") {
-      dispatch(commonAction.setPostState("created"));
-      Router.push("../");
-    }
-  };
-
 
   return (
     <Container $isdark={isDarkMode}>
       <div className="btn-group">
-        {postState === "created" && (
-          <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
-            Edit
-          </Button>
-        )}
-        {postState !== "published" && (
-          <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
-            Write
-          </Button>
-        )}
-        {postState !== "created" && (
-          <Button onClick={onClickPostBlog} width="110px" color={palette.green}>
-            Back
-          </Button>
-        )}
+        <UserProfile />
       </div>
     </Container>
   );

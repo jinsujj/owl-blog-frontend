@@ -5,7 +5,7 @@ import { useSelector } from "./store";
 import styled from "styled-components";
 import CardList from "./components/card/CardList";
 import { UserProfile } from "./components/common/UserProfile";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { HiMiniSquares2X2, HiBars3 } from "react-icons/hi2";
 import ListView from "./components/list/ListView";
 import { commonAction } from "./store/common";
@@ -14,8 +14,9 @@ import SideBar from "./components/sidebar/Sidebar";
 import WidthSlider from "./components/common/WidthSlder";
 import { getBlogSummary, Post } from "./api/blogApi";
 import { useRouter } from "next/navigation";
-import { checkTokenValidity, getKakaoToken } from "./api/loginApi";
+import { checkTokenValidity, getKakaoToken, getKakaoUserInfo } from "./api/loginApi";
 import SearchParamsHandler from "./components/SearchParamhandler";
+import { authAction } from "./store/auth";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -90,6 +91,7 @@ const HomePage = () => {
 	const router = useRouter();
 	// status
 	const dispatch = useDispatch();
+	const isLogged = useSelector((state) => state.auth.isLogged);
 	const searchQuery = useSelector((state) => state.common.search);
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [isListView, setIsListView] = useState(false);
@@ -121,17 +123,19 @@ const HomePage = () => {
 	// login token 
 	useEffect(() => {
 		if (!code){
+			const token = document.cookie.split("; ").find((row) => row.startsWith("token="))?.split("=")[1];
+			if (!token) return;
 			checkTokenValidity().then((validToken) => {
-				if(validToken) dispatch(commonAction.setLogged(true));
+				if(!validToken) return;
+				dispatch(authAction.setLogged(true));
 			});
 			return;
 		}
-
 		const handleKakaoLogin = async () => {
 			try {
 				const kakaoToken = await getKakaoToken(code);
 				if (kakaoToken !== null) {
-					dispatch(commonAction.setLogged(true));
+					dispatch(authAction.setLogged(true));
 				}
 			} catch (error) {
 				console.error("Error in kakao login process:", error);
@@ -143,13 +147,11 @@ const HomePage = () => {
 				}
 			}
 		};
+
 		handleKakaoLogin();
 	}, [code, router]);
 
-	const handleWidthChage = (width: number) => {
-		setEditorMaxWidth(`${width}px`);
-	}
-
+	// blog info 
 	useEffect(() => {
 		const fetchPosts = async () => {
 			try {
@@ -163,6 +165,26 @@ const HomePage = () => {
 		fetchPosts();
 	}, []);
 
+	// userinfo
+	useEffect(() => {
+		if(isLogged)
+			setUserInfo();
+	},[isLogged]);
+
+	const setUserInfo = useCallback(async () => {
+		try {
+		  const userInfo = await getKakaoUserInfo();
+		  dispatch(authAction.setUserName(userInfo?.userName || ''));
+		  dispatch(authAction.setImageUrl(userInfo?.imageUrl || ''));
+		  dispatch(authAction.setEmail(userInfo?.email || ''));
+		} catch (error) {
+		  console.error("Error setting userInfo:", error);
+		}
+	  }, [dispatch]);
+
+	const handleWidthChage = (width: number) => {
+		setEditorMaxWidth(`${width}px`);
+	}
 
 	const filteredPosts = searchQuery
 		? posts.filter((post) =>
