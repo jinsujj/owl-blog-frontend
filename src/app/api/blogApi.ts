@@ -40,9 +40,9 @@ export interface BlogResponse {
 }
 
 
-export const createBlog = async (title: string, content: string, thumbnailUrl: string, tags?: TagOption[]): Promise<BlogResponse> => {
+export const createBlog = async (userId: string, title: string, content: string, thumbnailUrl: string, tags?: TagOption[]): Promise<BlogResponse> => {
   try {
-    const response = await axios.post(`${BASE_URL}/blogs`, { title, content, thumbnailUrl, tags });
+    const response = await axios.post(`${BASE_URL}/blogs`, {userId, title, content, thumbnailUrl, tags });
     return response.data; 
   } catch (error) {
     console.error("Error creating blog:", error);
@@ -65,9 +65,9 @@ export const createBlog = async (title: string, content: string, thumbnailUrl: s
   }
 };
 
-export const updateBlog = async(id: number, title: string, content: string, thumbnailUrl: string, tags?: TagOption[]) => {
+export const updateBlog = async(id: number, userId: string, title: string, content: string, thumbnailUrl: string, tags?: TagOption[]) => {
 	try{
-		const response = await axios.put(`${BASE_URL}/blogs/${id}`,{title, content, thumbnailUrl, tags});
+		const response = await axios.put(`${BASE_URL}/blogs/${id}`,{userId, title, content, thumbnailUrl, tags: tags ??[]});
 		return response.data;
 	}
 	catch(error){
@@ -125,7 +125,7 @@ export const unPublishBlog = async(id:number) => {
 
 export const getBlogSummary = async() => {
 	try{
-		const response = await axios.get(`${BASE_URL}/blogs/summary`);
+		const response = await axios.get(`${BASE_URL}/blogs/summary`, {withCredentials: true});
 		if(response.status === 200)
 			return response.data;
 		

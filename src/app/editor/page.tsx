@@ -70,6 +70,7 @@ const EditorPage: React.FC = () => {
 	const [isReadOnly, setIsReadOnly] = useState(false);
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const isLogged = useSelector((state) => state.auth.isLogged);
+	const userId = useSelector((state) => state.auth.id);
 
 	// blog
 	const [editorData, setEditorData] = useState<OutputData>({ version: undefined, time: undefined, blocks: [] });
@@ -96,10 +97,11 @@ const EditorPage: React.FC = () => {
 		}
 
 		try {
-			const result = await createBlog(title, content, imageUrl, selectedTags || []);
+			const result = await createBlog(userId, title, content, imageUrl, selectedTags || []);
 			setModalMessage("Blog created successfully! "+ result.id);
 			setAlertColor(palette.green);
 			openModal();
+			window.location.href = '/';
 		}
 		catch (error) {
 			setModalMessage("Failed to create blog. Please try again. "+ error);

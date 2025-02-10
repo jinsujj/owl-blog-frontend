@@ -131,7 +131,7 @@ const ListView = ({ posts }: ListViewProps) => {
 						<Content $isDark={isDarkMode}>
 							<Title $isDark={isDarkMode}>{post.title}</Title>
 							<Summary $isDark={isDarkMode}>{post.summary?.length > 250 ? `${post.summary.slice(0, 250)}...` : post.summary}</Summary>
-							<Meta $isDark={isDarkMode}>Updated at: {post.updatedAt}</Meta>
+							<Meta $isDark={isDarkMode}>Updated at: {new Date(post.updatedAt).toLocaleDateString()}</Meta>
 						</Content>
 					</ListItem>
 				</Link>

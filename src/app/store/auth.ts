@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 interface AuthState {
     isLogged: boolean;
+    id: string;
     userName: string;
     imageUrl?: string;
     email?: string;
@@ -9,6 +10,7 @@ interface AuthState {
 
 const initialState: AuthState={
     isLogged: false,
+    id: '',
     userName: '',
     imageUrl: '',
     email: '',
@@ -20,6 +22,9 @@ const auth = createSlice({
     reducers: {
         setLogged(state, action: PayloadAction<boolean>){
             state.isLogged = action.payload;
+        },
+        setUserId(state, action: PayloadAction<string>){
+            state.id = action.payload;
         },
         setUserName(state, action: PayloadAction<string>){
             state.userName = action.payload;

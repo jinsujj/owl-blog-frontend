@@ -3,6 +3,7 @@ import axios from 'axios';
 const BASE_URL = 'http://localhost:8080';
 
 export type UserInfo ={
+  id: string,
 	userName: string,
 	imageUrl?: string,
   email?: string

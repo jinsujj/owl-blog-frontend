@@ -68,6 +68,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
 	const [isReadOnly, setIsReadOnly] = useState(false);
 	const isDarkMode = useSelector((state) => state.common.isDark);
+	const userId = useSelector((state) => state.auth.id);
 	const dispatch = useDispatch();
 
 	// blog 
@@ -98,7 +99,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 			return;
 		}
 		try{
-			const result = await updateBlog(post.id, title, content, imageUrl, selectedTags);
+			const result = await updateBlog(post.id, userId, title, content, imageUrl, selectedTags);
 			setModalMessage("Blog update successfully! "+ result.id);
 			setAlertColor(palette.green);
 			openModal();

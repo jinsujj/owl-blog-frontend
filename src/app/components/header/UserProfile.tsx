@@ -98,7 +98,7 @@ const UserProfile = () => {
         <Popover.Root>
             <Popover.Trigger asChild>
                 <ProfileContainer>
-                    <Avatar src={imageUrl || "/default-avatar.png"} alt="User Avatar" />
+                    <Avatar src={imageUrl || "/img/owl.svg"} alt="User Avatar" />
                     <UserInfo>
                         <UserName>{userName || "Guest"}</UserName>
                     </UserInfo>

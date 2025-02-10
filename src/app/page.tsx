@@ -123,8 +123,6 @@ const HomePage = () => {
 	// login token 
 	useEffect(() => {
 		if (!code){
-			const token = document.cookie.split("; ").find((row) => row.startsWith("token="))?.split("=")[1];
-			if (!token) return;
 			checkTokenValidity().then((validToken) => {
 				if(!validToken) return;
 				dispatch(authAction.setLogged(true));
@@ -174,6 +172,7 @@ const HomePage = () => {
 	const setUserInfo = useCallback(async () => {
 		try {
 		  const userInfo = await getKakaoUserInfo();
+		  dispatch(authAction.setUserId(userInfo?.id||''));
 		  dispatch(authAction.setUserName(userInfo?.userName || ''));
 		  dispatch(authAction.setImageUrl(userInfo?.imageUrl || ''));
 		  dispatch(authAction.setEmail(userInfo?.email || ''));

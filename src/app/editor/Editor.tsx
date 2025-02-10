@@ -216,8 +216,6 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 		const savedData = await editorRef.current.save();
 		const blog: OutputData = { ...savedData, }
 		if (onSave) onSave(blog);
-
-		window.location.href = '/';
 	};
 
 	const handlePublish = async () => {
