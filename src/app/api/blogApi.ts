@@ -10,6 +10,7 @@ export type TagOption ={
 
 export type Post = {
 	id: number;
+	author: string,
 	thumbnailUrl: string;
 	title: string;
 	content: OutputData;

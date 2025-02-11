@@ -67,6 +67,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	// state 
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
 	const [isReadOnly, setIsReadOnly] = useState(false);
+	const isLogged = useSelector((state) => state.auth.isLogged);
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const userId = useSelector((state) => state.auth.id);
 	const dispatch = useDispatch();
@@ -149,6 +150,13 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		fetchBlogTags();
 	}, [post.id]);
 
+	useEffect(() => {
+		if(!isLogged || (userId !== post.author))
+			setIsReadOnly(true);
+		if (userId === post.author)
+			setIsReadOnly(false);
+	},[isLogged]);
+
 
 	const handleTagChange = (newValue: MultiValue<TagOption>, actionMeta: ActionMeta<TagOption>) => {
 		switch (actionMeta.action) {
@@ -184,7 +192,6 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		setAvailableTags((prev) => [...(prev || []), newTag]);
 		setSelectedTags((prev) => [...(prev || []), newTag]);
 	};
-
 
 	return (
 		<Container $isDark={isDarkMode}>

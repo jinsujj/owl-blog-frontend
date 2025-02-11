@@ -25,7 +25,7 @@ interface StyledProps {
 const PageContainer = styled.div<StyledProps>`
   padding: 0;
   margin: 0;
-	min-height: 100vh;
+  min-height: 100vh;
   font-family: Arial, sans-serif;
   background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
   color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
@@ -122,9 +122,9 @@ const HomePage = () => {
 
 	// login token 
 	useEffect(() => {
-		if (!code){
+		if (!code) {
 			checkTokenValidity().then((validToken) => {
-				if(!validToken) return;
+				if (!validToken) return;
 				dispatch(authAction.setLogged(true));
 			});
 			return;
@@ -161,25 +161,25 @@ const HomePage = () => {
 		};
 
 		fetchPosts();
-	}, []);
+	}, [isLogged]);
 
 	// userinfo
 	useEffect(() => {
-		if(isLogged)
+		if (isLogged)
 			setUserInfo();
-	},[isLogged]);
+	}, [isLogged]);
 
 	const setUserInfo = useCallback(async () => {
 		try {
-		  const userInfo = await getKakaoUserInfo();
-		  dispatch(authAction.setUserId(userInfo?.id||''));
-		  dispatch(authAction.setUserName(userInfo?.userName || ''));
-		  dispatch(authAction.setImageUrl(userInfo?.imageUrl || ''));
-		  dispatch(authAction.setEmail(userInfo?.email || ''));
+			const userInfo = await getKakaoUserInfo();
+			dispatch(authAction.setUserId(userInfo?.id || ''));
+			dispatch(authAction.setUserName(userInfo?.userName || ''));
+			dispatch(authAction.setImageUrl(userInfo?.imageUrl || ''));
+			dispatch(authAction.setEmail(userInfo?.email || ''));
 		} catch (error) {
-		  console.error("Error setting userInfo:", error);
+			console.error("Error setting userInfo:", error);
 		}
-	  }, [dispatch]);
+	}, [dispatch]);
 
 	const handleWidthChage = (width: number) => {
 		setEditorMaxWidth(`${width}px`);

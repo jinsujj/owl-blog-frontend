@@ -150,7 +150,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 					readOnly: isReadOnly,
 					placeholder: 'Hello world!',
 					data: parsedInitialData,
-					autofocus: true,
+					autofocus: false,
 					tools: {
 						raw: { class: RawTool, shortcut: 'OPTION+R' },
 						code: { class: CodeTool, shortcut: 'OPTION+C' },
