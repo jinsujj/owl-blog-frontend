@@ -4,7 +4,6 @@ import { getTagsAll, getTagsByBlogId, Post, TagOption, updateBlog } from "@/app/
 import WidthSlider from "@/app/components/common/WidthSlder";
 import Title from "@/app/components/editor/Title";
 import Header from "@/app/components/header/Header";
-import ConfirmModal from "@/app/components/modal/ConfirmModal";
 import SideBar from "@/app/components/sidebar/Sidebar";
 import Editor from "@/app/editor/Editor";
 import useModal from "@/app/hooks/useModal";
@@ -17,6 +16,8 @@ import { ActionMeta, MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
+import palette from "@/app/styles/palette";
+import MessageModal from "@/app/components/modal/MessageModal";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -62,6 +63,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	// modal 
 	const {openModal, closeModal, ModalPortal} = useModal();
 	const [modalMessage, setModalMessage] = useState('');
+	const [alertColor, setAlertColor] = useState('');
 
 	// state 
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
@@ -88,28 +90,35 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		const content = JSON.stringify(data);
 
 		if(title.length == 0){
+			setAlertColor(palette.red);
 			setModalMessage("제목이 비어있습니다.");
 			openModal();
 			return;
 		}
 		if(data.blocks.length == 0){
+			setAlertColor(palette.red);
 			setModalMessage("내용이 비어있습니다.");
 			openModal();
 			return;
 		}
 		try{
 			const result = await updateBlog(post.id, userId, title, content, imageUrl, selectedTags);
+			setAlertColor(palette.green);
 			setModalMessage("Blog update successfully! "+ result.id);
 			openModal();
+			hadlepost();
 		}
 		catch(error){
+			setAlertColor(palette.red);
 			setModalMessage("Failed to update blog. Please try again. "+ error);
 			openModal();
 		}
 	}
 
 	const hadlepost = () => {
-		router.push('/');
+		setTimeout(() => {
+      router.push('/');
+    }, 1000); 
 	}
 
 
@@ -197,7 +206,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		<Container $isDark={isDarkMode}>
 			<Header />
 			<ModalPortal>
-				<ConfirmModal message={modalMessage} onClose={closeModal} onConfirm={hadlepost} onCancel={closeModal}/>
+				<MessageModal message={modalMessage} onClose={closeModal} color={alertColor}/>
 			</ModalPortal>
 			<SideBar />
 			<TagsWrapper width={editorMaxWidth}>
