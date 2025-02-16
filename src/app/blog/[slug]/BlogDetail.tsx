@@ -4,19 +4,19 @@ import { getTagsAll, getTagsByBlogId, Post, TagOption, updateBlog } from "@/app/
 import WidthSlider from "@/app/components/common/WidthSlder";
 import Title from "@/app/components/editor/Title";
 import Header from "@/app/components/header/Header";
-import MessageModal from "@/app/components/modal/MessageModal";
+import ConfirmModal from "@/app/components/modal/ConfirmModal";
 import SideBar from "@/app/components/sidebar/Sidebar";
 import Editor from "@/app/editor/Editor";
 import useModal from "@/app/hooks/useModal";
 import { useSelector } from "@/app/store";
 import { commonAction } from "@/app/store/common";
-import palette from "@/app/styles/palette";
 import { OutputData } from "@editorjs/editorjs";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ActionMeta, MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import styled from "styled-components";
+import { useRouter } from "next/navigation";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -62,7 +62,6 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	// modal 
 	const {openModal, closeModal, ModalPortal} = useModal();
 	const [modalMessage, setModalMessage] = useState('');
-	const [alertColor, setAlertColor] = useState('');
 
 	// state 
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
@@ -71,6 +70,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const userId = useSelector((state) => state.auth.id);
 	const dispatch = useDispatch();
+	const router= useRouter();
 
 	// blog 
 	const [title, setTitle] = useState('');
@@ -89,27 +89,27 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 
 		if(title.length == 0){
 			setModalMessage("제목이 비어있습니다.");
-			setAlertColor(palette.red);
 			openModal();
 			return;
 		}
 		if(data.blocks.length == 0){
 			setModalMessage("내용이 비어있습니다.");
-			setAlertColor(palette.red);
 			openModal();
 			return;
 		}
 		try{
 			const result = await updateBlog(post.id, userId, title, content, imageUrl, selectedTags);
 			setModalMessage("Blog update successfully! "+ result.id);
-			setAlertColor(palette.green);
 			openModal();
 		}
 		catch(error){
 			setModalMessage("Failed to update blog. Please try again. "+ error);
-			setAlertColor(palette.red);
 			openModal();
 		}
+	}
+
+	const hadlepost = () => {
+		router.push('/');
 	}
 
 
@@ -197,7 +197,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		<Container $isDark={isDarkMode}>
 			<Header />
 			<ModalPortal>
-				<MessageModal message={modalMessage} onClose={closeModal} color={alertColor}/>
+				<ConfirmModal message={modalMessage} onClose={closeModal} onConfirm={hadlepost} onCancel={closeModal}/>
 			</ModalPortal>
 			<SideBar />
 			<TagsWrapper width={editorMaxWidth}>
