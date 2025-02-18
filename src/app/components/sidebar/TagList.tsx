@@ -4,6 +4,7 @@ import { commonAction } from "@/app/store/common";
 import palette from "@/app/styles/palette";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
+import { useRouter } from "next/navigation";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -62,35 +63,37 @@ interface TagListProps {
 	posts: PostSummary[];
 }
 
-export const TagList =({posts}: TagListProps) => {
+export const TagList = ({ posts }: TagListProps) => {
 	const dispatch = useDispatch();
 	const isDarkMode = useSelector((state) => state.common.isDark);
+	const router= useRouter();
 
 	const tagCounts = posts
-    .flatMap((post) => post.tags)
-    .reduce((acc,tag) => {
+		.flatMap((post) => post.tags)
+		.reduce((acc, tag) => {
 			const tagKey = tag.name;
-      acc[tagKey] = (acc[tagKey] || 0) + 1;
-      return acc;
-  }, {} as Record<string,number>);
+			acc[tagKey] = (acc[tagKey] || 0) + 1;
+			return acc;
+		}, {} as Record<string, number>);
 
-  const allTags = Object.keys(tagCounts);
+	const allTags = Object.keys(tagCounts);
 
-  const handleClick = (tag:string) =>{
-	dispatch(commonAction.setSearchFilter(tag));
-  }
-	
+	const handleClick = (tag: string) => {
+		dispatch(commonAction.setSearchFilter(tag));
+		router.push('/');
+	}
+
 	return (
 		<TagWrapper>
-		<H3>Tag List</H3>
-		<Divider $isDark={isDarkMode} />
-		<TagListContainer>
-			{allTags.map((tag, index) => (
-				<TagItem key={index} $isDark={isDarkMode} onClick={() => handleClick(tag)}>
-					{tag} <span>({tagCounts[tag]})</span>
-				</TagItem>
-			))}
-		</TagListContainer>
-	</TagWrapper>
+			<H3>Tag List</H3>
+			<Divider $isDark={isDarkMode} />
+			<TagListContainer>
+				{allTags.map((tag, index) => (
+					<TagItem key={index} $isDark={isDarkMode} onClick={() => handleClick(tag)}>
+						{tag} <span>({tagCounts[tag]})</span>
+					</TagItem>
+				))}
+			</TagListContainer>
+		</TagWrapper>
 	)
 }
