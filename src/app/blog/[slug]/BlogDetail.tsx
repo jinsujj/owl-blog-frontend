@@ -18,6 +18,7 @@ import styled from "styled-components";
 import { useRouter } from "next/navigation";
 import palette from "@/app/styles/palette";
 import MessageModal from "@/app/components/modal/MessageModal";
+import useUtterances from "@/app/hooks/useUtterances";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -54,6 +55,10 @@ const TagsWrapper = styled.div<{ width: string }>`
 	padding-bottom: 10px;
 `;
 
+const Utterances = styled.div`
+	margin-top: 20px;
+`;
+
 
 interface BlogDetailProps {
 	post: Post;
@@ -80,6 +85,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	const [availableTags, setAvailableTags] = useState<TagOption[]>();
 	const [selectedTags, setSelectedTags] = useState<TagOption[]>();
 	const [imageUrl, setImageUrl] = useState<string>('');
+	useUtterances(post.id.toString());
 
 	const handleWidthChage = (width: number) => {
 		setEditorMaxWidth(`${width}px`);
@@ -165,6 +171,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		if (userId === post.author)
 			setIsReadOnly(false);
 	},[isLogged]);
+
 
 
 	const handleTagChange = (newValue: MultiValue<TagOption>, actionMeta: ActionMeta<TagOption>) => {
@@ -267,6 +274,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 				/>
 			</TagsWrapper>
 			<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} imageUrl={imageUrl} setImageUrl={setImageUrl}/>
+			<Utterances id={post.id.toString()}/>
 			<SliderWrapper>
 				<WidthSlider defaultWidth={650} onWidthChange={handleWidthChage} />
 			</SliderWrapper>
