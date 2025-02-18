@@ -10,7 +10,7 @@ interface StyledProps {
 }
 
 const SearchWrapper = styled.div`
-  padding: 0px;
+  padding-top: 60px;
   display: flex;
   align-items: center;
   width: 100%;
@@ -20,7 +20,7 @@ const SearchWrapper = styled.div`
 const SearchIcon = styled(HiSearch)`
   position: absolute;
   left: 10px;
-  top:50px;
+  top:110px;
   transform: translateY(-150%);
   color: #ccc;
   font-size: 20px;
@@ -47,17 +47,17 @@ const SearchInput = styled.input<StyledProps>`
 `;
 
 export const SearchBox = () => {
-	const dispath = useDispatch();
+	const dispatch = useDispatch();
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [searchQuery, setSearchQuery] = useState("");
 
 	useEffect(() => {
 		const timeoutId = setTimeout(() => {
-			dispath(commonAction.setSearchFilter(searchQuery));
+			dispatch(commonAction.setSearchFilter(searchQuery));
 		}, 300); 
 		return () => clearTimeout(timeoutId); 
 		
-	}, [searchQuery, dispath]);
+	}, [searchQuery, dispatch]);
 	
 	return (
 		<SearchWrapper>
