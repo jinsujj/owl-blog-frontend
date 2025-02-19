@@ -19,6 +19,7 @@ const initialState: CommonState = {
     postState: "created",
     toggle: true,
     search: "",
+		renderTab: "글"
 };
 
 
@@ -38,6 +39,9 @@ const common = createSlice({
         setPostState(state, action: PayloadAction<"created" | "modify" | "published">) {
             state.postState = action.payload;
         },
+				setRenderTab(state, action: PayloadAction<"글"|"시리즈"|"소개">){
+					state.renderTab = action.payload;
+				},
         setSearchFilter(state, action: PayloadAction<string>){
             state.search = action.payload;
         },

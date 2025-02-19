@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import { checkTokenValidity, getKakaoToken, getKakaoUserInfo } from "./api/loginApi";
 import SearchParamsHandler from "./components/SearchParamhandler";
 import { authAction } from "./store/auth";
+import Editor from "./editor/Editor";
+import { OutputData } from "@editorjs/editorjs/types/data-formats/output-data";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -97,6 +99,8 @@ const HomePage = () => {
 	const [isListView, setIsListView] = useState(false);
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('980px');
 	const [code, setCode] = useState<string | null>(null);
+	const renderTab = useSelector((state) => state.common.renderTab);
+	const [editorData, setEditorData] = useState<OutputData>({ version: undefined, time: undefined, blocks: [] });
 	// posts
 	const [posts, setPosts] = useState<Post[]>([]);
 
@@ -185,6 +189,10 @@ const HomePage = () => {
 		setEditorMaxWidth(`${width}px`);
 	}
 
+	const handleSave = () => {
+
+	}
+
 	const filteredPosts = searchQuery
 		? posts.filter((post) =>
 			post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -201,13 +209,21 @@ const HomePage = () => {
 				<SideBar />
 				<LayoutWrapper width={editorMaxWidth}>
 					<UserProfile />
-					<ToggleWrapper>
-						<ToggleButton onClick={() => setIsListView(!isListView)}>
-							{isListView ? <HiMiniSquares2X2 size={20} /> : <HiBars3 size={20} />}
-						</ToggleButton>
-					</ToggleWrapper>
-					{isListView ?
-						(<ListView posts={filteredPosts} />) : (<CardList posts={filteredPosts} />)}
+					{renderTab === '글' && (
+						<>
+							<ToggleWrapper>
+								<ToggleButton onClick={() => setIsListView(!isListView)}>
+									{isListView ? <HiMiniSquares2X2 size={20} /> : <HiBars3 size={20} />}
+								</ToggleButton>
+							</ToggleWrapper>
+							{isListView ? <ListView posts={filteredPosts} /> : <CardList posts={filteredPosts} />}
+						</>
+					)}
+					{renderTab === '소개' && (
+						<>
+						<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={false} imageUrl={''} setImageUrl={() => {}}/>
+						</>
+					)}
 				</LayoutWrapper>
 				<SliderWrapper>
 					<WidthSlider defaultWidth={980} onWidthChange={handleWidthChage} />

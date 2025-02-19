@@ -1,5 +1,7 @@
 import { useSelector } from "@/app/store";
-import { useState } from "react";
+import { commonAction } from "@/app/store/common";
+import { CommonState } from "@/app/types/reduxState";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
 
 interface StyledProps {
@@ -52,7 +54,7 @@ const ProfileStats = styled.div<StyledProps>`
   display: flex;
   gap: 15px;
   font-size: 0.9rem;
-  color: ${(props) => (props.$isDark? "#bbb" : "#666")};
+  color: ${(props) => (props.$isDark ? "#bbb" : "#666")};
   margin-bottom: 10px;
 `;
 
@@ -80,19 +82,19 @@ const TabContainer = styled.div`
   width: 100%;
 `;
 
-const TabButton = styled.button<{ $isActive: boolean , $isDark: boolean}>`
+const TabButton = styled.button<{ $isActive: boolean, $isDark: boolean }>`
   flex: 1;
   text-align: center;
   padding: 10px 0;
   font-size: 1rem;
   font-weight: ${(props) => (props.$isActive ? "bold" : "normal")};
   color: ${(props) =>
-    props.$isActive
-      ? (props.$isDark ? "#88c57f" : "#4caf50")
-      : (props.$isDark ? "#bbb" : "#666")};
+		props.$isActive
+			? (props.$isDark ? "#88c57f" : "#4caf50")
+			: (props.$isDark ? "#bbb" : "#666")};
   border: none;
   border-bottom: ${(props) =>
-    props.$isActive ? "3px solid #4caf50" : "3px solid transparent"};
+		props.$isActive ? "3px solid #4caf50" : "3px solid transparent"};
   background: none;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -119,48 +121,51 @@ const TabContent = styled.div`
   }
 `;
 
+const tabs = ["글", "시리즈", "소개"] as const;
+
 export const UserProfile = () => {
+	const dispatch = useDispatch();
 	const isDarkMode = useSelector((state) => state.common.isDark);
-  const [activeTab, setActiveTab] = useState("글");
+	const renderTab = useSelector((state) => state.common.renderTab);
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "글":
-        return <div>사용자가 작성한 글 목록입니다.</div>;
-      case "시리즈":
-        return <div>사용자가 작성한 시리즈 목록입니다.</div>;
-      case "소개":
-        return <div>사용자에 대한 소개입니다.</div>;
-      default:
-        return null;
-    }
-  };
+	const renderTabContent = () => {
+		switch (renderTab) {
+			case "글":
+				return <div>사용자가 작성한 글 목록입니다.</div>;
+			case "시리즈":
+				return <div>사용자가 작성한 시리즈 목록입니다.</div>;
+			case "소개":
+				return <div>사용자에 대한 소개입니다.</div>;
+			default:
+				return null;
+		}
+	};
 
-  return (
-    <ProfileWrapper $isDark={isDarkMode}>
-      <ProfileImageWrapper>
-        <ProfileImage src="https://avatars.githubusercontent.com/u/19955904?v=4" alt="Profile" />
-        <ProfileDetails>
-          <ProfileName $isDark={isDarkMode}>jinsujj</ProfileName>
-          <ProfileStats $isDark={isDarkMode}>
-            <span>3 팔로워</span>
-            <span>0 팔로잉</span>
-          </ProfileStats>
-          <FollowButton $isDark={isDarkMode}>팔로우</FollowButton>
-        </ProfileDetails>
-      </ProfileImageWrapper>
-      <TabContainer>
-        {["글", "시리즈", "소개"].map((tab) => (
-          <TabButton $isDark={isDarkMode}
-            key={tab}
-            $isActive={activeTab === tab}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </TabButton>
-        ))}
-      </TabContainer>
-      <TabContent>{renderTabContent()}</TabContent>
-    </ProfileWrapper>
-  );
+	return (
+		<ProfileWrapper $isDark={isDarkMode}>
+			<ProfileImageWrapper>
+				<ProfileImage src="https://avatars.githubusercontent.com/u/19955904?v=4" alt="Profile" />
+				<ProfileDetails>
+					<ProfileName $isDark={isDarkMode}>jinsujj</ProfileName>
+					<ProfileStats $isDark={isDarkMode}>
+						<span>3 팔로워</span>
+						<span>0 팔로잉</span>
+					</ProfileStats>
+					<FollowButton $isDark={isDarkMode}>팔로우</FollowButton>
+				</ProfileDetails>
+			</ProfileImageWrapper>
+			<TabContainer>
+				{["글", "시리즈", "소개"].map((tab) => (
+					<TabButton $isDark={isDarkMode}
+						key={tab}
+						$isActive={renderTab === tab}
+						onClick={() => dispatch(commonAction.setRenderTab(tab as CommonState["renderTab"]))}
+					>
+						{tab}
+					</TabButton>
+				))}
+			</TabContainer>
+			<TabContent>{renderTabContent()}</TabContent>
+		</ProfileWrapper>
+	);
 };
