@@ -12,7 +12,7 @@ import { commonAction } from "./store/common";
 import { useDispatch } from "react-redux";
 import SideBar from "./components/sidebar/Sidebar";
 import WidthSlider from "./components/common/WidthSlder";
-import { getBlogSummary, Post } from "./api/blogApi";
+import { getBlogById, getBlogSummary, Post } from "./api/blogApi";
 import { useRouter } from "next/navigation";
 import { checkTokenValidity, getKakaoToken, getKakaoUserInfo } from "./api/loginApi";
 import SearchParamsHandler from "./components/SearchParamhandler";
@@ -185,12 +185,22 @@ const HomePage = () => {
 		}
 	}, [dispatch]);
 
+	// Introduce Blog
+	useEffect(() => {
+		const fetchIntroduceBlog = async () => {
+			const data = await getBlogById("9000");
+			setEditorData(data?.content ?? { version: "2.27.0", time: Date.now(), blocks: [] });
+		};
+		fetchIntroduceBlog();
+	}, []);
+
+
 	const handleWidthChage = (width: number) => {
 		setEditorMaxWidth(`${width}px`);
 	}
 
 	const handleSave = () => {
-
+		setEditorData(editorData);
 	}
 
 	const filteredPosts = searchQuery
@@ -221,7 +231,7 @@ const HomePage = () => {
 					)}
 					{renderTab === '소개' && (
 						<>
-						<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={false} imageUrl={''} setImageUrl={() => {}}/>
+							<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={false} imageUrl={''} setImageUrl={() => { }} />
 						</>
 					)}
 				</LayoutWrapper>

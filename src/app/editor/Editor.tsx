@@ -24,6 +24,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { publishBlog, unPublishBlog } from '../api/blogApi';
 import useModal from '../hooks/useModal';
 import ConfirmModal from '../components/modal/ConfirmModal';
+import { uploadThumbnail } from '../api/thumbnailApi';
+import DeleteImageTune from './DeleteImageTune';
 
 interface EditorContainerProps {
 	$isReadOnly: boolean;
@@ -71,6 +73,10 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	.ce-toolbar__settings-btn {
 		color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
 	}
+
+	.image-tool__image {
+		background-color: transparent !important;
+	}
 `;
 
 const StyledEditor = styled.div`
@@ -100,9 +106,9 @@ interface EditorProps {
 	setImageUrl?: (imageUrl: string) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly ,imageUrl, setImageUrl }) => {
+const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly, imageUrl, setImageUrl }) => {
 	// modal
-	const {openModal, closeModal, ModalPortal} = useModal();
+	const { openModal, closeModal, ModalPortal } = useModal();
 	const [modalMessage, setModalMessage] = useState('');
 	// blog
 	const blogId = useSelector((state) => state.common.postId);
@@ -113,16 +119,16 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 	const editorRef = useRef<EditorJS | null>(null);
 
 	const parsedInitialData = useMemo(() => {
-    if (typeof initialData === 'string') {
-      try {
-        return JSON.parse(initialData);
-      } catch (error) {
-        console.error('Error parsing initialData:', error);
-        return null;
-      }
-    }
-    return initialData;
-  }, [initialData]);
+		if (typeof initialData === 'string') {
+			try {
+				return JSON.parse(initialData);
+			} catch (error) {
+				console.error('Error parsing initialData:', error);
+				return null;
+			}
+		}
+		return initialData;
+	}, [initialData]);
 
 	const renderHighlightedCode = () => {
 		const editorElement = document.querySelector('#editorjs');
@@ -162,11 +168,27 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 						image: {
 							class: ImageTool,
 							config: {
-								endpoints: {
-									byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
-									byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
-								}
-							}
+								uploader: {
+									async uploadByFile(file: File) {
+										try {
+											const response = await uploadThumbnail(file);
+											return {
+												success: 1,
+												file: {
+													url: response.fileUrl,
+												},
+											};
+										} catch (error) {
+											console.error("Image upload failed:", error);
+											return { success: 0 };
+										}
+									},
+								},
+							},
+							tunes: ["deleteImage"],
+						},
+						deleteImage: {
+							class: DeleteImageTune,
 						},
 						linkTool: {
 							class: LinkTool, shortcut: 'OPTION+L',
@@ -228,11 +250,11 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 		openModal();
 	}
 
-	const onConfirmPublish = async() => {
-		if(isPublished === true)
+	const onConfirmPublish = async () => {
+		if (isPublished === true)
 			await unPublishBlog(blogId);
 
-		if(isPublished === false)
+		if (isPublished === false)
 			await publishBlog(blogId);
 
 		window.location.href = '/';
@@ -244,11 +266,11 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 			<EditorContainer $isReadOnly={isReadOnly} $maxwidth={editorMaxWidth} $isDark={isDarkMode}>
 				<StyledEditor id="editorjs"></StyledEditor>
 				<ModalPortal>
-					<ConfirmModal message={modalMessage} onClose={closeModal} onCancel={() =>{}} onConfirm={onConfirmPublish}/>
+					<ConfirmModal message={modalMessage} onClose={closeModal} onCancel={() => { }} onConfirm={onConfirmPublish} />
 				</ModalPortal>
 				<BlogActionWrapper>
 					{!isReadOnly && (
-						<Thumbnail editorMaxWidth={editorMaxWidth} imageUrl={imageUrl} setImageUrl={setImageUrl}/>
+						<Thumbnail editorMaxWidth={editorMaxWidth} imageUrl={imageUrl} setImageUrl={setImageUrl} />
 					)}
 					<ButtonWrapper>
 						{!isReadOnly && (

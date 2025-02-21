@@ -121,8 +121,6 @@ const TabContent = styled.div`
   }
 `;
 
-const tabs = ["글", "시리즈", "소개"] as const;
-
 export const UserProfile = () => {
 	const dispatch = useDispatch();
 	const isDarkMode = useSelector((state) => state.common.isDark);
