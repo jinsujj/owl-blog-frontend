@@ -231,7 +231,7 @@ const HomePage = () => {
 					)}
 					{renderTab === '소개' && (
 						<>
-							<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={false} imageUrl={''} setImageUrl={() => { }} />
+							<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={!isLogged} imageUrl={''} setImageUrl={() => { }} />
 						</>
 					)}
 				</LayoutWrapper>

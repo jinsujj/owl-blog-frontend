@@ -38,6 +38,14 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	margin: 0 auto;
 	width: 100%;
 
+	.ce-code__textarea {
+  	display: ${(props) => (props.$isReadOnly ? "none" : "block" )};
+	}
+
+	.highlighted-code {
+		display: ${(props) => (props.$isReadOnly ? "block" : "none" )};
+	}
+
 
   #editorjs pre {
     border: ${(props) => (props.$isReadOnly ? "none" : "1px solid #ccc")};
@@ -77,6 +85,10 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	.image-tool__image {
 		background-color: transparent !important;
 	}
+
+	.image-tool__caption{
+		display: none !important;
+	}
 `;
 
 const StyledEditor = styled.div`
@@ -96,6 +108,7 @@ const BlogActionWrapper = styled.div`
 const ButtonWrapper = styled.div`
 	display: flex;
 `;
+
 
 interface EditorProps {
 	initialData?: OutputData;
@@ -136,15 +149,26 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 
 		const codeBlocks = editorElement.querySelectorAll('.ce-code__textarea');
 		codeBlocks.forEach((textarea) => {
+			const parent = textarea.parentNode;
+    	if (!parent) return;
+			
 			const codeContent = (textarea as HTMLTextAreaElement).value;
+			// 기존에 하이라이트된 코드가 있다면 삭제
+			const existingHighlight = textarea.parentNode?.querySelector('.ce-code__textarea cdx-input');
+			if (existingHighlight) {
+				existingHighlight.remove();
+			}
+
+			// 새로운 코드 블록 생성
 			const pre = document.createElement('pre');
 			const code = document.createElement('code');
 
 			code.textContent = codeContent;
 			hljs.highlightElement(code);
 
+			pre.classList.add('highlighted-code');
 			pre.appendChild(code);
-			textarea.parentNode?.replaceChild(pre, textarea); // `<textarea>` -> `<pre>`
+			textarea.parentNode?.insertBefore(pre, textarea.nextSibling);
 		});
 	};
 
