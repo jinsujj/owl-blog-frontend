@@ -12,13 +12,13 @@ import { commonAction } from "./store/common";
 import { useDispatch } from "react-redux";
 import SideBar from "./components/sidebar/Sidebar";
 import WidthSlider from "./components/common/WidthSlder";
-import { getBlogById, getBlogSummary, Post } from "./api/blogApi";
+import { createBlog, getBlogByType, getBlogSummary, Post } from "./api/blogApi";
 import { useRouter } from "next/navigation";
 import { checkTokenValidity, getKakaoToken, getKakaoUserInfo } from "./api/loginApi";
 import SearchParamsHandler from "./components/SearchParamhandler";
 import { authAction } from "./store/auth";
-import Editor from "./editor/Editor";
 import { OutputData } from "@editorjs/editorjs/types/data-formats/output-data";
+import dynamic from "next/dynamic";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -87,6 +87,7 @@ const SliderWrapper = styled.div`
   }
 `;
 
+const Editor = dynamic(() => import("./editor/Editor"), { ssr: false });
 
 const HomePage = () => {
 	// router
@@ -94,6 +95,7 @@ const HomePage = () => {
 	// status
 	const dispatch = useDispatch();
 	const isLogged = useSelector((state) => state.auth.isLogged);
+	const userId = useSelector((state) => state.auth.id);
 	const searchQuery = useSelector((state) => state.common.search);
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [isListView, setIsListView] = useState(false);
@@ -101,6 +103,7 @@ const HomePage = () => {
 	const [code, setCode] = useState<string | null>(null);
 	const renderTab = useSelector((state) => state.common.renderTab);
 	const [editorData, setEditorData] = useState<OutputData>({ version: undefined, time: undefined, blocks: [] });
+	
 	// posts
 	const [posts, setPosts] = useState<Post[]>([]);
 
@@ -188,7 +191,7 @@ const HomePage = () => {
 	// Introduce Blog
 	useEffect(() => {
 		const fetchIntroduceBlog = async () => {
-			const data = await getBlogById("9000");
+			const data = await getBlogByType("Introduce");
 			setEditorData(data?.content ?? { version: "2.27.0", time: Date.now(), blocks: [] });
 		};
 		fetchIntroduceBlog();
@@ -199,8 +202,10 @@ const HomePage = () => {
 		setEditorMaxWidth(`${width}px`);
 	}
 
-	const handleSave = () => {
-		setEditorData(editorData);
+	const handleSave = async (data: OutputData) => {
+		setEditorData(data);
+		const content = JSON.stringify(data);
+		await createBlog(userId, "Introduce", content,'', [], "Introduce");
 	}
 
 	const filteredPosts = searchQuery

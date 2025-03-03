@@ -131,6 +131,8 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 	const isPublished = postState === 'published'
 	const editorRef = useRef<EditorJS | null>(null);
 
+
+
 	const parsedInitialData = useMemo(() => {
 		if (typeof initialData === 'string') {
 			try {
@@ -258,7 +260,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 
 	const handleSave = async () => {
 		if (!editorRef.current) return;
-
+		
 		const savedData = await editorRef.current.save();
 		const blog: OutputData = { ...savedData, }
 		if (onSave) onSave(blog);

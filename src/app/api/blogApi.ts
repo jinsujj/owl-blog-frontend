@@ -41,10 +41,16 @@ export interface BlogResponse {
 }
 
 
-export const createBlog = async (userId: string, title: string, content: string, thumbnailUrl: string, tags?: TagOption[]): Promise<BlogResponse> => {
+export const createBlog = async (userId: string, title: string, content: string, thumbnailUrl: string, tags?: TagOption[], type?: string): Promise<BlogResponse> => {
   try {
-    const response = await axios.post(`${BASE_URL}/blogs`, {userId, title, content, thumbnailUrl, tags });
-    return response.data; 
+		if (type){
+			const response = await axios.post(`${BASE_URL}/blogs`, {userId, title, content, thumbnailUrl, tags, type });	
+			return response.data;
+		}
+		else {
+			const response = await axios.post(`${BASE_URL}/blogs`, {userId, title, content, thumbnailUrl, tags });
+    	return response.data; 
+		}
   } catch (error) {
     console.error("Error creating blog:", error);
 
@@ -156,6 +162,19 @@ export const getBlogById = async (id: string): Promise<Post | undefined> => {
     return undefined; 
   }
 };
+
+
+export const getBlogByType = async (type: string): Promise<Post | undefined> => {
+	try{
+		const response = await axios.get(`${BASE_URL}/blogs/type/${type}`);
+		console.log(response);
+		return response.data;
+	}
+	catch (error){
+		console.log("Error fetching blog: "+ error);
+		return undefined;
+	}
+}
 
 export const getTagsAll = async(): Promise<TagOption[] | undefined> => {
 	try{
