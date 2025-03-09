@@ -1,8 +1,13 @@
-import { addSeriesToBlog, createSeries, getBlogSummary, getSeries, Post, Series } from "@/app/api/blogApi";
+import { addSeriesToBlog, createSeries, getBlogBySeries, getBlogSummary, getSeries, Post, Series } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import { useEffect, useState } from "react"
 import { HiTrash } from "react-icons/hi2";
 import styled from "styled-components";
+import ListView from "./ListView";
+
+interface StyledProps {
+	$isDark: boolean;
+}
 
 const SeriesContainer = styled.div`
   width: 100%;
@@ -10,11 +15,12 @@ const SeriesContainer = styled.div`
   margin: 0 auto;
 `;
 
-const SeriesItem = styled.div`
+const SeriesItem = styled.div<StyledProps>`
   margin-bottom: 20px;
+	color: ${(props: StyledProps) => (props.$isDark ? "#333" : "#333")};
 `;
 
-const SeriesTitle = styled.h3`
+const SeriesTitle = styled.h3<StyledProps>`
   cursor: pointer;
   background-color: #f4f4f4;
   padding: 10px;
@@ -62,10 +68,52 @@ const Select = styled.select`
   width: 200px;
 `;
 
+
+const BlogCard = styled.li`
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+`;
+
+const Thumbnail = styled.img`
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+`;
+
+const BlogContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const BlogTitle = styled.h4`
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+`;
+
+const BlogDate = styled.span`
+  font-size: 12px;
+  color: #777;
+`;
+
 const SeriesView = () => {
 	const isLogged = useSelector((state) => state.auth.isLogged);
+	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [series, setSeries] = useState<Series[]>([]);
-	const [seriesMap, setSeriesMap] = useState<{ [key: string]: Post[] }>({});
+	const [seriesMappedBlogs, setSeriesMappedBlogs] = useState<Record<string, Post[]>>({});
 	const [openSeries, setOpenSeries] = useState<string | null>(null);
 	const [newSeriesName, setNewSeriesName] = useState("");
 	const [allBlogs, setAllBlogs] = useState<Post[]>([]);
@@ -77,7 +125,6 @@ const SeriesView = () => {
 		const fetchSeries = async () => {
 			try {
 				const data = await getSeries();
-				console.log(data);
 				setSeries(data||[]);
 			} catch (error) {
 				console.error("Failed to fetch series", error);
@@ -93,8 +140,19 @@ const SeriesView = () => {
 			}
 		};
 
+		const fetchSeriesMappedBlog = async () => {
+			try {
+				const blogsBySeries = await getBlogBySeries();
+				console.log(blogsBySeries);
+				setSeriesMappedBlogs(blogsBySeries || {});
+			} catch (error) {
+				console.error("Failed to fetch blogs", error);
+			}
+		};
+
 		fetchSeries();
 		fetchBlogs();
+		fetchSeriesMappedBlog();
 	}, []);
 
 	const handleAddSeries = async (seriesName: string) => {
@@ -102,7 +160,7 @@ const SeriesView = () => {
 		try {
 			console.log(seriesName);
 			await createSeries(seriesName);
-			setSeriesMap((prev) => ({ ...prev, [seriesName]: [] }));
+			setSeriesMappedBlogs((prev) => ({ ...prev, [seriesName]: [] })); 
 			setNewSeriesName("");
 		} catch (error) {
 			console.error("Failed to create series", error);
@@ -116,9 +174,9 @@ const SeriesView = () => {
 			if (!blog) return;
 
 			await addSeriesToBlog(selectedSeries, selectedBlog);
-			setSeriesMap((prev) => ({
+			setSeriesMappedBlogs((prev) => ({
 				...prev,
-				[selectedSeries]: [...(prev[selectedSeries] || []), blog],
+				[selectedSeries]: [...(prev[selectedSeries] || []), blog], 
 			}));
 			setSelectedBlog(null);
 		} catch (error) {
@@ -165,10 +223,10 @@ const SeriesView = () => {
           </div>
         </>
       )}
-			{Object.keys(seriesMap).map((seriesName) => (
-				<SeriesItem key={seriesName}>
-					<SeriesTitle onClick={() => toggleSeries(seriesName)}>
-						<span>{seriesName} ({seriesMap[seriesName].length}개)</span>
+			{Object.keys(seriesMappedBlogs).map((seriesName) => (
+				<SeriesItem $isDark={isDarkMode} key={seriesName}>
+					<SeriesTitle $isDark={isDarkMode}  onClick={() => toggleSeries(seriesName)}>
+						<span>{seriesName} ({seriesMappedBlogs[seriesName]?.length || 0}개)</span>
 						{isLogged &&
 							<DeleteButton onClick={(e) => {
 								e.stopPropagation(); // 부모 클릭 이벤트 방지
@@ -179,11 +237,9 @@ const SeriesView = () => {
 						}
 					</SeriesTitle>
 					{openSeries === seriesName && (
-						<ul>
-							{seriesMap[seriesName].map((post) => (
-								<li key={post.id}>{post.title}</li>
-							))}
-						</ul>
+						<ul style={{ listStyle: "none", padding: 0 }}>
+						<ListView posts={seriesMappedBlogs[seriesName]}/>
+					</ul>
 					)}
 				</SeriesItem>
 			))}

@@ -196,7 +196,7 @@ export const getSeries = async(): Promise<Series[]|undefined> => {
 
 export const getBlogBySeries = async(): Promise<{ [key: string]: Post[] } | undefined> => {
 	try{
-		const response = await axios.get(`${BASE_URL}/series/blogs`);
+		const response = await axios.get(`${BASE_URL}/blogs/series`);
 		if (response.status === 200) return response.data;
     else {
       console.log("Series not found");
