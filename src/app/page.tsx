@@ -7,7 +7,7 @@ import CardList from "./components/card/CardList";
 import { UserProfile } from "./components/common/UserProfile";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { HiMiniSquares2X2, HiBars3 } from "react-icons/hi2";
-import ListView from "./components/list/ListView";
+import ListView from "./components/View/ListView";
 import { commonAction } from "./store/common";
 import { useDispatch } from "react-redux";
 import SideBar from "./components/sidebar/Sidebar";
@@ -19,6 +19,7 @@ import SearchParamsHandler from "./components/SearchParamhandler";
 import { authAction } from "./store/auth";
 import { OutputData } from "@editorjs/editorjs/types/data-formats/output-data";
 import dynamic from "next/dynamic";
+import SeriesView from "./components/View/SeriesView";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -234,6 +235,7 @@ const HomePage = () => {
 							{isListView ? <ListView posts={filteredPosts} /> : <CardList posts={filteredPosts} />}
 						</>
 					)}
+					{renderTab === '시리즈' && <SeriesView />}
 					{renderTab === '소개' && (
 						<>
 							<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={!isLogged} imageUrl={''} setImageUrl={() => { }} />

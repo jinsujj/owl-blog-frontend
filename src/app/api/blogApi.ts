@@ -21,6 +21,10 @@ export type Post = {
 	tags: TagOption[];
 }
 
+export type Series ={
+	name: string,
+}
+
 export type PostSummary = {
 	id: number,
 	thumbnailUrl: string;
@@ -40,7 +44,7 @@ export interface BlogResponse {
   updatedAt: string;
 }
 
-
+// [Posting]
 export const createBlog = async (userId: string, title: string, content: string, thumbnailUrl: string, tags?: TagOption[], type?: string): Promise<BlogResponse> => {
   try {
 		if (type){
@@ -92,6 +96,7 @@ export const updateBlog = async(id: number, userId: string, title: string, conte
 	}
 }
 
+// [Publish Blog]
 export const publishBlog = async(id: number) => {
 	try{
 		const response = await axios.post(`${BASE_URL}/blogs/${id}/publish`, {id});
@@ -130,6 +135,7 @@ export const unPublishBlog = async(id:number) => {
 	}
 }
 
+// [Contents]
 export const getBlogSummary = async() => {
 	try{
 		const response = await axios.get(`${BASE_URL}/blogs/summary`, {withCredentials: true});
@@ -167,7 +173,6 @@ export const getBlogById = async (id: string): Promise<Post | undefined> => {
 export const getBlogByType = async (type: string): Promise<Post | undefined> => {
 	try{
 		const response = await axios.get(`${BASE_URL}/blogs/type/${type}`);
-		console.log(response);
 		return response.data;
 	}
 	catch (error){
@@ -176,6 +181,69 @@ export const getBlogByType = async (type: string): Promise<Post | undefined> => 
 	}
 }
 
+// [Series]
+export const getSeries = async(): Promise<Series[]|undefined> => {
+	try{
+		const response = await axios.get(`${BASE_URL}/series/`);
+		if (response.status === 200) 
+			return response.data;
+		return [];
+	}
+	catch(error){
+		console.log("Error fetching series", error);
+	}
+}
+
+export const getBlogBySeries = async(): Promise<{ [key: string]: Post[] } | undefined> => {
+	try{
+		const response = await axios.get(`${BASE_URL}/series/blogs`);
+		if (response.status === 200) return response.data;
+    else {
+      console.log("Series not found");
+      return undefined;
+    }
+	}
+	catch(error){
+		console.log("Error fetching series", error);
+	}
+}
+
+
+export const createSeries = async (seriesName: string): Promise<boolean> => {
+  try {
+    const response = await axios.post(`${BASE_URL}/series/${seriesName}`);
+    return response.status === 201;
+  } catch (error) {
+    console.error("Error creating series:", error);
+    return false;
+  }
+};
+
+export const deleteSeries = async (seriesName: string): Promise<boolean> => {
+  try {
+    const response = await axios.delete(`${BASE_URL}/blogs/series/`, {
+      data: { seriesName },
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error deleting series:", error);
+    return false;
+  }
+};
+
+export const addSeriesToBlog = async (seriesName: string, blogId: number): Promise<boolean> => {
+  try {
+    const response = await axios.post(`${BASE_URL}/series/${seriesName}/blog/${blogId}`);
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error adding blog to series:", error);
+    return false;
+  }
+};
+
+
+
+// [Tags]
 export const getTagsAll = async(): Promise<TagOption[] | undefined> => {
 	try{
 		const response = await axios.get(`${BASE_URL}/blogs/tags`);
