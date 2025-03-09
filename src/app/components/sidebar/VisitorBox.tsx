@@ -1,4 +1,6 @@
+import { getTodayVisitorCount, getTotalVisitorCount } from "@/app/api/historyApi";
 import { useSelector } from "@/app/store";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 interface StyledProps {
@@ -32,15 +34,26 @@ const VisitNumber = styled.div<StyledProps>`
 
 export const VisitorBox = () => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
+	const [todayCnt, setTodayCnt] = useState<number>(0);
+	const [totalCnt, setTotalCnt] = useState<number>(0);
 
-	const totalVisit = 472312;
-  const todayVisit = 54;
+	useEffect(() => {
+    const fetchVisitorCounts = async () => {
+			const today = await getTodayVisitorCount();
+			const total = await getTotalVisitorCount();
+
+			setTodayCnt(today ?? 0);  
+			setTotalCnt(total ?? 0);
+    };
+
+    fetchVisitorCounts();
+  }, []);
 
 	return (
 		<VisitorWrapper>
 			<VisitorInfo $isDark={isDarkMode}>
-				Total <VisitNumber $isDark={isDarkMode}>{totalVisit.toLocaleString()}</VisitNumber>
-				Today <VisitNumber $isDark={isDarkMode}>{todayVisit.toLocaleString()}</VisitNumber>
+				Total <VisitNumber $isDark={isDarkMode}>{totalCnt.toLocaleString()}</VisitNumber>
+				Today <VisitNumber $isDark={isDarkMode}>{todayCnt.toLocaleString()}</VisitNumber>
 			</VisitorInfo>
 		</VisitorWrapper>
 	)

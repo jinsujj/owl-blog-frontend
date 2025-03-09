@@ -74,47 +74,6 @@ const Select = styled.select`
   width: 200px;
 `;
 
-
-const BlogCard = styled.li`
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 12px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
-  cursor: pointer;
-
-  &:hover {
-    transform: scale(1.02);
-  }
-`;
-
-const Thumbnail = styled.img`
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-`;
-
-const BlogContent = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const BlogTitle = styled.h4`
-  margin: 0;
-  font-size: 16px;
-  color: #333;
-`;
-
-const BlogDate = styled.span`
-  font-size: 12px;
-  color: #777;
-`;
-
 const SeriesView = () => {
 	const isLogged = useSelector((state) => state.auth.isLogged);
 	const isDarkMode = useSelector((state) => state.common.isDark);
