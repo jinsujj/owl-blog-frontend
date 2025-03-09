@@ -22,9 +22,15 @@ const SeriesItem = styled.div<StyledProps>`
 
 const SeriesTitle = styled.h3<StyledProps>`
   cursor: pointer;
-  background-color: #f4f4f4;
+  background-color: ${(props) => (props.$isDark ? "#2a2a2a" : "#f4f4f4")};
+  color: ${(props) => (props.$isDark ? "#ffffff" : "#333")};
   padding: 10px;
   border-radius: 5px;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+
+  &:hover {
+    background-color: ${(props) => (props.$isDark ? "#3a3a3a" : "#e0e0e0")};
+  }
 `;
 
 const Input = styled.input`
