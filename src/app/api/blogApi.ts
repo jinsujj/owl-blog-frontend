@@ -173,7 +173,7 @@ export const getBlogById = async (id: string): Promise<Post | undefined> => {
 export const getBlogByType = async (type: string): Promise<Post | undefined> => {
 	try{
 		const response = await axios.get(`${BASE_URL}/blogs/type/${type}`);
-		return response.data;
+		return response.status === 200 ? response.data: undefined;
 	}
 	catch (error){
 		console.log("Error fetching blog: "+ error);
