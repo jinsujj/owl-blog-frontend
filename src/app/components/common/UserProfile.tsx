@@ -3,6 +3,8 @@ import { commonAction } from "@/app/store/common";
 import { CommonState } from "@/app/types/reduxState";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+
 
 interface StyledProps {
 	$isDark: boolean;
@@ -104,6 +106,25 @@ const TabButton = styled.button<{ $isActive: boolean, $isDark: boolean }>`
   }
 `;
 
+
+const ProfileLinks = styled.div`
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+`;
+
+const ProfileLink = styled.a<StyledProps>`
+  color: ${(props) => (props.$isDark ? "#bbb" : "#333")};
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
+  }
+`;
+
+
+
 const TabContent = styled.div`
   padding: 20px;
   font-size: 1rem;
@@ -140,30 +161,39 @@ export const UserProfile = () => {
 	};
 
 	return (
-		<ProfileWrapper $isDark={isDarkMode}>
-			<ProfileImageWrapper>
-				<ProfileImage src="https://avatars.githubusercontent.com/u/19955904?v=4" alt="Profile" />
-				<ProfileDetails>
-					<ProfileName $isDark={isDarkMode}>jinsujj</ProfileName>
-					<ProfileStats $isDark={isDarkMode}>
-						<span>3 팔로워</span>
-						<span>0 팔로잉</span>
-					</ProfileStats>
-					<FollowButton $isDark={isDarkMode}>팔로우</FollowButton>
-				</ProfileDetails>
-			</ProfileImageWrapper>
-			<TabContainer>
-				{["글", "시리즈", "소개"].map((tab) => (
-					<TabButton $isDark={isDarkMode}
-						key={tab}
-						$isActive={renderTab === tab}
-						onClick={() => dispatch(commonAction.setRenderTab(tab as CommonState["renderTab"]))}
-					>
-						{tab}
-					</TabButton>
-				))}
-			</TabContainer>
-			<TabContent>{renderTabContent()}</TabContent>
-		</ProfileWrapper>
-	);
+    <ProfileWrapper $isDark={isDarkMode}>
+      <ProfileImageWrapper>
+        <ProfileImage src="https://avatars.githubusercontent.com/u/19955904?v=4" alt="Profile" />
+        <ProfileDetails>
+          <ProfileName $isDark={isDarkMode}>jinsujj</ProfileName>
+          <ProfileStats $isDark={isDarkMode}>
+            <span>3 팔로워</span>
+            <span>0 팔로잉</span>
+          </ProfileStats>
+          {/* 링크 아이콘 추가 */}
+          <ProfileLinks>
+					<ProfileLink $isDark={isDarkMode} href="https://github.com/jinsujj" target="_blank" rel="noopener noreferrer">
+						<FaGithub size={24} />
+					</ProfileLink>
+					<ProfileLink $isDark={isDarkMode} href="https://www.linkedin.com/in/jinsu-jang-0b2269107/" target="_blank" rel="noopener noreferrer">
+						<FaLinkedin size={24} />
+					</ProfileLink>
+				</ProfileLinks>
+        </ProfileDetails>
+      </ProfileImageWrapper>
+      <TabContainer>
+        {["글", "시리즈", "소개"].map((tab) => (
+          <TabButton
+            $isDark={isDarkMode}
+            key={tab}
+            $isActive={renderTab === tab}
+            onClick={() => dispatch(commonAction.setRenderTab(tab as CommonState["renderTab"]))}
+          >
+            {tab}
+          </TabButton>
+        ))}
+      </TabContainer>
+      <TabContent>{renderTabContent()}</TabContent>
+    </ProfileWrapper>
+  );
 };

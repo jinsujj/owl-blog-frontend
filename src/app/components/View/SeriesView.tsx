@@ -108,7 +108,6 @@ const SeriesView = () => {
 		const fetchSeriesMappedBlog = async () => {
 			try {
 				const blogsBySeries = await getBlogBySeries();
-				console.log(blogsBySeries);
 				setSeriesMappedBlogs(blogsBySeries || {});
 			} catch (error) {
 				console.error("Failed to fetch blogs", error);
