@@ -60,22 +60,22 @@ const ProfileStats = styled.div<StyledProps>`
   margin-bottom: 10px;
 `;
 
-const FollowButton = styled.button<StyledProps>`
-  margin-top: 10px;
-  padding: 7px 20px;
-  border: 1px solid ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
-  background-color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
-  color: ${(props) => (props.$isDark ? "#333" : "#fff")};
-  border-radius: 20px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
+// const FollowButton = styled.button<StyledProps>`
+//   margin-top: 10px;
+//   padding: 7px 20px;
+//   border: 1px solid ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
+//   background-color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
+//   color: ${(props) => (props.$isDark ? "#333" : "#fff")};
+//   border-radius: 20px;
+//   font-size: 0.9rem;
+//   cursor: pointer;
+//   transition: all 0.3s ease;
 
-  &:hover {
-    background-color: ${(props) => (props.$isDark ? "#333" : "transparent")};
-    color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
-  }
-`;
+//   &:hover {
+//     background-color: ${(props) => (props.$isDark ? "#333" : "transparent")};
+//     color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
+//   }
+// `;
 
 const TabContainer = styled.div`
   display: flex;
