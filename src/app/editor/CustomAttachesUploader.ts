@@ -1,5 +1,3 @@
-import exp from "constants";
-
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
 
 const CustomAttachesUploader = {

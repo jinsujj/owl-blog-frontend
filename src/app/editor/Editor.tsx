@@ -226,10 +226,6 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 											return { success: 0 };
 										}
 									},
-									async uploadByUrl(url: string) {
-										console.warn("uploadByUrl is not supported.");
-										return { success: 0 };
-									},
 								},
 							},
 						},
