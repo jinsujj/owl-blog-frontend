@@ -26,6 +26,8 @@ import useModal from '../hooks/useModal';
 import ConfirmModal from '../components/modal/ConfirmModal';
 import { uploadThumbnail } from '../api/thumbnailApi';
 import DeleteImageTune from './DeleteImageTune';
+import CustomHeader from './CustomHeader';
+import CustomAttachesUploader from './CustomAttachesUploader';
 
 interface EditorContainerProps {
 	$isReadOnly: boolean;
@@ -38,12 +40,16 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	margin: 0 auto;
 	width: 100%;
 
+	.image-tool__image{
+		z-index: 99999;
+	}
+
 	.ce-code__textarea {
-  	display: ${(props) => (props.$isReadOnly ? "none" : "block" )};
+  	display: ${(props) => (props.$isReadOnly ? "none" : "block")};
 	}
 
 	.highlighted-code {
-		display: ${(props) => (props.$isReadOnly ? "block" : "none" )};
+		display: ${(props) => (props.$isReadOnly ? "block" : "none")};
 	}
 
 
@@ -89,6 +95,23 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	.image-tool__caption{
 		display: none !important;
 	}
+
+	.custom-header {
+		border-left: 4px solid red;
+		padding-left: 8px;
+		margin-top: .6em;
+		font-size: 30px;
+		font-weight: bold;
+	}
+
+	.custom-header-input {
+		border: none;
+		outline: none;
+		font-size: 30px;
+		font-weight: bold;
+		width: 100%;
+		background: transparent;
+	}
 `;
 
 const StyledEditor = styled.div`
@@ -131,8 +154,6 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 	const isPublished = postState === 'published'
 	const editorRef = useRef<EditorJS | null>(null);
 
-
-
 	const parsedInitialData = useMemo(() => {
 		if (typeof initialData === 'string') {
 			try {
@@ -152,8 +173,8 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 		const codeBlocks = editorElement.querySelectorAll('.ce-code__textarea');
 		codeBlocks.forEach((textarea) => {
 			const parent = textarea.parentNode;
-    	if (!parent) return;
-			
+			if (!parent) return;
+
 			const codeContent = (textarea as HTMLTextAreaElement).value;
 			// 기존에 하이라이트된 코드가 있다면 삭제
 			const existingHighlight = textarea.parentNode?.querySelector('.ce-code__textarea cdx-input');
@@ -186,10 +207,11 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 					tools: {
 						raw: { class: RawTool, shortcut: 'OPTION+R' },
 						code: { class: CodeTool, shortcut: 'OPTION+C' },
-						list: { class: List as unknown as BlockToolConstructable, inlineToolbar: true, shortcut: 'OPTION+O' },
+						list: { class: List as unknown as BlockToolConstructable, inlineToolbar: true, shortcut: 'OPTION+L' },
 						delimiter: { class: Delimiter as unknown as BlockToolConstructable, shortcut: 'OPTION+D' },
 						embed: { class: Embed, config: { services: { youtube: true } } },
 						Marker: { class: Marker, shortcut: 'OPTION+M' },
+						CustomHeaer: { class: CustomHeader, shortcut: 'OPTION+M' },
 						warning: { class: Warning, inlineToolbar: true, shortcut: 'OPTION+W', config: { titlePlaceholder: 'Title', messagePlaceholder: 'Message', }, },
 						image: {
 							class: ImageTool,
@@ -198,26 +220,24 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 									async uploadByFile(file: File) {
 										try {
 											const response = await uploadThumbnail(file);
-											return {
-												success: 1,
-												file: {
-													url: response.fileUrl,
-												},
-											};
+											return {success: 1, file: { url: response.fileUrl}};
 										} catch (error) {
 											console.error("Image upload failed:", error);
 											return { success: 0 };
 										}
 									},
+									async uploadByUrl(url: string) {
+										console.warn("uploadByUrl is not supported.");
+										return { success: 0 };
+									},
 								},
 							},
-							tunes: ["deleteImage"],
 						},
 						deleteImage: {
 							class: DeleteImageTune,
 						},
 						linkTool: {
-							class: LinkTool, shortcut: 'OPTION+L',
+							class: LinkTool, shortcut: 'OPTION+q',
 							config: { endpoint: 'https://api.microlink.io?url=', }
 						},
 						table: {
@@ -227,7 +247,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 						},
 						attaches: {
 							class: AttachesTool, shortcut: 'OPTION+A',
-							config: { endpoint: 'http://localhost:8008/uploadFile' }
+							config: { uploader: CustomAttachesUploader }
 						},
 						header: {
 							class: Header as unknown as BlockToolConstructable, shortcut: 'OPTION+H',
@@ -237,6 +257,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 							},
 						},
 					},
+					tunes: ['deleteImage'],
 					onReady: () => {
 						if (isReadOnly) {
 							renderHighlightedCode();
@@ -260,7 +281,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 
 	const handleSave = async () => {
 		if (!editorRef.current) return;
-		
+
 		const savedData = await editorRef.current.save();
 		const blog: OutputData = { ...savedData, }
 		if (onSave) onSave(blog);
