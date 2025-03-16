@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'backend.owl-dev.me',
+        hostname: 'backend2.owl-dev.me',
         pathname: '/**'
       }
     ],
