@@ -7,7 +7,10 @@ const nextConfig: NextConfig = {
 		Improved performance: Faster compilation with SWC instead of Babel.
 	*/
   compiler: {
-    styledComponents: true,  
+    styledComponents: {
+      ssr: true,
+      displayName: true,
+    },
   },
   images: {
     remotePatterns: [
