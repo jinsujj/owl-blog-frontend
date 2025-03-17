@@ -10,7 +10,7 @@ import useModal from "@/app/hooks/useModal";
 import { useSelector } from "@/app/store";
 import { commonAction } from "@/app/store/common";
 import { OutputData } from "@editorjs/editorjs";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ActionMeta, MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
@@ -19,6 +19,8 @@ import { useRouter } from "next/navigation";
 import palette from "@/app/styles/palette";
 import MessageModal from "@/app/components/modal/MessageModal";
 import useUtterances from "@/app/hooks/useUtterances";
+import { authAction } from "@/app/store/auth";
+import { checkTokenValidity, getKakaoUserInfo } from "@/app/api/loginApi";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -126,6 +128,33 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
       router.push('/');
     }, 1000); 
 	}
+
+	// login token 
+	useEffect(() => {
+		checkTokenValidity().then((validToken) => {
+			if (!validToken) return;
+			dispatch(authAction.setLogged(true));
+		});
+		return;
+	}, [router]);
+
+	// userinfo
+	useEffect(() => {
+		if (isLogged)
+			setUserInfo();
+	}, [isLogged]);
+	
+	const setUserInfo = useCallback(async () => {
+		try {
+			const userInfo = await getKakaoUserInfo();
+			dispatch(authAction.setUserId(userInfo?.id || ''));
+			dispatch(authAction.setUserName(userInfo?.userName || ''));
+			dispatch(authAction.setImageUrl(userInfo?.imageUrl || ''));
+			dispatch(authAction.setEmail(userInfo?.email || ''));
+		} catch (error) {
+			console.error("Error setting userInfo:", error);
+		}
+	}, [dispatch]);
 
 
 	useEffect(() => {
