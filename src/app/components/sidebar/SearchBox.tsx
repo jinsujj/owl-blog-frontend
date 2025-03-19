@@ -1,3 +1,5 @@
+"use client";
+
 import { useSelector } from "@/app/store";
 import { commonAction } from "@/app/store/common";
 import { useEffect, useState } from "react";
@@ -48,8 +50,13 @@ const SearchInput = styled.input<StyledProps>`
 
 export const SearchBox = () => {
 	const dispatch = useDispatch();
-	const isDarkMode = useSelector((state) => state.common.isDark);
 	const [searchQuery, setSearchQuery] = useState("");
+  const isDarkMode = useSelector((state) => state.common.isDark);
+  const [isDark, setIsDark] = useState<boolean>(false);
+
+  useEffect(() => {
+		setIsDark(isDarkMode);
+	}, [isDarkMode]);
 
 	useEffect(() => {
 		const timeoutId = setTimeout(() => {
@@ -58,12 +65,12 @@ export const SearchBox = () => {
 		return () => clearTimeout(timeoutId); 
 		
 	}, [searchQuery, dispatch]);
-	
+
 	return (
 		<SearchWrapper>
 			<SearchIcon/>
 			<SearchInput
-				$isDark={isDarkMode}
+				$isDark={isDark}
 				placeholder="검색어를 입력하세요"
 				value={searchQuery}
 				onChange={(e) => setSearchQuery(e.target.value)}

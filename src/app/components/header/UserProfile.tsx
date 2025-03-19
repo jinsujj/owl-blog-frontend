@@ -1,3 +1,5 @@
+"use client";
+
 import { useSelector } from "@/app/store";
 import styled from "styled-components";
 import * as Popover from "@radix-ui/react-popover";
@@ -94,8 +96,8 @@ const UserProfile = () => {
 	const postState = useSelector((state) => state.common.postState);
 	const userName = useSelector((state) => state.auth.userName);
 	const imageUrl = useSelector((state) => state.auth.imageUrl);
-	const isDarkMode = useSelector((state) => state.common.isDark);
-
+  const isDarkMode = useSelector((state) => state.common.isDark);
+  
 
 	const onClickPostBlog = () => {
 		console.log(postState);

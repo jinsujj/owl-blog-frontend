@@ -1,5 +1,6 @@
 import Script from "next/script";
 import ReduxProvider from "./ReduxProvider";
+import StyledComponentsRegistry from "./registry";
 import "./globals.css";
 
 export const metadata = {
@@ -90,9 +91,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         <FontLinks />
       </head>
       <body>
-        <ReduxProvider>
-          {children}
-        </ReduxProvider>
+        <StyledComponentsRegistry>
+          <ReduxProvider>
+            {children}
+          </ReduxProvider>
+        </StyledComponentsRegistry>
         <div id="root-modal" />
         <ExternalScripts />
       </body>

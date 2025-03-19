@@ -1,11 +1,10 @@
-"use client";
-
 import { useSelector } from "@/app/store";
 import { commonAction } from "@/app/store/common";
 import { CommonState } from "@/app/types/reduxState";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
 
 interface StyledProps {
@@ -61,23 +60,6 @@ const ProfileStats = styled.div<StyledProps>`
   color: ${(props) => (props.$isDark ? "#bbb" : "#666")};
   margin-bottom: 10px;
 `;
-
-// const FollowButton = styled.button<StyledProps>`
-//   margin-top: 10px;
-//   padding: 7px 20px;
-//   border: 1px solid ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
-//   background-color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
-//   color: ${(props) => (props.$isDark ? "#333" : "#fff")};
-//   border-radius: 20px;
-//   font-size: 0.9rem;
-//   cursor: pointer;
-//   transition: all 0.3s ease;
-
-//   &:hover {
-//     background-color: ${(props) => (props.$isDark ? "#333" : "transparent")};
-//     color: ${(props) => (props.$isDark ? "#88c57f" : "#4caf50")};
-//   }
-// `;
 
 const TabContainer = styled.div`
   display: flex;
@@ -146,8 +128,13 @@ const TabContent = styled.div`
 
 export const UserProfile = () => {
 	const dispatch = useDispatch();
-	const isDarkMode = useSelector((state) => state.common.isDark);
 	const renderTab = useSelector((state) => state.common.renderTab);
+  const isDarkMode = useSelector((state) => state.common.isDark);
+  const [isDark, setIsDark] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsDark(isDarkMode);
+  }, [isDarkMode]);
 
 	const renderTabContent = () => {
 		switch (renderTab) {
@@ -163,21 +150,21 @@ export const UserProfile = () => {
 	};
 
 	return (
-    <ProfileWrapper $isDark={isDarkMode}>
+    <ProfileWrapper $isDark={isDark}>
       <ProfileImageWrapper>
         <ProfileImage src="https://avatars.githubusercontent.com/u/19955904?v=4" alt="Profile" />
         <ProfileDetails>
-          <ProfileName $isDark={isDarkMode}>jinsujj</ProfileName>
-          <ProfileStats $isDark={isDarkMode}>
+          <ProfileName $isDark={isDark}>jinsujj</ProfileName>
+          <ProfileStats $isDark={isDark}>
             <span>3 팔로워</span>
             <span>0 팔로잉</span>
           </ProfileStats>
           {/* 링크 아이콘 추가 */}
           <ProfileLinks>
-					<ProfileLink $isDark={isDarkMode} href="https://github.com/jinsujj" target="_blank" rel="noopener noreferrer">
+					<ProfileLink $isDark={isDark} href="https://github.com/jinsujj" target="_blank" rel="noopener noreferrer">
 						<FaGithub size={24} />
 					</ProfileLink>
-					<ProfileLink $isDark={isDarkMode} href="https://www.linkedin.com/in/jinsu-jang-0b2269107/" target="_blank" rel="noopener noreferrer">
+					<ProfileLink $isDark={isDark} href="https://www.linkedin.com/in/jinsu-jang-0b2269107/" target="_blank" rel="noopener noreferrer">
 						<FaLinkedin size={24} />
 					</ProfileLink>
 				</ProfileLinks>

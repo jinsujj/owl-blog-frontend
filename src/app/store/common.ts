@@ -7,7 +7,7 @@ const initialState: CommonState = {
     postState: "created",
     toggle: true,
     search: "",
-		renderTab: "글"
+    renderTab: "글"
 };
 
 

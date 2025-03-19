@@ -1,3 +1,5 @@
+"use client";
+
 import { setDarkMode, useSelector } from "@/app/store";
 import palette from "@/app/styles/palette";
 import styled, { css } from "styled-components";

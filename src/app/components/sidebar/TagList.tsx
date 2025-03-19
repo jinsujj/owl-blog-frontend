@@ -1,3 +1,5 @@
+"use client";
+
 import { PostSummary } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import { commonAction } from "@/app/store/common";

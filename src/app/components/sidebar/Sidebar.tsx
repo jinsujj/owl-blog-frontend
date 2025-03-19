@@ -50,10 +50,15 @@ const SidebarToggleIcon = styled.button`
 
 export const SideBar = () => {
 	const dispatch = useDispatch();
-	const isDarkMode = useSelector((state) => state.common.isDark);
 	const isSidebarOpen = useSelector((state) => state.common.toggle);
 	const toggle = useSelector((state) => state.common.toggle);
 	const [postSummary, setPostSummary] = useState<PostSummary[]>([]);
+	const isDarkMode = useSelector((state) => state.common.isDark);
+	const [isDark, setIsDark] = useState<boolean>(false);
+  
+	useEffect(() => {
+		  setIsDark(isDarkMode);
+	}, [isDarkMode]);
 
 	useEffect(() => {
 		const fetchPosts = async () => {
@@ -72,8 +77,9 @@ export const SideBar = () => {
 		dispatch(commonAction.setToggle(!toggle));
 	  }
 
+	
 	return (
-		<SideBarContainer $isDark={isDarkMode} $isSidebarOpen={isSidebarOpen}>
+		<SideBarContainer $isDark={isDark} $isSidebarOpen={isSidebarOpen}>
 			<SidebarToggleIcon onClick={() => setToggle(toggle)}>
 				{toggle ? <HiBars3 /> : <HiBars3 />}
 			</SidebarToggleIcon>
