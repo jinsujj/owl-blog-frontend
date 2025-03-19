@@ -44,6 +44,13 @@ const EditorContainer = styled.div<EditorContainerProps>`
 		z-index: 99999;
 	}
 
+	.image-tool__image {
+    display: block; 
+    margin: 0 auto; 
+    max-width: 80%;
+    height: auto;
+  }
+
 	.ce-code__textarea {
   	display: ${(props) => (props.$isReadOnly ? "none" : "block")};
 	}
