@@ -1,3 +1,5 @@
+"use client";
+
 import { useSelector } from "@/app/store";
 import { commonAction } from "@/app/store/common";
 import { CommonState } from "@/app/types/reduxState";

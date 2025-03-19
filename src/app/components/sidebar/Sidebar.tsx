@@ -1,3 +1,5 @@
+"use client";
+
 import { getBlogSummary, PostSummary } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import styled from "styled-components";
