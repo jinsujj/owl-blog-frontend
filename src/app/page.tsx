@@ -104,7 +104,6 @@ const HomePage = () => {
 	const [code, setCode] = useState<string | null>(null);
 	const renderTab = useSelector((state) => state.common.renderTab);
 	const [editorData, setEditorData] = useState<OutputData>({ version: undefined, time: undefined, blocks: [] });
-	
 	// posts
 	const [posts, setPosts] = useState<Post[]>([]);
 
@@ -127,6 +126,18 @@ const HomePage = () => {
 			window.removeEventListener("resize", handleResize);
 		};
 	}, [dispatch]);
+
+	// dark mode 
+	useEffect(() => {
+		const now = new Date();
+		const utcNow = now.getTime() + now.getTimezoneOffset() * 60 * 1000; 
+		const koreanTimeDiff = 9 * 60 * 60 * 1000;
+		const koreaNow = new Date(utcNow + koreanTimeDiff);
+		if (18 <= koreaNow.getHours() || koreaNow.getHours() <= 6) 
+			dispatch(commonAction.setDarkMode(true));
+		else 
+			dispatch(commonAction.setDarkMode(false));
+	},[dispatch])
 
 	// login token 
 	useEffect(() => {
