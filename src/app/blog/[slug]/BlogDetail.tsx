@@ -156,6 +156,24 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		}
 	}, [dispatch]);
 
+	// dynamic size effect
+	useEffect(() => {
+		const handleResize = () => {
+			if (window.innerWidth <= 768) {
+				dispatch(commonAction.setToggle(false));
+			} else {
+				dispatch(commonAction.setToggle(true));
+			}
+		};
+
+		handleResize();
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, [dispatch]);
+
 
 	useEffect(() => {
 		dispatch(commonAction.setPostId(post?.id || 0));
