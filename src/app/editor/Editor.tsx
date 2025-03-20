@@ -45,24 +45,26 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	}
 
 	.image-tool__image {
-    display: block; 
-    margin: 0 auto; 
-    max-width: 80%;
-    height: auto;
-  }
+		display: block; 
+		margin: 0 auto; 
+		max-width: 80%;
+		height: auto;
+	}
 
 	.ce-code__textarea {
-  	display: ${(props) => (props.$isReadOnly ? "none" : "block")};
+		font-size: 16px !important;
+		display: ${(props) => (props.$isReadOnly ? "none" : "block")};
 	}
 
 	.highlighted-code {
+		font-size: 16px !important;
 		display: ${(props) => (props.$isReadOnly ? "block" : "none")};
 	}
 
 
-  #editorjs pre {
-    border: ${(props) => (props.$isReadOnly ? "none" : "1px solid #ccc")};
-  }
+	#editorjs pre {
+		border: ${(props) => (props.$isReadOnly ? "none" : "1px solid #ccc")};
+	}
 
 	.ce-toolbar__content {
 		max-width: ${(props) => props.$maxwidth};
