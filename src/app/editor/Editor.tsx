@@ -13,7 +13,6 @@ import Warning from '@editorjs/warning';
 import Marker from '@editorjs/marker';
 import Table from '@editorjs/table';
 import Embed from '@editorjs/embed';
-import LinkTool from '@editorjs/link';
 import Delimiter from '@editorjs/delimiter';
 import RawTool from '@editorjs/raw';
 import ImageTool from '@editorjs/image';
@@ -28,6 +27,7 @@ import { uploadThumbnail } from '../api/thumbnailApi';
 import DeleteImageTune from './DeleteImageTune';
 import CustomHeader from './CustomHeader';
 import CustomAttachesUploader from './CustomAttachesUploader';
+import CustomLinkTool from './CustomLinkTool';
 
 interface EditorContainerProps {
 	$isReadOnly: boolean;
@@ -119,6 +119,97 @@ const EditorContainer = styled.div<EditorContainerProps>`
 		width: 100%;
 		background: transparent;
 	}
+
+	.custom-link-tool {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 10px;
+		border: 1px solid ${(props) => (props.$isDark ? "#444" : "#ddd")};
+		border-radius: 5px;
+		background: ${(props) => (props.$isDark ? "#222" : "#f9f9f9")};
+		color: ${(props) => (props.$isDark ? "#fff" : "#000")};
+	}
+
+	/* ✅ 입력창 스타일 조정 (다크 모드 지원) */
+	.custom-link-input {
+		width: 100%;
+		padding: 8px;
+		font-size: 14px;
+		border: 1px solid ${(props) => (props.$isDark ? "#555" : "#ccc")};
+		border-radius: 4px;
+		outline: none;
+		background: ${(props) => (props.$isDark ? "#333" : "#fff")};
+		color: ${(props) => (props.$isDark ? "#fff" : "#000")};
+		transition: border-color 0.3s ease, background 0.3s ease;
+		${(props) =>
+			props.$isReadOnly &&
+			`
+			cursor: not-allowed;
+			background: ${props.$isDark ? "#222" : "#eee"};
+			border: 1px solid ${props.$isDark ? "#444" : "#ccc"};
+		`}
+	}
+
+	.custom-link-input:focus {
+		border-color: ${(props) => (props.$isDark ? "#66b2ff" : "#007bff")};
+		background: ${(props) => (props.$isDark ? "#444" : "#fff")};
+	}
+
+	/* ✅ 링크 미리보기 (다크 모드 지원) */
+	.custom-link-preview {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		border-radius: 5px;
+		overflow: hidden;
+		background: ${(props) => (props.$isDark ? "#333" : "#fff")};
+		transition: all 0.3s ease;
+		border: 1px solid ${(props) => (props.$isDark ? "#555" : "#e1e1e1")};
+	}
+
+	.custom-link-wrapper {
+		display: flex;
+		text-decoration: none;
+		width: 100%;
+		color: inherit;
+		transition: all 0.3s ease;
+	}
+
+	.custom-link-wrapper:hover {
+		background: ${(props) => (props.$isDark ? "#444" : "#f1f1f1")};
+	}
+
+	.custom-link-image {
+		width: 100px;
+		height: 100px;
+		object-fit: cover;
+		border-right: 1px solid ${(props) => (props.$isDark ? "#555" : "#ddd")};
+	}
+
+	.custom-link-text {
+		flex: 1;
+		padding: 8px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.custom-link-title {
+		font-size: 16px;
+		font-weight: bold;
+		color: ${(props) => (props.$isDark ? "#fff" : "#333")};
+		margin: 0;
+		line-height: 1.3;
+	}
+
+	.custom-link-description {
+		font-size: 14px;
+		color: ${(props) => (props.$isDark ? "#aaa" : "#666")};
+		margin: 4px 0 0;
+		line-height: 1.4;
+	}
+
 `;
 
 const StyledEditor = styled.div`
@@ -227,7 +318,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 									async uploadByFile(file: File) {
 										try {
 											const response = await uploadThumbnail(file);
-											return {success: 1, file: { url: response.fileUrl}};
+											return { success: 1, file: { url: response.fileUrl } };
 										} catch (error) {
 											console.error("Image upload failed:", error);
 											return { success: 0 };
@@ -239,9 +330,11 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 						deleteImage: {
 							class: DeleteImageTune,
 						},
-						linkTool: {
-							class: LinkTool, shortcut: 'OPTION+q',
-							config: { endpoint: 'https://api.microlink.io?url=', }
+						customLink: {
+							class: CustomLinkTool, shortcut: 'OPTION+Q',
+							config: {
+								readOnly: false, 
+							},
 						},
 						table: {
 							class: Table as unknown as BlockToolConstructable, shortcut: 'OPTION+T',
