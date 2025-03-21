@@ -178,6 +178,18 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		};
 	}, [dispatch]);
 
+	// dark mode 
+	useEffect(() => {
+		const now = new Date();
+		const utcNow = now.getTime() + now.getTimezoneOffset() * 60 * 1000; 
+		const koreanTimeDiff = 9 * 60 * 60 * 1000;
+		const koreaNow = new Date(utcNow + koreanTimeDiff);
+		if (18 <= koreaNow.getHours() || koreaNow.getHours() <= 6) 
+			dispatch(commonAction.setDarkMode(true));
+		else 
+			dispatch(commonAction.setDarkMode(false));
+	},[dispatch])
+
 
 	useEffect(() => {
 		dispatch(commonAction.setPostId(post?.id || 0));
