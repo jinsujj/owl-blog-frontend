@@ -46,6 +46,10 @@ const SliderWrapper = styled.div`
   bottom: 20px;
   right: 100px;
 	z-index: 1000;
+
+	@media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const TagsWrapper = styled.div<{ width: string }>`

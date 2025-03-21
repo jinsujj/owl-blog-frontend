@@ -134,7 +134,6 @@ const EditorContainer = styled.div<EditorContainerProps>`
 		color: ${(props) => (props.$isDark ? "#fff" : "#000")};
 	}
 
-	/* ✅ 입력창 스타일 조정 (다크 모드 지원) */
 	.custom-link-input {
 		width: 100%;
 		padding: 8px;
