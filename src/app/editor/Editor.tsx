@@ -12,7 +12,6 @@ import List from '@editorjs/list';
 import Warning from '@editorjs/warning';
 import Marker from '@editorjs/marker';
 import Table from '@editorjs/table';
-import Embed from '@editorjs/embed';
 import Delimiter from '@editorjs/delimiter';
 import RawTool from '@editorjs/raw';
 import ImageTool from '@editorjs/image';
@@ -28,6 +27,7 @@ import DeleteImageTune from './DeleteImageTune';
 import CustomHeader from './CustomHeader';
 import CustomAttachesUploader from './CustomAttachesUploader';
 import CustomLinkTool from './CustomLinkTool';
+import CustomEmbedTool from './CustomEmbedTool';
 
 interface EditorContainerProps {
 	$isReadOnly: boolean;
@@ -145,8 +145,8 @@ const EditorContainer = styled.div<EditorContainerProps>`
 		color: ${(props) => (props.$isDark ? "#fff" : "#000")};
 		transition: border-color 0.3s ease, background 0.3s ease;
 		${(props) =>
-			props.$isReadOnly &&
-			`
+		props.$isReadOnly &&
+		`
 			cursor: not-allowed;
 			background: ${props.$isDark ? "#222" : "#eee"};
 			border: 1px solid ${props.$isDark ? "#444" : "#ccc"};
@@ -158,7 +158,6 @@ const EditorContainer = styled.div<EditorContainerProps>`
 		background: ${(props) => (props.$isDark ? "#444" : "#fff")};
 	}
 
-	/* ✅ 링크 미리보기 (다크 모드 지원) */
 	.custom-link-preview {
 		display: flex;
 		align-items: center;
@@ -210,6 +209,45 @@ const EditorContainer = styled.div<EditorContainerProps>`
 		margin: 4px 0 0;
 		line-height: 1.4;
 	}
+
+	.custom-embed-wrapper {
+		margin: 16px 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.custom-embed-wrapper input {
+    width: 100%;
+    max-width: 600px;
+    font-size: 14px;
+    padding: 10px;
+    border: 1px solid ${(props) => (props.$isDark ? '#555' : '#ccc')};
+    border-radius: 6px;
+    margin-bottom: 12px;
+    background-color: ${(props) => (props.$isDark ? '#222' : '#fff')};
+    color: ${(props) => (props.$isDark ? '#fff' : '#000')};
+    transition: all 0.3s ease;
+  }
+
+	.custom-embed-wrapper input:focus {
+    border-color: ${(props) => (props.$isDark ? '#888' : '#007bff')};
+    outline: none;
+  }
+
+  .custom-embed-wrapper iframe {
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 16 / 9; 
+		height: auto; 
+    border: none;
+    border-radius: 10px;
+    box-shadow: ${(props) =>
+      props.$isDark
+        ? '0 2px 10px rgba(255, 255, 255, 0.1)'
+        : '0 2px 10px rgba(0, 0, 0, 0.1)'};
+    background-color: ${(props) => (props.$isDark ? '#111' : '#fff')};
+  }
 
 `;
 
@@ -308,9 +346,13 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 						code: { class: CodeTool, shortcut: 'OPTION+C' },
 						list: { class: List as unknown as BlockToolConstructable, inlineToolbar: true, shortcut: 'OPTION+L' },
 						delimiter: { class: Delimiter as unknown as BlockToolConstructable, shortcut: 'OPTION+D' },
-						embed: { class: Embed, config: { services: { youtube: true } } },
+						customEmbed: {
+							class: CustomEmbedTool,
+							shortcut: 'OPTION+Y',
+							toolbox: CustomEmbedTool.toolbox,
+						},
 						Marker: { class: Marker, shortcut: 'OPTION+M' },
-						CustomHeaer: { class: CustomHeader, shortcut: 'OPTION+M' },
+						customHeader: { class: CustomHeader, shortcut: 'OPTION+N' },
 						warning: { class: Warning, inlineToolbar: true, shortcut: 'OPTION+W', config: { titlePlaceholder: 'Title', messagePlaceholder: 'Message', }, },
 						image: {
 							class: ImageTool,
@@ -334,7 +376,7 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
 						customLink: {
 							class: CustomLinkTool, shortcut: 'OPTION+Q',
 							config: {
-								readOnly: false, 
+								readOnly: false,
 							},
 						},
 						table: {
