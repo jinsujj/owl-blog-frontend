@@ -196,7 +196,7 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	}
 
 	.custom-link-title {
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: bold;
 		color: ${(props) => (props.$isDark ? "#fff" : "#333")};
 		margin: 0;
