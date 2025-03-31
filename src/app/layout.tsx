@@ -48,19 +48,7 @@ function ExternalScripts() {
 	return (
 		<>
 			{/* External Scripts */}
-			<Script src="https://code.jquery.com/jquery-3.6.1.slim.min.js" strategy="lazyOnload" />
-			<Script
-				src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-				strategy="lazyOnload" />
-			<Script
-				src="https://kit.fontawesome.com/3ec141240c.js"
-				strategy="lazyOnload" />
-			<Script
-				src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
-				strategy="lazyOnload" />
-			<Script
-				src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"
-				strategy="lazyOnload" />
+			
 			{/* Google Analytics */}
 			{/* <Script 
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} 
