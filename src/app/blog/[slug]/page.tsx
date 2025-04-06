@@ -27,9 +27,9 @@ export async function generateMetadata({params}: BlogDetailPageProps): Promise<M
   }
 
   return {
-    title: post.title,
+    title: post.title || 'title',
     description:
-      post.summary || post.content.blocks.toString()?.slice(0, 100),
+      post.summary || post.content?.blocks?.toString()?.slice(0, 100),
     openGraph: {
       title: post.title,
       description: post.summary || post.title,
