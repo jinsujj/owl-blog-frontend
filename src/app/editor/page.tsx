@@ -59,7 +59,7 @@ const TagsWrapper = styled.div<{ width: string }>`
 	padding-bottom: 10px;
 `;
 
-const Editor = dynamic(() => import("./Editor"), { ssr: true });
+const Editor = dynamic(() => import("./Editor"), { ssr: false });
 const CreatableSelect = dynamic(() => import('react-select/creatable'), { ssr: false }) as typeof import('react-select/creatable').default;
 
 

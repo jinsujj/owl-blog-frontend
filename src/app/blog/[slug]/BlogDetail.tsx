@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { getTagsAll, getTagsByBlogId, Post, TagOption, updateBlog } from "@/app/api/blogApi";
 import WidthSlider from "@/app/components/common/WidthSlder";
 import Title from "@/app/components/editor/Title";
@@ -13,7 +14,6 @@ import { OutputData } from "@editorjs/editorjs";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ActionMeta, MultiValue } from "react-select";
-import CreatableSelect from "react-select/creatable";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
 import palette from "@/app/styles/palette";
@@ -64,6 +64,8 @@ const TagsWrapper = styled.div<{ width: string }>`
 const Utterances = styled.div`
 	margin-top: 20px;
 `;
+
+const CreatableSelect = dynamic(() => import('react-select/creatable'), { ssr: false }) as typeof import('react-select/creatable').default;
 
 
 interface BlogDetailProps {
