@@ -1,5 +1,6 @@
 import { OutputData } from '@editorjs/editorjs/types/data-formats';
 import axios from 'axios';
+import { ApiError } from 'next/dist/server/api-utils';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
 
@@ -153,19 +154,18 @@ export const getBlogSummary = async() => {
 	}
 }
 
-export const getBlogById = async (id: string): Promise<Post | undefined> => {
+export const getBlogById = async (id: string): Promise<Post> => {
   try {
-    const response = await axios.get(`${BASE_URL}/blogs/${id}`);
-    if (response.status === 200) 
-      return response.data; 
-    
-		else {
-      console.log("Blog not found");
-      return undefined; 
-    }
+    const response = await axios.get<Post>(`${BASE_URL}/blogs/${id}`);
+    return response.data;
   } catch (error) {
-    console.log("Error fetching blog: " + error);
-    return undefined; 
+    if (axios.isAxiosError(error)) {
+      throw new ApiError(
+        error.response?.status || 500,
+        error.response?.data?.message || 'Unknown error'
+      );
+    }
+    throw new ApiError(500, 'Internal server error');
   }
 };
 
