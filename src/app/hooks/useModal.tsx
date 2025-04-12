@@ -90,7 +90,7 @@ const useModal = () =>{
     }
 
     const ModalPortal: React.FC<IProps> = ({ children}) => {
-        const ref = useRef<Element | null>();
+        const ref = useRef<Element | null>(null);
         const [mounted, setMounted] = useState(false);
 
         useEffect(() => {
