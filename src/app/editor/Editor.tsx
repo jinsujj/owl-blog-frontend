@@ -404,12 +404,6 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
         onReady: () => {
           if (isReadOnly) renderHighlightedCode();
         },
-        onChange: async () => {
-          if (editorRef.current && onSave) {
-            const content = await editorRef.current.save();
-            onSave(content);
-          }
-        },
       });
     };
 
