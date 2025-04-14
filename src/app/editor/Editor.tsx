@@ -414,7 +414,12 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
     };
 
     initEditor();
-    return () => editorRef.current?.destroy();
+    return () => {
+		if (editorRef.current && typeof editorRef.current.destroy === 'function') {
+		  editorRef.current.destroy();
+		  editorRef.current = null; 
+		}
+	  };
   }, [parsedInitialData, isReadOnly]);
 
   useEffect(() => {
