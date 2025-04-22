@@ -21,6 +21,7 @@ import MessageModal from "@/app/components/modal/MessageModal";
 import useUtterances from "@/app/hooks/useUtterances";
 import { authAction } from "@/app/store/auth";
 import { checkTokenValidity, getKakaoUserInfo } from "@/app/api/loginApi";
+import { summaryBlog } from "@/app/api/aiApi";
 
 interface StyledProps {
 	$isDark: boolean;
@@ -74,9 +75,10 @@ interface BlogDetailProps {
 
 const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	// modal 
-	const {openModal, closeModal, ModalPortal} = useModal();
+	const { openModal, closeModal, ModalPortal } = useModal();
 	const [modalMessage, setModalMessage] = useState('');
 	const [alertColor, setAlertColor] = useState('');
+
 
 	// state 
 	const [editorMaxWidth, setEditorMaxWidth] = useState<string>('650px');
@@ -85,7 +87,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	const isDarkMode = useSelector((state) => state.common.isDark);
 	const userId = useSelector((state) => state.auth.id);
 	const dispatch = useDispatch();
-	const router= useRouter();
+	const router = useRouter();
 
 	// blog 
 	const [title, setTitle] = useState('');
@@ -99,40 +101,40 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		setEditorMaxWidth(`${width}px`);
 	}
 
-	const handleSave = async (data : OutputData) => {
+	const handleSave = async (data: OutputData) => {
 		setEditordata(data);
 		const content = JSON.stringify(data);
 
-		if(title.length == 0){
+		if (title.length == 0) {
 			setAlertColor(palette.red);
 			setModalMessage("제목이 비어있습니다.");
 			openModal();
 			return;
 		}
-		if(data.blocks.length == 0){
+		if (data.blocks.length == 0) {
 			setAlertColor(palette.red);
 			setModalMessage("내용이 비어있습니다.");
 			openModal();
 			return;
 		}
-		try{
+		try {
 			const result = await updateBlog(post.id, userId, title, content, imageUrl, selectedTags);
 			setAlertColor(palette.green);
-			setModalMessage("Blog update successfully! "+ result.id);
+			setModalMessage("Blog update successfully! " + result.id);
 			openModal();
-			hadlepost();
+			handlepost();
 		}
-		catch(error){
+		catch (error) {
 			setAlertColor(palette.red);
-			setModalMessage("Failed to update blog. Please try again. "+ error);
+			setModalMessage("Failed to update blog. Please try again. " + error);
 			openModal();
 		}
 	}
 
-	const hadlepost = () => {
+	const handlepost = () => {
 		setTimeout(() => {
-      router.push('/');
-    }, 1000); 
+			router.push('/');
+		}, 1000);
 	}
 
 	// login token 
@@ -149,7 +151,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		if (isLogged)
 			setUserInfo();
 	}, [isLogged]);
-	
+
 	const setUserInfo = useCallback(async () => {
 		try {
 			const userInfo = await getKakaoUserInfo();
@@ -183,15 +185,14 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	// dark mode 
 	useEffect(() => {
 		const now = new Date();
-		const utcNow = now.getTime() + now.getTimezoneOffset() * 60 * 1000; 
+		const utcNow = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
 		const koreanTimeDiff = 9 * 60 * 60 * 1000;
 		const koreaNow = new Date(utcNow + koreanTimeDiff);
-		if (18 <= koreaNow.getHours() || koreaNow.getHours() <= 6) 
+		if (18 <= koreaNow.getHours() || koreaNow.getHours() <= 6)
 			dispatch(commonAction.setDarkMode(true));
-		else 
+		else
 			dispatch(commonAction.setDarkMode(false));
-	},[dispatch])
-
+	}, [dispatch])
 
 	useEffect(() => {
 		dispatch(commonAction.setPostId(post?.id || 0));
@@ -231,12 +232,19 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	}, [post.id]);
 
 	useEffect(() => {
-		if(!isLogged || (userId !== post.author))
+		if (!isLogged || (userId !== post.author))
 			setIsReadOnly(true);
 		if (userId === post.author)
 			setIsReadOnly(false);
-	},[isLogged]);
+	}, [isLogged]);
 
+	const handleAISummaryClick = () => {
+		setModalMessage("AI 요약이 요청되었습니다.");
+		setAlertColor(palette.blue); 
+		openModal(); 
+		summaryBlog(post.id);
+	};
+	
 
 
 	const handleTagChange = (newValue: MultiValue<TagOption>, actionMeta: ActionMeta<TagOption>) => {
@@ -278,11 +286,11 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		<Container $isDark={isDarkMode}>
 			<Header />
 			<ModalPortal>
-				<MessageModal message={modalMessage} onClose={closeModal} color={alertColor}/>
+				<MessageModal message={modalMessage} onClose={closeModal} color={alertColor} />
 			</ModalPortal>
 			<SideBar />
 			<TagsWrapper width={editorMaxWidth}>
-				<Title editorMaxWidth={editorMaxWidth} title={title} setTitle={setTitle} isReadOnly={isReadOnly} setIsReadOnly={setIsReadOnly} />
+				<Title editorMaxWidth={editorMaxWidth} title={title} setTitle={setTitle} isReadOnly={isReadOnly} setIsReadOnly={setIsReadOnly} onAISummary={handleAISummaryClick} />
 				<CreatableSelect
 					isMulti
 					isDisabled={isReadOnly}
@@ -290,7 +298,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 					onChange={(newValue, actionMeta) => handleTagChange(newValue as MultiValue<TagOption>, actionMeta as ActionMeta<TagOption>)}
 					onCreateOption={handleCreateTag}
 					options={availableTags}
-					getOptionValue={(option) => option.name} 
+					getOptionValue={(option) => option.name}
 					getOptionLabel={(option) => option.label}
 					placeholder="Select or create tags..."
 					isClearable
@@ -333,13 +341,13 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 						}),
 						multiValueRemove: (baseStyles) => ({
 							...baseStyles,
-							display: isReadOnly ? "none" : "flex", 
+							display: isReadOnly ? "none" : "flex",
 						})
 					}}
 				/>
 			</TagsWrapper>
-			<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} imageUrl={imageUrl} setImageUrl={setImageUrl}/>
-			<Utterances id={post.id.toString()}/>
+			<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} imageUrl={imageUrl} setImageUrl={setImageUrl} />
+			<Utterances id={post.id.toString()} />
 			<SliderWrapper>
 				<WidthSlider defaultWidth={650} onWidthChange={handleWidthChage} />
 			</SliderWrapper>

@@ -130,7 +130,7 @@ const ListView = ({ posts }: ListViewProps) => {
 						<Thumbnail src={post.thumbnailUrl || "/img/owl.svg"} alt={`Thumbnail of ${post.title}`} loading="lazy" />
 						<Content $isDark={isDarkMode}>
 							<Title $isDark={isDarkMode}>{post.title}</Title>
-							<Summary $isDark={isDarkMode}>{post.summary?.length > 250 ? `${post.summary.slice(0, 250)}...` : post.summary}</Summary>
+							<Summary $isDark={isDarkMode}>{post.summary}</Summary>
 							<Meta $isDark={isDarkMode}>Updated at: {new Date(post.updatedAt).toLocaleDateString()}</Meta>
 						</Content>
 					</ListItem>

@@ -1,6 +1,6 @@
 import { useSelector } from "@/app/store";
 import palette from "@/app/styles/palette";
-import { MdEdit, MdVisibility } from "react-icons/md";
+import { MdEdit, MdVisibility, MdOutlineSummarize } from "react-icons/md";
 import styled from "styled-components";
 
 const TitleInputWrapper = styled.div`
@@ -64,9 +64,10 @@ interface TitleProps {
 	setTitle: (title: string) => void;
 	isReadOnly: boolean;
 	setIsReadOnly: (isReadOnly: boolean) => void;
+	onAISummary?: () => void;
 }
 
-export const Title: React.FC<TitleProps> = ({ editorMaxWidth, title, isReadOnly, setTitle, setIsReadOnly }) => {
+export const Title: React.FC<TitleProps> = ({ editorMaxWidth, title, isReadOnly, setTitle, setIsReadOnly ,onAISummary}) => {
 	const isLogged = useSelector((state) => state.auth.isLogged);
 	const isDarkMode = useSelector((state) => state.common.isDark);
 
@@ -84,11 +85,18 @@ export const Title: React.FC<TitleProps> = ({ editorMaxWidth, title, isReadOnly,
 				readOnly={isReadOnly}
 				width={editorMaxWidth}
 			/>
-			{isLogged &&
-				<IconButton $isReadOnly={isReadOnly} $isDark={isDarkMode} onClick={toggleMode}>
-					{isReadOnly ? <MdVisibility /> : <MdEdit />}
-				</IconButton>			
-			}
+			{isLogged && (
+				<>
+					<IconButton $isReadOnly={isReadOnly} $isDark={isDarkMode} onClick={toggleMode}>
+						{isReadOnly ? <MdVisibility /> : <MdEdit />}
+					</IconButton>
+					{onAISummary && (
+						<IconButton $isReadOnly={false} $isDark={isDarkMode} onClick={onAISummary}>
+							<MdOutlineSummarize />
+						</IconButton>
+					)}
+				</>
+			)}
 		</TitleInputWrapper>
 	);
 }
