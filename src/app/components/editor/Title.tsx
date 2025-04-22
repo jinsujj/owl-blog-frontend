@@ -1,6 +1,7 @@
 import { useSelector } from "@/app/store";
 import palette from "@/app/styles/palette";
-import { MdEdit, MdVisibility, MdOutlineSummarize } from "react-icons/md";
+import { MdEdit, MdVisibility } from "react-icons/md";
+import { PiBrainDuotone } from "react-icons/pi";
 import styled from "styled-components";
 
 const TitleInputWrapper = styled.div`
@@ -92,7 +93,7 @@ export const Title: React.FC<TitleProps> = ({ editorMaxWidth, title, isReadOnly,
 					</IconButton>
 					{onAISummary && (
 						<IconButton $isReadOnly={false} $isDark={isDarkMode} onClick={onAISummary}>
-							<MdOutlineSummarize />
+							<PiBrainDuotone />
 						</IconButton>
 					)}
 				</>
