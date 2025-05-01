@@ -1,10 +1,9 @@
-import axios from 'axios';
+import { api } from './lib/axios-client';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
 
 export const summaryBlog = async(blogId: number): Promise<void> =>{
     try{
-        await axios.post(`${BASE_URL}/ai/summary/${blogId}`);
+        await api.post(`/ai/summary/${blogId}`);
         console.log(blogId + " AI summary request compled");
     } catch (error) {
         console.error("AI summary request failed:", error);

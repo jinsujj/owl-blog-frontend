@@ -1,7 +1,6 @@
 import { OutputData } from '@editorjs/editorjs/types/data-formats';
 import axios from 'axios';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
+import { api } from './lib/axios-client';
 
 export type TagOption ={
 	name: string,
@@ -48,11 +47,11 @@ export interface BlogResponse {
 export const createBlog = async (userId: string, title: string, content: string, thumbnailUrl: string, tags?: TagOption[], type?: string): Promise<BlogResponse> => {
   try {
 		if (type){
-			const response = await axios.post(`${BASE_URL}/blogs`, {userId, title, content, thumbnailUrl, tags, type });	
+			const response = await api.post(`/blogs`, {userId, title, content, thumbnailUrl, tags, type });	
 			return response.data;
 		}
 		else {
-			const response = await axios.post(`${BASE_URL}/blogs`, {userId, title, content, thumbnailUrl, tags });
+			const response = await api.post(`/blogs`, {userId, title, content, thumbnailUrl, tags });
     	return response.data; 
 		}
   } catch (error) {
@@ -78,7 +77,7 @@ export const createBlog = async (userId: string, title: string, content: string,
 
 export const updateBlog = async(id: number, userId: string, title: string, content: string, thumbnailUrl: string, tags?: TagOption[]) => {
 	try{
-		const response = await axios.put(`${BASE_URL}/blogs/${id}`,{userId, title, content, thumbnailUrl, tags: tags ??[]});
+		const response = await api.put(`/blogs/${id}`,{userId, title, content, thumbnailUrl, tags: tags ??[]});
 		return response.data;
 	}
 	catch(error){
@@ -99,7 +98,7 @@ export const updateBlog = async(id: number, userId: string, title: string, conte
 // [Publish Blog]
 export const publishBlog = async(id: number) => {
 	try{
-		const response = await axios.post(`${BASE_URL}/blogs/${id}/publish`, {id});
+		const response = await api.post(`/blogs/${id}/publish`, {id});
 		return response.data;
 	}
 	catch(error){
@@ -118,7 +117,7 @@ export const publishBlog = async(id: number) => {
 
 export const unPublishBlog = async(id:number) => {
 	try{
-		const response = await axios.post(`${BASE_URL}/blogs/${id}/unpublish`,{id});
+		const response = await api.post(`/blogs/${id}/unpublish`,{id});
 		return response.data;
 	}
 	catch(error){
@@ -138,7 +137,7 @@ export const unPublishBlog = async(id:number) => {
 // [Contents]
 export const getBlogSummary = async() => {
 	try{
-		const response = await axios.get(`${BASE_URL}/blogs/summary`, {withCredentials: true});
+		const response = await api.get(`/blogs/summary`, {withCredentials: true});
 		if(response.status === 200)
 			return response.data;
 		
@@ -155,7 +154,7 @@ export const getBlogSummary = async() => {
 
 export const getBlogById = async (id: string): Promise<Post | undefined> => {
   try {
-    const response = await axios.get(`${BASE_URL}/blogs/${id}`);
+    const response = await api.get(`/blogs/${id}`);
     if (response.status === 200) 
       return response.data; 
     
@@ -172,7 +171,7 @@ export const getBlogById = async (id: string): Promise<Post | undefined> => {
 
 export const getBlogByType = async (type: string): Promise<Post | undefined> => {
 	try{
-		const response = await axios.get(`${BASE_URL}/blogs/type/${type}`);
+		const response = await api.get(`/blogs/type/${type}`);
 		return response.status === 200 ? response.data: undefined;
 	}
 	catch (error){
@@ -184,7 +183,7 @@ export const getBlogByType = async (type: string): Promise<Post | undefined> => 
 // [Series]
 export const getSeries = async(): Promise<Series[]|undefined> => {
 	try{
-		const response = await axios.get(`${BASE_URL}/series/`);
+		const response = await api.get(`/series/`);
 		if (response.status === 200) 
 			return response.data;
 		return [];
@@ -196,7 +195,7 @@ export const getSeries = async(): Promise<Series[]|undefined> => {
 
 export const getBlogBySeries = async(): Promise<{ [key: string]: Post[] } | undefined> => {
 	try{
-		const response = await axios.get(`${BASE_URL}/blogs/series`);
+		const response = await api.get(`/blogs/series`);
 		if (response.status === 200) return response.data;
     else {
       console.log("Series not found");
@@ -211,7 +210,7 @@ export const getBlogBySeries = async(): Promise<{ [key: string]: Post[] } | unde
 
 export const createSeries = async (seriesName: string): Promise<boolean> => {
   try {
-    const response = await axios.post(`${BASE_URL}/series/${seriesName}`);
+    const response = await api.post(`/series/${seriesName}`);
     return response.status === 201;
   } catch (error) {
     console.error("Error creating series:", error);
@@ -221,7 +220,7 @@ export const createSeries = async (seriesName: string): Promise<boolean> => {
 
 export const deleteSeries = async (seriesName: string): Promise<boolean> => {
   try {
-    const response = await axios.delete(`${BASE_URL}/blogs/series/`, {
+    const response = await api.delete(`/blogs/series/`, {
       data: { seriesName },
     });
     return response.status === 200;
@@ -233,7 +232,7 @@ export const deleteSeries = async (seriesName: string): Promise<boolean> => {
 
 export const addSeriesToBlog = async (seriesName: string, blogId: number): Promise<boolean> => {
   try {
-    const response = await axios.post(`${BASE_URL}/series/${seriesName}/blog/${blogId}`);
+    const response = await api.post(`/series/${seriesName}/blog/${blogId}`);
     return response.status === 200;
   } catch (error) {
     console.error("Error adding blog to series:", error);
@@ -246,7 +245,7 @@ export const addSeriesToBlog = async (seriesName: string, blogId: number): Promi
 // [Tags]
 export const getTagsAll = async(): Promise<TagOption[] | undefined> => {
 	try{
-		const response = await axios.get(`${BASE_URL}/blogs/tags`);
+		const response = await api.get(`/blogs/tags`);
 		if(response.status == 200)
 			return response.data;
 
@@ -263,7 +262,7 @@ export const getTagsAll = async(): Promise<TagOption[] | undefined> => {
 
 export const getTagsByBlogId = async (id: string): Promise<TagOption[] | undefined> => {
 	try{
-		const response = await axios.get(`${BASE_URL}/blogs/${id}/tags`);
+		const response = await api.get(`/blogs/${id}/tags`);
 		if (response.status === 200)
 			return response.data;
 

@@ -1,12 +1,9 @@
-import axios from "axios";
-
-
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
+import { api } from "./lib/axios-client";
 
 
 export const getTodayVisitorCount = async() : Promise<number | undefined> => {
 	try{
-		const response = await axios.get(`${BASE_URL}/visitor/todayCnt`);
+		const response = await api.get(`/visitor/todayCnt`);
 		return response.status === 200 ? response.data : undefined;
 	}
 	catch(error){
@@ -17,7 +14,7 @@ export const getTodayVisitorCount = async() : Promise<number | undefined> => {
 
 export const getTotalVisitorCount = async(): Promise<number | undefined> => {
 	try{
-		const response = await axios.get(`${BASE_URL}/visitor/totalCnt`);
+		const response = await api.get(`/visitor/totalCnt`);
 		return response.status === 200 ? response.data : undefined;
 	}
 	catch(error){

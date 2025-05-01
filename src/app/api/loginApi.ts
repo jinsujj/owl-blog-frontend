@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
+import { api } from './lib/axios-client';
 
 export type UserInfo ={
   id: string,
@@ -19,7 +17,7 @@ export const requestKakaoLogin = () => {
 
 export const getKakaoToken = async (code: string): Promise<boolean> => {
     try {
-        const response = await axios.post(`${BASE_URL}/auth/kakao/login`, { code }, {withCredentials: true});
+        const response = await api.post(`/auth/kakao/login`, { code }, {withCredentials: true});
         return response.status === 200;
     }
     catch (error) {
@@ -30,7 +28,7 @@ export const getKakaoToken = async (code: string): Promise<boolean> => {
 
 export const getKakaoUserInfo = async (): Promise<UserInfo | undefined> => {
   try{
-    const response = await axios.get(`${BASE_URL}/auth/token/decode`, {withCredentials: true});
+    const response = await api.get(`/auth/token/decode`, {withCredentials: true});
     if (response.status === 200) 
       return response.data;
   }
@@ -41,7 +39,7 @@ export const getKakaoUserInfo = async (): Promise<UserInfo | undefined> => {
 
 export const checkTokenValidity = async ():Promise<boolean> => {
   try {
-    const response = await axios.get(`${BASE_URL}/auth/token/validate`, {withCredentials: true});
+    const response = await api.get(`/auth/token/validate`, {withCredentials: true});
 
     if (response.status === 200 && response.data.isValid) {
       return true;
@@ -54,7 +52,7 @@ export const checkTokenValidity = async ():Promise<boolean> => {
 
 export const logout = async (): Promise<boolean> => {
     try {
-        await axios.post(`${BASE_URL}/auth/logout`, {}, {withCredentials: true});
+        await api.post(`/auth/logout`, {}, {withCredentials: true});
         return true;
     } catch (error) {
         console.error("Error during logout:", error);

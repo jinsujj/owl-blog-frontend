@@ -1,6 +1,5 @@
-import axios from 'axios';
+import { api } from './lib/axios-client';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
 export type LinkPreview = {
   title: string;
   description: string;
@@ -9,7 +8,7 @@ export type LinkPreview = {
 
 export const getLinkPreview = async (url: string): Promise<LinkPreview | undefined> => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/link-preview`, {
+    const response = await api.get(`/api/link-preview`, {
       params: { url },
     });
 
