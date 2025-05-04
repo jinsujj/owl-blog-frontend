@@ -1,5 +1,29 @@
 import { api } from "./lib/axios-client";
 
+export interface CoordinateVO {
+	country: string;
+	city: string;
+	ip: string;
+	createdAt: string;
+	lat: string;
+	lon: string;
+  }
+
+export const getVisitorCoordinatesHistory = async (
+	from: string,
+	to: string
+  ): Promise<CoordinateVO[] | undefined> => {
+	try {
+	  const response = await api.get(`/visitor/coordinate/history`, {
+		params: { from, to },
+	  });
+  
+	  return response.status === 200 ? response.data : undefined;
+	} catch (error) {
+	  console.error("Error fetching visitor coordinates history:", error);
+	  return undefined;
+	}
+  };
 
 export const getTodayVisitorCount = async() : Promise<number | undefined> => {
 	try{

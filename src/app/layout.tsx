@@ -43,16 +43,15 @@ function Links() {
 
 function ExternalScripts() {
 	const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID || '';
-	const NAVER_MAP_CLIENT_ID = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '';
 
 	return (
 		<>
 			{/* Google Analytics */}
-			{<Script 
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} 
-        strategy="afterInteractive" />}
+			{<Script
+				src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+				strategy="afterInteractive" />}
 			{<Script id="google-analytics" strategy="afterInteractive">
-        {`
+				{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
@@ -61,14 +60,15 @@ function ExternalScripts() {
           });
         `}</Script>}
 			{/* Google AdSense */}
-			{<Script 
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2309486098831986" 
-        strategy="afterInteractive" 
-        crossOrigin="anonymous" /> }
+			{<Script
+				src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2309486098831986"
+				strategy="afterInteractive"
+				crossOrigin="anonymous" />}
 			{/* Naver Map */}
 			<Script
-				src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${NAVER_MAP_CLIENT_ID}`}
-				strategy="lazyOnload" />
+				src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}`}
+				strategy="lazyOnload"
+			/>
 		</>
 	);
 }
