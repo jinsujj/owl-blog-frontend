@@ -66,8 +66,8 @@ function ExternalScripts() {
 				crossOrigin="anonymous" />}
 			{/* Naver Map */}
 			<Script
-				src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}`}
-				strategy="lazyOnload"
+				src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}`}
+				strategy="beforeInteractive"
 			/>
 		</>
 	);

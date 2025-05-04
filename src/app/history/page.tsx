@@ -3,34 +3,15 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import WidthSlider from '../components/common/WidthSlder';
 import { checkTokenValidity } from '../api/loginApi';
-
-const SliderWrapper = styled.div`
-  position: fixed;
-  bottom: 20px;
-  right: 100px;
-	z-index: 1000;
-
-	@media (max-width: 768px) {
-    display: none;
-  }
-`;
+import Script from 'next/script';
+import WidthSlider from "@/app/components/common/WidthSlder";
 
 
-const Container = styled.div`
+const Container = styled.div<{width: string}>`
   margin: 0 auto;
   padding: 2rem 1rem;
-`;
-
-const LayoutWrapper = styled.main<{ width: string }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; 
   max-width: ${(props) => props.width};
-  width: 100%;
-  margin: 0 auto;
 `;
 
 const Title = styled.h1`
@@ -84,81 +65,96 @@ const MapContainer = styled.div`
 `;
 
 
+const SliderWrapper = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 100px;
+	z-index: 1000;
+
+	@media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+
 const NaverMapWithMarkers = dynamic(() => import('./NaverMapWithMarkers'), {
-    ssr: false
+  ssr: false
 });
 
 const getTodayDateString = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
+  const today = new Date();
+  return today.toISOString().split('T')[0];
 };
 
 export default function MapPage() {
-    const [from, setFrom] = useState(getTodayDateString());
-    const [to, setTo] = useState(getTodayDateString());
-    // state 
-    const [editorMaxWidth, setEditorMaxWidth] = useState<string>('980px');
-    const [searchRange, setSearchRange] = useState<{ from: string; to: string } | null>(null);
-    const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
+  const [from, setFrom] = useState(getTodayDateString());
+  const [to, setTo] = useState(getTodayDateString());
+  // state 
+  const [editorMaxWidth, setEditorMaxWidth] = useState<string>('1000px');
+  const [searchRange, setSearchRange] = useState<{ from: string; to: string } | null>(null);
+  const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
 
-    // token check 
-    useEffect(() => {
-        const validate = async () => {
-          const isValid = await checkTokenValidity();
-          setIsValidToken(isValid);
-        };
-    
-        validate();
-      }, []);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (from && to) {
-            setSearchRange({ from, to });
-        }
+  // token check 
+  useEffect(() => {
+    const validate = async () => {
+      const isValid = await checkTokenValidity();
+      setIsValidToken(isValid);
     };
 
-    const handleWidthChage = (width: number) => {
-        setEditorMaxWidth(`${width}px`);
-    }
+    validate();
+  }, []);
 
-    if (isValidToken === null || !isValidToken){
-        return (
-            <p>Not Authorized</p>
-        )
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('폼이 제출됨!', from, to);
+    if (from && to) {
+      setSearchRange({ from, to });
     }
-    else {
-        return (
-            <>
-                <Container>
-                    <LayoutWrapper width={editorMaxWidth}>
-                        <Title>방문자 IP 기반 위치</Title>
-                        <Form onSubmit={handleSubmit}>
-                            <StyledInput
-                                type="date"
-                                value={from}
-                                onChange={(e) => setFrom(e.target.value)}
-                                required
-                            />
-                            <StyledInput
-                                type="date"
-                                value={to}
-                                onChange={(e) => setTo(e.target.value)}
-                                required
-                            />
-                            <SubmitButton type="submit">조회</SubmitButton>
-                        </Form>
-                        {searchRange && (
-                            <MapContainer>
-                                <NaverMapWithMarkers from={searchRange.from} to={searchRange.to} />
-                            </MapContainer>
-                        )}
-                        <SliderWrapper>
-                            <WidthSlider defaultWidth={980} onWidthChange={handleWidthChage} />
-                        </SliderWrapper>
-                    </LayoutWrapper>
-                </Container>
-            </>
-        );
-    }
+  };
+
+  const handleWidthChage = (width: number) => {
+    setEditorMaxWidth(`${width}px`);
+  }
+
+  if (isValidToken === null || !isValidToken) {
+    return (
+      <p>Not Authorized</p>
+    )
+  }
+  else {
+    return (
+      <>
+        <Script
+          src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}`}
+          strategy="beforeInteractive"
+        />
+        <Container width={editorMaxWidth}>
+          <Title>방문자 IP 기반 위치</Title>
+          <Form onSubmit={handleSubmit}>
+            <StyledInput
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              required
+            />
+            <StyledInput
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              required
+            />
+            <SubmitButton type="submit">조회</SubmitButton>
+          </Form>
+          {searchRange && (
+            <MapContainer>
+              <NaverMapWithMarkers from={searchRange.from} to={searchRange.to} />
+            </MapContainer>
+          )}
+          <SliderWrapper>
+            <WidthSlider defaultWidth={1000} onWidthChange={handleWidthChage} />
+          </SliderWrapper>
+        </Container>
+      </>
+    );
+  }
 }
