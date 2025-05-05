@@ -8,7 +8,8 @@ import { authAction } from "@/app/store/auth";
 import { useDispatch } from "react-redux";
 import { commonAction } from "@/app/store/common";
 import { useRouter } from "next/navigation";
-import { FiEdit, FiLogOut } from "react-icons/fi"; // 아이콘 추가
+import { FiEdit, FiLogOut ,} from "react-icons/fi";
+import { LuHistory } from "react-icons/lu";
 
 interface StyledProps {
 	$isdark: boolean;
@@ -112,6 +113,11 @@ const UserProfile = () => {
 		window.location.replace("/");
 	};
 
+  const handleHistory = () => {
+		console.log("history");
+		window.location.replace("/history");
+	};
+
 	return (
 		<Popover.Root>
 			<Popover.Trigger asChild>
@@ -132,6 +138,9 @@ const UserProfile = () => {
 					</PopupButton>
 					<PopupButton $isdark={isDarkMode} onClick={handleLogout}>
 						<FiLogOut /> 로그아웃
+					</PopupButton>
+          <PopupButton $isdark={isDarkMode} onClick={handleHistory}>
+						<LuHistory /> 방문기록
 					</PopupButton>
 				</PopupContent>
 			</Popover.Portal>

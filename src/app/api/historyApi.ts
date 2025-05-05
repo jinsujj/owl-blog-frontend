@@ -1,6 +1,8 @@
 import { api } from "./lib/axios-client";
 
 export interface CoordinateVO {
+	blogTitle: string;
+    blogId: string;
 	country: string;
 	city: string;
 	ip: string;
@@ -11,11 +13,13 @@ export interface CoordinateVO {
 
 export const getVisitorCoordinatesHistory = async (
 	from: string,
-	to: string
+	to: string,
+	ipAddress?: string
   ): Promise<CoordinateVO[] | undefined> => {
 	try {
 	  const response = await api.get(`/visitor/coordinate/history`, {
-		params: { from, to },
+		params: {from,to,...(ipAddress ? { ip: ipAddress } : {}),
+		  },
 	  });
   
 	  return response.status === 200 ? response.data : undefined;

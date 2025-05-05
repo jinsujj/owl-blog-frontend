@@ -1,17 +1,36 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
-import { checkTokenValidity } from '../api/loginApi';
+import { checkTokenValidity, getKakaoUserInfo } from '../api/loginApi';
 import Script from 'next/script';
 import WidthSlider from "@/app/components/common/WidthSlder";
+import Header from '../components/header/Header';
+import { authAction } from '../store/auth';
+import { useDispatch } from 'react-redux';
+import { useSelector } from '../store';
+import { useRouter } from 'next/navigation';
 
 
-const Container = styled.div<{width: string}>`
-  margin: 0 auto;
-  padding: 2rem 1rem;
+interface StyledProps {
+  $isDark: boolean;
+}
+
+const Container = styled.div<StyledProps>`
+  min-height: 100vh;
+	margin: 0 auto;
+	background-color: ${(props) => (props.$isDark ? "#333" : "#fff")};
+	color: ${(props) => (props.$isDark ? "#ddd" : "#333")};
+`;
+
+const LayoutWrapper = styled.main<{ width: string }>`
+  align-items: center;
+  justify-content: center; 
   max-width: ${(props) => props.width};
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
 `;
 
 const Title = styled.h1`
@@ -89,10 +108,42 @@ const getTodayDateString = () => {
 export default function MapPage() {
   const [from, setFrom] = useState(getTodayDateString());
   const [to, setTo] = useState(getTodayDateString());
+  const [ip, setIp] = useState<string>('');
   // state 
-  const [editorMaxWidth, setEditorMaxWidth] = useState<string>('1000px');
-  const [searchRange, setSearchRange] = useState<{ from: string; to: string } | null>(null);
+  const [editorMaxWidth, setEditorMaxWidth] = useState<string>('1200px');
+  const [searchRange, setSearchRange] = useState<{ from: string; to: string; ip: string } | null>(null);
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
+  const isDarkMode = useSelector((state) => state.common.isDark);
+  const isLogged = useSelector((state) => state.auth.isLogged);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  // login token 
+  useEffect(() => {
+    checkTokenValidity().then((validToken) => {
+      if (!validToken) return;
+      dispatch(authAction.setLogged(true));
+    });
+    return;
+  }, [router]);
+
+  // userinfo
+  useEffect(() => {
+    if (isLogged)
+      setUserInfo();
+  }, [isLogged]);
+
+  const setUserInfo = useCallback(async () => {
+    try {
+      const userInfo = await getKakaoUserInfo();
+      dispatch(authAction.setUserId(userInfo?.id || ''));
+      dispatch(authAction.setUserName(userInfo?.userName || ''));
+      dispatch(authAction.setImageUrl(userInfo?.imageUrl || ''));
+      dispatch(authAction.setEmail(userInfo?.email || ''));
+    } catch (error) {
+      console.error("Error setting userInfo:", error);
+    }
+  }, [dispatch]);
 
   // token check 
   useEffect(() => {
@@ -106,9 +157,10 @@ export default function MapPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('폼이 제출됨!', from, to);
+    console.log('폼이 제출됨!', from, to, ip);
     if (from && to) {
-      setSearchRange({ from, to });
+      setSearchRange({ from, to, ip: ip.trim() });
+      console.log("searchRange "+searchRange);
     }
   };
 
@@ -128,30 +180,39 @@ export default function MapPage() {
           src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}`}
           strategy="beforeInteractive"
         />
-        <Container width={editorMaxWidth}>
-          <Title>방문자 IP 기반 위치</Title>
-          <Form onSubmit={handleSubmit}>
-            <StyledInput
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              required
-            />
-            <StyledInput
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              required
-            />
-            <SubmitButton type="submit">조회</SubmitButton>
-          </Form>
-          {searchRange && (
-            <MapContainer>
-              <NaverMapWithMarkers from={searchRange.from} to={searchRange.to} />
-            </MapContainer>
-          )}
+        <Container $isDark={isDarkMode}>
+          <Header />
+          <LayoutWrapper width={editorMaxWidth}>
+            <Title>방문자 IP 기반 위치</Title>
+            <Form onSubmit={handleSubmit}>
+              <StyledInput
+                type="date"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                required
+              />
+              <StyledInput
+                type="date"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                required
+              />
+              <StyledInput
+                type="text"
+                placeholder="IP 주소 (선택)"
+                value={ip}
+                onChange={(e) => setIp(e.target.value)}
+              />
+              <SubmitButton type="submit">조회</SubmitButton>
+            </Form>
+            {searchRange && (
+              <MapContainer>
+                <NaverMapWithMarkers from={searchRange.from} to={searchRange.to} ip={searchRange.ip} />
+              </MapContainer>
+            )}
+          </LayoutWrapper>
           <SliderWrapper>
-            <WidthSlider defaultWidth={1000} onWidthChange={handleWidthChage} />
+            <WidthSlider defaultWidth={1200} onWidthChange={handleWidthChage} />
           </SliderWrapper>
         </Container>
       </>
