@@ -16,14 +16,12 @@ export default function NaverMapWithMarkers({ from, to, ip }: { from: string; to
         clearInterval(interval);
       }
     }, 100);
-
     return () => clearInterval(interval);
   }, []);
 
   // 2. 좌표 data fetch
   useEffect(() => {
     const fetchData = async () => {
-      console.log("ip "+ ip);
       const data = await getVisitorCoordinatesHistory(from, to, ip);
       if (data) setCoordinates(data);
     };
@@ -36,7 +34,7 @@ export default function NaverMapWithMarkers({ from, to, ip }: { from: string; to
     if (!naverLoaded || !mapRef.current || coordinates.length === 0) return;
 
     const map = new window.naver.maps.Map(mapRef.current, {
-      center: new window.naver.maps.LatLng(37.5665, 126.978),
+      center: new window.naver.maps.LatLng(37.5665, 126.978), // 서울 기준
       zoom: 3,
       zoomControl: true,
       scrollWheel: true,
@@ -45,19 +43,60 @@ export default function NaverMapWithMarkers({ from, to, ip }: { from: string; to
       pinchZoom: true,
     });
 
-    let activeInfoWindow: naver.maps.InfoWindow | null = null; 
+    let activeInfoWindow: naver.maps.InfoWindow | null = null;
 
+    // 4. IP 기준으로 그룹핑
+    type GroupedByIp = {
+      ip: string;
+      lat: string;
+      lon: string;
+      country: string;
+      city: string;
+      logs: {
+        blogTitle: string;
+        createdAt: string;
+      }[];
+    };
+
+    const grouped: Record<string, GroupedByIp> = {};
     coordinates.forEach((coord) => {
+      const key = coord.ip;
+      if (!grouped[key]) {
+        grouped[key] = {
+          ip: coord.ip,
+          lat: coord.lat,
+          lon: coord.lon,
+          country: coord.country,
+          city: coord.city,
+          logs: [],
+        };
+      }
+      grouped[key].logs.push({
+        blogTitle: coord.blogTitle,
+        createdAt: coord.createdAt,
+      });
+    });
+
+    // 5. 마커 및 InfoWindow 생성
+    Object.values(grouped).forEach((group) => {
       const latlng = new window.naver.maps.LatLng(
-        parseFloat(coord.lat),
-        parseFloat(coord.lon)
+        parseFloat(group.lat),
+        parseFloat(group.lon)
       );
 
       const marker = new window.naver.maps.Marker({
         position: latlng,
         map,
-        title: `${coord.city} (${coord.ip})`,
+        title: `${group.city} (${group.ip})`,
       });
+
+      const blogLogs = group.logs.map(
+        (log, idx) => `
+          <div>
+            <strong>📖 제목 ${idx + 1}:</strong> ${log.blogTitle}<br/>
+            <strong>🕒 시간:</strong> ${new Date(log.createdAt).toLocaleString()}
+          </div>`
+      ).join('<hr style="margin: 6px 0;" />');
 
       const content = `
         <div style="
@@ -69,22 +108,17 @@ export default function NaverMapWithMarkers({ from, to, ip }: { from: string; to
           border-radius: 8px;
           box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
           max-width: 1000px;
-          width: 100%;
           word-break: break-word;
         ">
-          <div><strong>📖 제목:</strong> ${coord.blogTitle}</div>
-          <div><strong>🌐 IP:</strong> ${coord.ip}</div>
-          <div><strong>📍 위치:</strong> ${coord.lat}, ${coord.lon}</div>
-          <div><strong>🕒 시간:</strong> ${new Date(coord.createdAt).toLocaleString()}</div>
-          <div><strong>🌏 국가/도시:</strong> ${coord.country} / ${coord.city}</div>
+          ${blogLogs}
+          <hr />
+          <div><strong>🌐 IP:</strong> ${group.ip}</div>
+          <div><strong>📍 위치:</strong> ${group.lat}, ${group.lon}</div>
+          <div><strong>🌏 국가/도시:</strong> ${group.country} / ${group.city}</div>
         </div>
       `;
 
-
-      const infoWindow = new window.naver.maps.InfoWindow({
-        content,
-        maxWidth: 300,
-      });
+      const infoWindow = new window.naver.maps.InfoWindow({ content });
 
       window.naver.maps.Event.addListener(marker, 'click', () => {
         if (activeInfoWindow === infoWindow) {
