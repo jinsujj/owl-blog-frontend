@@ -39,12 +39,12 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	}
 
 	.ce-code__textarea {
-		font-size: 16px !important;
+		font-size: 14px !important;
 		display: ${(props) => (props.$isReadOnly ? "none" : "block")};
 	}
 
 	.highlighted-code {
-		font-size: 16px !important;
+		font-size: 14px !important;
 		display: ${(props) => (props.$isReadOnly ? "block" : "none")};
 	}
 
