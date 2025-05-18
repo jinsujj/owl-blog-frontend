@@ -136,7 +136,7 @@ const SeriesView = () => {
 		try {
 			const blog = allBlogs.find((b) => b.id === selectedBlog);
 			if (!blog) return;
-
+			
 			await addSeriesToBlog(selectedSeries, selectedBlog);
 			setSeriesMappedBlogs((prev) => ({
 				...prev,

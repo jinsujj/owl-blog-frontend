@@ -210,7 +210,7 @@ export const getBlogBySeries = async(): Promise<{ [key: string]: Post[] } | unde
 
 export const createSeries = async (seriesName: string): Promise<boolean> => {
   try {
-    const response = await api.post(`/series/${seriesName}`);
+    const response = await api.post(`/series/${seriesName}`,{withCredentials: true});
     return response.status === 201;
   } catch (error) {
     console.error("Error creating series:", error);
@@ -220,9 +220,7 @@ export const createSeries = async (seriesName: string): Promise<boolean> => {
 
 export const deleteSeries = async (seriesName: string): Promise<boolean> => {
   try {
-    const response = await api.delete(`/blogs/series/`, {
-      data: { seriesName },
-    });
+    const response = await api.delete(`/series/${seriesName}`, {withCredentials: true});
     return response.status === 200;
   } catch (error) {
     console.error("Error deleting series:", error);
@@ -230,9 +228,11 @@ export const deleteSeries = async (seriesName: string): Promise<boolean> => {
   }
 };
 
+
+
 export const addSeriesToBlog = async (seriesName: string, blogId: number): Promise<boolean> => {
   try {
-    const response = await api.post(`/series/${seriesName}/blog/${blogId}`);
+    const response = await api.post(`/series/${seriesName}/blog/${blogId}`,{withCredentials: true});
     return response.status === 200;
   } catch (error) {
     console.error("Error adding blog to series:", error);
