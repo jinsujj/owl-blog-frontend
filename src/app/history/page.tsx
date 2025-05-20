@@ -11,6 +11,7 @@ import { authAction } from '../store/auth';
 import { useDispatch } from 'react-redux';
 import { useSelector } from '../store';
 import { useRouter } from 'next/navigation';
+import NaverMapWithTable from './NaverMapWithTable';
 
 
 interface StyledProps {
@@ -206,9 +207,12 @@ export default function MapPage() {
               <SubmitButton type="submit">조회</SubmitButton>
             </Form>
             {searchRange && (
+							<>
               <MapContainer>
                 <NaverMapWithMarkers from={searchRange.from} to={searchRange.to} ip={searchRange.ip} />
               </MapContainer>
+							<NaverMapWithTable from={searchRange.from} to={searchRange.to} ip={searchRange.ip} />
+							</>
             )}
           </LayoutWrapper>
           <SliderWrapper>

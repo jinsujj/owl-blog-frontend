@@ -23,7 +23,14 @@ export default function NaverMapWithMarkers({ from, to, ip }: { from: string; to
   useEffect(() => {
     const fetchData = async () => {
       const data = await getVisitorCoordinatesHistory(from, to, ip);
-      if (data) setCoordinates(data);
+      if (data){
+				const sortedData = data.sort((a,b) => {
+					if(a.ip < b.ip) return -1; 
+					if(a.ip > b.ip) return 1;
+					return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+				});
+				setCoordinates(sortedData);
+			}
     };
 
     fetchData();

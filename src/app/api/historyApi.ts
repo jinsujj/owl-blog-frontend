@@ -2,7 +2,7 @@ import { api } from "./lib/axios-client";
 
 export interface CoordinateVO {
 	blogTitle: string;
-    blogId: string;
+	blogId: string;
 	country: string;
 	city: string;
 	ip: string;
