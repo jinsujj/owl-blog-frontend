@@ -149,12 +149,20 @@ const SeriesView = () => {
 	};
 
 	const handleDeleteSeries = async (seriesName: string) => {
-		if(!seriesName) return 
+		if (!seriesName) return 
+		if (!window.confirm(`${seriesName} 시리즈를 정말 삭제하시겠습니까?`)) return;
+
 		try{
-			const newLocal = deleteSeries(seriesName);
+			const isSucceed = await deleteSeries(seriesName);
+			if (isSucceed){
+				setSeriesMappedBlogs((prev) => ({ ...prev, [seriesName]: [] })); 
+				setSeries((prev) => prev.filter((s) => s.name !== seriesName));
+				setNewSeriesName("");
+			}
 		}
 		catch (error){
-
+			console.error("Failed to delete series", error);
+			alert("시리즈 삭제에 실패했습니다. 연결된 블로그가 있는지 확인하세요.");
 		}
 	}
 
