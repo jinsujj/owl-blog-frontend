@@ -1,4 +1,4 @@
-import { addSeriesToBlog, createSeries, getBlogBySeries, getBlogSummary, getSeries, Post, Series } from "@/app/api/blogApi";
+import { addSeriesToBlog, createSeries, deleteSeries, getBlogBySeries, getBlogSummary, getSeries, Post, Series } from "@/app/api/blogApi";
 import { useSelector } from "@/app/store";
 import { useEffect, useState } from "react"
 import { HiTrash } from "react-icons/hi2";
@@ -148,6 +148,16 @@ const SeriesView = () => {
 		}
 	};
 
+	const handleDeleteSeries = async (seriesName: string) => {
+		if(!seriesName) return 
+		try{
+			const newLocal = deleteSeries(seriesName);
+		}
+		catch (error){
+
+		}
+	}
+
 
 	const toggleSeries = (seriesName: string) => {
 		setOpenSeries(openSeries === seriesName ? null : seriesName);
@@ -194,7 +204,7 @@ const SeriesView = () => {
 						{isLogged &&
 							<DeleteButton onClick={(e) => {
 								e.stopPropagation(); // 부모 클릭 이벤트 방지
-								handleAddSeries(seriesName);
+								handleDeleteSeries(seriesName);
 							}}>
 								<HiTrash />
 							</DeleteButton>
