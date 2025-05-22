@@ -111,7 +111,6 @@ const HomePage = () => {
 	useEffect(() => {
 		const handleResize = () => {
 			if (window.innerWidth <= 768) {
-				setIsListView(true);
 				dispatch(commonAction.setToggle(false));
 			} else {
 				setIsListView(false);

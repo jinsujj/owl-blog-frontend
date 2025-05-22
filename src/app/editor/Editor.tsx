@@ -26,6 +26,8 @@ const EditorContainer = styled.div<EditorContainerProps>`
 	max-width: ${(props) => props.$maxwidth};
 	margin: 0 auto;
 	width: 100%;
+	padding-left: 16px;
+	padding-right: 16px;
 
 	.image-tool__image{
 		z-index: 99999;
