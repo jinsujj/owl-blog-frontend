@@ -230,9 +230,9 @@ const HomePage = () => {
 			<HeaderWrapper>
 				<Header />
 			</HeaderWrapper>
+			<SideBar />
 			<Suspense fallback={<div>인증 처리 중...</div>}>
 				<SearchParamsHandler onCodeReceived={setCode} />
-				<SideBar />
 				<LayoutWrapper width={editorMaxWidth}>
 					<UserProfile />
 					{renderTab === '글' && (
