@@ -64,6 +64,10 @@ const EditorContainer = styled.div<EditorContainerProps>`
     margin: 0 auto;
     position: relative;
   }
+	
+	.ce-toolbar__actions {
+		right: 100% !important;
+	}
 
 	.cdx-warning__message{
 		display: none;
