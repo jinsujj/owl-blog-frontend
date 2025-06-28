@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import type EditorJS from '@editorjs/editorjs';
 import type { OutputData, BlockToolConstructable } from '@editorjs/editorjs';
 import hljs from 'highlight.js';
@@ -269,9 +269,22 @@ interface EditorProps {
   isReadOnly: boolean;
   imageUrl: string;
   setImageUrl?: (imageUrl: string) => void;
+  onEditorReady?: (ready: boolean) => void;
+  onEditorRef?: (editor: EditorJS | null) => void;
+  onTypingStateChange?: (isTyping: boolean) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, isReadOnly, imageUrl, setImageUrl }) => {
+const Editor: React.FC<EditorProps> = ({ 
+  initialData, 
+  editorMaxWidth, 
+  onSave, 
+  isReadOnly, 
+  imageUrl, 
+  setImageUrl,
+  onEditorReady,
+  onEditorRef,
+  onTypingStateChange
+}) => {
   // modal
   const { openModal, closeModal, ModalPortal } = useModal();
   const [modalMessage, setModalMessage] = useState('');
@@ -313,6 +326,22 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
       textarea.parentNode?.insertBefore(pre, textarea.nextSibling);
     });
   };
+
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleTyping = useCallback(() => {
+    if (onTypingStateChange) {
+      onTypingStateChange(true);
+      
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      
+      typingTimeoutRef.current = setTimeout(() => {
+        onTypingStateChange(false);
+      }, 1000);
+    }
+  }, [onTypingStateChange]);
 
   useEffect(() => {
     const initEditor = async () => {
@@ -409,18 +438,29 @@ const Editor: React.FC<EditorProps> = ({ initialData, editorMaxWidth, onSave, is
         tunes: ['deleteImage'],
         onReady: () => {
           if (isReadOnly) renderHighlightedCode();
+          
+          console.log('Editor: EditorJS is ready');
+          if (onEditorReady) onEditorReady(true);
+          if (onEditorRef) onEditorRef(editorRef.current);
         },
+        onChange: () => {
+          handleTyping();
+        }
       });
     };
 
     initEditor();
     return () => {
-		if (editorRef.current && typeof editorRef.current.destroy === 'function') {
-		  editorRef.current.destroy();
-		  editorRef.current = null; 
-		}
-	  };
-  }, [parsedInitialData, isReadOnly]);
+      if (editorRef.current && typeof editorRef.current.destroy === 'function') {
+        if (onEditorReady) onEditorReady(false);
+        editorRef.current.destroy();
+        editorRef.current = null; 
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [parsedInitialData, isReadOnly, onEditorReady, onEditorRef, handleTyping]);
 
   useEffect(() => {
     if (editorRef.current) {

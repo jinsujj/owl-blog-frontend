@@ -22,6 +22,7 @@ import useUtterances from "@/app/hooks/useUtterances";
 import { authAction } from "@/app/store/auth";
 import { checkTokenValidity, getKakaoUserInfo } from "@/app/api/loginApi";
 import { summaryBlog } from "@/app/api/aiApi";
+import { useAutoSave } from '@/app/hooks/useAutoSave';
 
 interface StyledProps {
 	$isDark: boolean;
@@ -97,6 +98,24 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	const [imageUrl, setImageUrl] = useState<string>('');
 	useUtterances(post.id.toString());
 
+	// 초기 로드 여부를 추적
+	const [isInitialized, setIsInitialized] = useState(false);
+
+	// 자동 저장 훅 사용
+	const {
+		setEditorReady,
+		setEditorRef,
+		setTypingState,
+		clearLocalStorage,
+		loadFromLocalStorage
+	} = useAutoSave({
+		blogId: post.id,
+		title,
+		imageUrl,
+		selectedTags: selectedTags || [],
+		onRestore: undefined // 복원 로직은 직접 처리
+	});
+
 	const handleWidthChage = (width: number) => {
 		setEditorMaxWidth(`${width}px`);
 	}
@@ -122,6 +141,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 			setAlertColor(palette.green);
 			setModalMessage("Blog update successfully! " + result.id);
 			openModal();
+			clearLocalStorage(); // 저장 성공 시 로컬 스토리지 클리어
 			handlepost();
 		}
 		catch (error) {
@@ -194,7 +214,10 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 			dispatch(commonAction.setDarkMode(false));
 	}, [dispatch])
 
+	// 초기화 로직
 	useEffect(() => {
+		if (isInitialized) return; // 이미 초기화되었으면 스킵
+
 		dispatch(commonAction.setPostId(post?.id || 0));
 		if (post?.publishedAt) {
 			dispatch(commonAction.setPostState("published"));
@@ -204,9 +227,21 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 			dispatch(commonAction.setPostState("created"));
 		}
 
+		// 1. 먼저 서버 데이터로 초기화
 		setTitle(post.title);
 		setEditordata(post.content);
 		setImageUrl(post.thumbnailUrl);
+
+		// 2. 로컬 스토리지에서 draft 데이터 확인
+		const savedData = loadFromLocalStorage();
+		if (savedData) {
+			console.log('Found draft data, restoring...');
+			// draft 데이터가 있으면 덮어쓰기
+			if (savedData.title) setTitle(savedData.title);
+			if (savedData.data) setEditordata(savedData.data);
+			if (savedData.imageUrl) setImageUrl(savedData.imageUrl);
+			if (savedData.selectedTags) setSelectedTags(savedData.selectedTags);
+		}
 
 		const tagsAll = async () => {
 			try {
@@ -221,15 +256,21 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		const fetchBlogTags = async () => {
 			try {
 				const selectedTags = await getTagsByBlogId(post.id.toString());
-				setSelectedTags(selectedTags);
+				// 로컬 스토리지에 태그가 없을 때만 서버 태그 사용
+				if (!savedData?.selectedTags) {
+					setSelectedTags(selectedTags);
+				}
 			}
 			catch (error) {
 				console.error("Failed to fetch post tags:", error);
 			}
 		};
+		
 		tagsAll();
 		fetchBlogTags();
-	}, [post.id]);
+		
+		setIsInitialized(true);
+	}, [post.id, dispatch, loadFromLocalStorage, isInitialized]);
 
 	useEffect(() => {
 		if (!isLogged || (userId !== post.author))
@@ -346,7 +387,17 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 					}}
 				/>
 			</TagsWrapper>
-			<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} imageUrl={imageUrl} setImageUrl={setImageUrl} />
+			<Editor 
+				initialData={editorData} 
+				editorMaxWidth={editorMaxWidth} 
+				onSave={handleSave} 
+				isReadOnly={isReadOnly} 
+				imageUrl={imageUrl} 
+				setImageUrl={setImageUrl}
+				onEditorReady={setEditorReady}
+				onEditorRef={setEditorRef}
+				onTypingStateChange={setTypingState}
+			/>
 			<Utterances id={post.id.toString()} />
 			<SliderWrapper>
 				<WidthSlider defaultWidth={650} onWidthChange={handleWidthChage} />

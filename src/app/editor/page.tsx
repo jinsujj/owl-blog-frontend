@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import palette from "../styles/palette";
 import WidthSlider from "../components/common/WidthSlder";
 import styled from "styled-components";
@@ -17,6 +17,7 @@ import { OutputData } from "@editorjs/editorjs";
 import { useEffect } from 'react';
 import { getTagsAll, TagOption } from "@/app/api/blogApi";
 import { NotAuthrizedPage } from "./NotAuthrizedPage";
+import { useAutoSave, DraftData } from '../hooks/useAutoSave';
 
 
 interface StyledProps {
@@ -62,7 +63,6 @@ const TagsWrapper = styled.div<{ width: string }>`
 const Editor = dynamic(() => import("./Editor"), { ssr: false });
 const CreatableSelect = dynamic(() => import('react-select/creatable'), { ssr: false }) as typeof import('react-select/creatable').default;
 
-
 const EditorPage: React.FC = () => {
 	// modal 
 	const { openModal, closeModal, ModalPortal } = useModal();
@@ -82,6 +82,28 @@ const EditorPage: React.FC = () => {
 	const [availableTags, setAvailableTags] = useState<TagOption[]>([]);
 	const [selectedTags, setSelectedTags] = useState<TagOption[]>([]);
 	const [imageUrl, setImageUrl] = useState<string>('');
+
+	// onRestore 콜백을 useCallback으로 메모이제이션
+	const handleRestore = useCallback((savedData: DraftData) => {
+		if (savedData.title) setTitle(savedData.title);
+		if (savedData.data) setEditorData(savedData.data);
+		if (savedData.imageUrl) setImageUrl(savedData.imageUrl);
+		if (savedData.selectedTags) setSelectedTags(savedData.selectedTags);
+	}, []);
+
+	// 자동 저장 훅 사용
+	const {
+		setEditorReady,
+		setEditorRef,
+		setTypingState,
+		clearLocalStorage
+	} = useAutoSave({
+		blogId: 0, // 새 글은 0으로 설정
+		title,
+		imageUrl,
+		selectedTags: selectedTags || [],
+		onRestore: handleRestore
+	});
 
 	const handleSave = async (data: OutputData) => {
 		setEditorData(data);
@@ -105,6 +127,7 @@ const EditorPage: React.FC = () => {
 			setModalMessage("Blog created successfully! "+ result.id);
 			setAlertColor(palette.green);
 			openModal();
+			clearLocalStorage(); // 저장 성공 시 로컬 스토리지 클리어
 			window.location.href = '/';
 		}
 		catch (error) {
@@ -234,7 +257,7 @@ const EditorPage: React.FC = () => {
 					}}
 				/>
 			</TagsWrapper>
-			<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} imageUrl={imageUrl} setImageUrl={setImageUrl}/>
+			<Editor initialData={editorData} editorMaxWidth={editorMaxWidth} onSave={handleSave} isReadOnly={isReadOnly} imageUrl={imageUrl} setImageUrl={setImageUrl} onEditorReady={setEditorReady} onEditorRef={setEditorRef} onTypingStateChange={setTypingState}/>
 			<SliderWrapper>
 				<WidthSlider defaultWidth={650} onWidthChange={handleWidthChage} />
 			</SliderWrapper>
