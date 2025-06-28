@@ -1,19 +1,19 @@
-import { useEffect, useRef, useCallback, useMemo } from 'react';
-import type { OutputData } from '@editorjs/editorjs';
-import type EditorJS from '@editorjs/editorjs';
+"use client";
 
-// 태그 타입 정의
-interface TagOption {
+import { useEffect, useRef, useCallback, useMemo } from "react";
+import type { OutputData } from "@editorjs/editorjs";
+import type EditorJS from "@editorjs/editorjs";
+import { useDispatch } from "react-redux";
+import { showTempSaveToast, hideTempSaveToast } from "../store";
+
+export interface TagOption {
   name: string;
   label: string;
 }
 
-// DraftData 타입을 export하여 재사용 가능하게 만듦
 export interface DraftData {
   data: OutputData;
-  title: string;
   imageUrl: string;
-  selectedTags: TagOption[];
   timestamp: number;
   blogId: number;
 }
@@ -23,171 +23,124 @@ interface UseAutoSaveProps {
   title: string;
   imageUrl: string;
   selectedTags: TagOption[];
-  onSave?: () => void;
   onRestore?: (data: DraftData) => void;
+  onTempSaveComplete?: () => void;
 }
 
-// localStorage가 사용 가능한지 확인하는 헬퍼 함수
-const isLocalStorageAvailable = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  try {
-    const test = '__localStorage_test__';
-    localStorage.setItem(test, test);
-    localStorage.removeItem(test);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-export const useAutoSave = ({ 
-  blogId, 
-  title, 
-  imageUrl, 
-  selectedTags, 
-  onSave, 
-  onRestore 
+export const useAutoSave = ({
+  blogId,
+  title,
+  imageUrl,
+  selectedTags,
+  onRestore,
+  onTempSaveComplete,
 }: UseAutoSaveProps) => {
+  const dispatch = useDispatch();
+
   const editorRef = useRef<EditorJS | null>(null);
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastSavedDataRef = useRef<string>('');
+  const lastSavedDataRef = useRef<string>("");
   const isEditorReadyRef = useRef<boolean>(false);
   const isTypingRef = useRef<boolean>(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 스토리지 키를 메모이제이션
   const storageKey = useMemo(() => `draft_${blogId}`, [blogId]);
 
-  // saveToLocalStorage를 안정적으로 메모이제이션
-  const saveToLocalStorage = useCallback((data: OutputData) => {
-    if (!isLocalStorageAvailable()) return;
-    
-    const saveData: DraftData = {
-      data,
+  const saveToLocalStorage = useCallback(
+    (data: OutputData) => {
+      if (typeof window === "undefined") return;
+
+      const saveData: DraftData = {data,imageUrl,timestamp: Date.now(),blogId};
+
+      localStorage.setItem(storageKey, JSON.stringify(saveData));
+      lastSavedDataRef.current = JSON.stringify(data);
+
+      if (onTempSaveComplete) {
+        onTempSaveComplete();
+      } else {
+        dispatch(showTempSaveToast());
+        setTimeout(() => {
+          dispatch(hideTempSaveToast());
+        }, 2000);
+      }
+    },
+    [
+      blogId,
       title,
       imageUrl,
       selectedTags,
-      timestamp: Date.now(),
-      blogId
-    };
-    
-    localStorage.setItem(storageKey, JSON.stringify(saveData));
-    lastSavedDataRef.current = JSON.stringify(data);
-    
-    if (onSave) {
-      onSave();
-    }
-  }, [title, imageUrl, selectedTags, blogId, storageKey, onSave]);
+      storageKey,
+      onTempSaveComplete,
+      dispatch,
+    ]
+  );
 
-  // loadFromLocalStorage를 안정적으로 메모이제이션
   const loadFromLocalStorage = useCallback((): DraftData | null => {
-    if (!isLocalStorageAvailable()) return null;
-    
+    if (typeof window === "undefined") return null;
     const saved = localStorage.getItem(storageKey);
     return saved ? JSON.parse(saved) : null;
   }, [storageKey]);
 
-  // clearLocalStorage를 안정적으로 메모이제이션
   const clearLocalStorage = useCallback(() => {
-    if (!isLocalStorageAvailable()) return;
-    
+    if (typeof window === "undefined") return;
     localStorage.removeItem(storageKey);
   }, [storageKey]);
 
-  // autoSave를 안정적으로 메모이제이션
   const autoSave = useCallback(() => {
-    // 1. 에디터가 존재하는지 확인
-    if (!editorRef.current) {
+    if (!editorRef.current || !isEditorReadyRef.current || isTypingRef.current)
       return;
-    }
+    if (typeof editorRef.current.save !== "function") return;
 
-    // 2. 에디터가 준비되었는지 확인
-    if (!isEditorReadyRef.current) {
-      return;
-    }
-
-    // 3. 타이핑 중인지 확인
-    if (isTypingRef.current) {
-      return;
-    }
-
-    // 4. save 메서드가 있는지 확인
-    if (typeof editorRef.current.save !== 'function') {
-      return;
-    }
-
-    // 5. 실제 저장 실행
-    editorRef.current.save().then((data: OutputData) => {
-      const currentData = JSON.stringify(data);
-      // 데이터가 변경된 경우에만 저장
-      if (currentData !== lastSavedDataRef.current) {
-        saveToLocalStorage(data);
-        console.log("임시저장 완료")
-      }
-    }).catch((error: Error) => {
-      console.warn('AutoSave: Save failed:', error);
-    });
+    editorRef.current
+      .save()
+      .then((data: OutputData) => {
+        const currentData = JSON.stringify(data);
+        if (currentData !== lastSavedDataRef.current) {
+          saveToLocalStorage(data);
+          console.log("임시저장 완료");
+        }
+      })
+      .catch((err) => console.warn("AutoSave:", err));
   }, [saveToLocalStorage]);
 
-  // setEditorReady를 안정적으로 메모이제이션
   const setEditorReady = useCallback((ready: boolean) => {
     isEditorReadyRef.current = ready;
   }, []);
 
-  // setEditorRef를 안정적으로 메모이제이션
   const setEditorRef = useCallback((editor: EditorJS | null) => {
     editorRef.current = editor;
   }, []);
 
-  // setTypingState를 안정적으로 메모이제이션 - 타이핑 종료 후 5초 지연 저장
-  const setTypingState = useCallback((isTyping: boolean) => {
-    isTypingRef.current = isTyping;
-    
-    // 기존 타이핑 타임아웃 클리어
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = null;
-    }
-    
-    // 타이핑이 종료된 경우 5초 후 저장
-    if (!isTyping) {
-      typingTimeoutRef.current = setTimeout(() => {
-        autoSave();
-      }, 5000);
-    }
-  }, [autoSave]);
-
-  // 초기 로드 시 로컬 스토리지 데이터 복원 (의존성 최소화)
-  useEffect(() => {
-    const savedData = loadFromLocalStorage();
-    if (savedData && onRestore) {
-      onRestore(savedData);
-    }
-  }, [loadFromLocalStorage, onRestore]);
-
-  // 페이지 이탈 시 저장 (의존성 최소화)
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const handleBeforeUnload = () => {
-      autoSave();
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [autoSave]);
-
-  // 컴포넌트 언마운트 시 정리
-  useEffect(() => {
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
+  const setTypingState = useCallback(
+    (isTyping: boolean) => {
+      isTypingRef.current = isTyping;
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
       }
-    };
-  }, []);
+      if (!isTyping) {
+        typingTimeoutRef.current = setTimeout(autoSave, 5000);
+      }
+    },
+    [autoSave]
+  );
+
+  useEffect(() => {
+    const saved = loadFromLocalStorage();
+    if (saved) onRestore?.(saved);
+  }, [loadFromLocalStorage, onRestore]);
+
+  useEffect(() => {
+    const handler = () => autoSave();
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [autoSave]);
+
+  useEffect(
+    () => () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    },
+    []
+  );
 
   return {
     saveToLocalStorage,
@@ -197,6 +150,6 @@ export const useAutoSave = ({
     setEditorReady,
     setEditorRef,
     setTypingState,
-    isEditorReady: isEditorReadyRef.current
+    isEditorReady: isEditorReadyRef.current,
   };
-}; 
+};

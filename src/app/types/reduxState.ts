@@ -5,4 +5,7 @@ export type CommonState = {
     toggle: boolean;
     search: string;
 		renderTab: "글"|"시리즈"|"소개";
+    tempSaveToast: {
+        isVisible: boolean;
+    };
   };

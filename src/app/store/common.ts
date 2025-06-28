@@ -7,9 +7,11 @@ const initialState: CommonState = {
     postState: "created",
     toggle: true,
     search: "",
-    renderTab: "글"
+    renderTab: "글",
+    tempSaveToast: {
+        isVisible: false,
+    },
 };
-
 
 const common = createSlice({
     name: "common",
@@ -36,6 +38,12 @@ const common = createSlice({
         initCommonState(state){
             state = initialState;
             return state;
+        },
+        showTempSaveToast(state) {
+            state.tempSaveToast.isVisible = true;
+        },
+        hideTempSaveToast(state) {
+            state.tempSaveToast.isVisible = false;
         },
     },
 });

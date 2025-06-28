@@ -2,6 +2,7 @@ import Script from "next/script";
 import ReduxProvider from "./ReduxProvider";
 import StyledComponentsRegistry from "./registry";
 import "./globals.css";
+import TempSaveToast from "./components/toast/TempSaveToast";
 
 export const metadata = {
 	title: "부엉이 개발자 블로그",
@@ -84,9 +85,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<StyledComponentsRegistry>
 					<ReduxProvider>
 						{children}
+						<TempSaveToast />
 					</ReduxProvider>
 				</StyledComponentsRegistry>
 				<div id="root-modal" />
+				<div id="temp-save-modal" />
 				<ExternalScripts />
 			</body>
 		</html>
