@@ -83,12 +83,9 @@ const EditorPage: React.FC = () => {
 	const [selectedTags, setSelectedTags] = useState<TagOption[]>([]);
 	const [imageUrl, setImageUrl] = useState<string>('');
 
-	// onRestore 콜백을 useCallback으로 메모이제이션
 	const handleRestore = useCallback((savedData: DraftData) => {
-		if (savedData.title) setTitle(savedData.title);
 		if (savedData.data) setEditorData(savedData.data);
 		if (savedData.imageUrl) setImageUrl(savedData.imageUrl);
-		if (savedData.selectedTags) setSelectedTags(savedData.selectedTags);
 	}, []);
 
 	// 자동 저장 훅 사용
@@ -99,9 +96,7 @@ const EditorPage: React.FC = () => {
 		clearLocalStorage
 	} = useAutoSave({
 		blogId: 0, // 새 글은 0으로 설정
-		title,
 		imageUrl,
-		selectedTags: selectedTags || [],
 		onRestore: handleRestore
 	});
 

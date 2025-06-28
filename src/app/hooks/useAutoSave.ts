@@ -1,9 +1,7 @@
-"use client";
-
 import { useEffect, useRef, useCallback, useMemo } from "react";
 import type { OutputData } from "@editorjs/editorjs";
-import type EditorJS from "@editorjs/editorjs";
 import { useDispatch } from "react-redux";
+import type EditorJS from "@editorjs/editorjs";
 import { showTempSaveToast, hideTempSaveToast } from "../store";
 
 export interface TagOption {
@@ -20,58 +18,38 @@ export interface DraftData {
 
 interface UseAutoSaveProps {
   blogId: number;
-  title: string;
   imageUrl: string;
-  selectedTags: TagOption[];
   onRestore?: (data: DraftData) => void;
-  onTempSaveComplete?: () => void;
 }
 
 export const useAutoSave = ({
   blogId,
-  title,
   imageUrl,
-  selectedTags,
   onRestore,
-  onTempSaveComplete,
 }: UseAutoSaveProps) => {
   const dispatch = useDispatch();
-
   const editorRef = useRef<EditorJS | null>(null);
   const lastSavedDataRef = useRef<string>("");
   const isEditorReadyRef = useRef<boolean>(false);
   const isTypingRef = useRef<boolean>(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  const isFirstSaveRef = useRef<boolean>(true);
   const storageKey = useMemo(() => `draft_${blogId}`, [blogId]);
 
   const saveToLocalStorage = useCallback(
     (data: OutputData) => {
       if (typeof window === "undefined") return;
-
-      const saveData: DraftData = {data,imageUrl,timestamp: Date.now(),blogId};
-
+      const saveData: DraftData = { data, imageUrl, timestamp: Date.now(), blogId };
       localStorage.setItem(storageKey, JSON.stringify(saveData));
       lastSavedDataRef.current = JSON.stringify(data);
-
-      if (onTempSaveComplete) {
-        onTempSaveComplete();
-      } else {
+      if (!isFirstSaveRef.current) {
         dispatch(showTempSaveToast());
-        setTimeout(() => {
-          dispatch(hideTempSaveToast());
-        }, 2000);
+        setTimeout(() => dispatch(hideTempSaveToast()), 2000);
+      } else {
+        isFirstSaveRef.current = false;
       }
     },
-    [
-      blogId,
-      title,
-      imageUrl,
-      selectedTags,
-      storageKey,
-      onTempSaveComplete,
-      dispatch,
-    ]
+    [blogId, imageUrl, storageKey, dispatch]
   );
 
   const loadFromLocalStorage = useCallback((): DraftData | null => {
@@ -86,48 +64,55 @@ export const useAutoSave = ({
   }, [storageKey]);
 
   const autoSave = useCallback(() => {
-    if (!editorRef.current || !isEditorReadyRef.current || isTypingRef.current)
-      return;
-    if (typeof editorRef.current.save !== "function") return;
-
-    editorRef.current
-      .save()
-      .then((data: OutputData) => {
-        const currentData = JSON.stringify(data);
-        if (currentData !== lastSavedDataRef.current) {
-          saveToLocalStorage(data);
-          console.log("임시저장 완료");
-        }
-      })
-      .catch((err) => console.warn("AutoSave:", err));
+    const editor = editorRef.current;
+    if (!editor || !isEditorReadyRef.current || isTypingRef.current) return;
+    editor.save().then((data: OutputData) => {
+      const json = JSON.stringify(data);
+      if (json !== lastSavedDataRef.current) {
+        saveToLocalStorage(data);
+        console.log("임시저장 완료");
+      }
+    }).catch(err => console.warn("AutoSave Error:", err));
   }, [saveToLocalStorage]);
 
   const setEditorReady = useCallback((ready: boolean) => {
     isEditorReadyRef.current = ready;
-  }, []);
-
-  const setEditorRef = useCallback((editor: EditorJS | null) => {
-    editorRef.current = editor;
-  }, []);
-
-  const setTypingState = useCallback(
-    (isTyping: boolean) => {
-      isTypingRef.current = isTyping;
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = null;
+    if (ready) {
+      const saved = loadFromLocalStorage();
+      if (saved) {
+        onRestore?.(saved);
+        lastSavedDataRef.current = JSON.stringify(saved.data);
+        // 복원 후 첫 저장만 스킵
+        isFirstSaveRef.current = true;
       }
-      if (!isTyping) {
-        typingTimeoutRef.current = setTimeout(autoSave, 5000);
-      }
-    },
-    [autoSave]
-  );
+    }
+  }, [loadFromLocalStorage, onRestore]);
+
+  const setTypingState = useCallback((typing: boolean) => {
+    isTypingRef.current = typing;
+    if (typing) {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    } else {
+      typingTimeoutRef.current = setTimeout(autoSave, 2000);
+    }
+  }, [autoSave]);
 
   useEffect(() => {
-    const saved = loadFromLocalStorage();
-    if (saved) onRestore?.(saved);
-  }, [loadFromLocalStorage, onRestore]);
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.isReady
+      .then(() => {
+        setEditorReady(true);
+        editor.on("change", () => setTypingState(true));
+      })
+      .catch(console.warn);
+    return () => {
+      editor.isReady
+        .then(() => editor.off("change", () => setTypingState(true)))
+        .catch(() => {});
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    };
+  }, [setEditorReady, setTypingState]);
 
   useEffect(() => {
     const handler = () => autoSave();
@@ -135,21 +120,13 @@ export const useAutoSave = ({
     return () => window.removeEventListener("beforeunload", handler);
   }, [autoSave]);
 
-  useEffect(
-    () => () => {
-      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    },
-    []
-  );
-
   return {
-    saveToLocalStorage,
-    loadFromLocalStorage,
+    setEditorRef: (editor: EditorJS | null) => (editorRef.current = editor),
+    setEditorReady,
+    setTypingState,
     clearLocalStorage,
     autoSave,
-    setEditorReady,
-    setEditorRef,
-    setTypingState,
+    loadFromLocalStorage,
     isEditorReady: isEditorReadyRef.current,
   };
 };

@@ -108,13 +108,11 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		setTypingState,
 		clearLocalStorage,
 		loadFromLocalStorage
-	} = useAutoSave({
+	  } = useAutoSave({
 		blogId: post.id,
-		title,
 		imageUrl,
-		selectedTags: selectedTags || [],
-		onRestore: undefined // 복원 로직은 직접 처리
-	});
+		onRestore: undefined
+	  });
 
 	const handleWidthChage = (width: number) => {
 		setEditorMaxWidth(`${width}px`);
@@ -237,10 +235,8 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		if (savedData) {
 			console.log('Found draft data, restoring...');
 			// draft 데이터가 있으면 덮어쓰기
-			if (savedData.title) setTitle(savedData.title);
 			if (savedData.data) setEditordata(savedData.data);
 			if (savedData.imageUrl) setImageUrl(savedData.imageUrl);
-			if (savedData.selectedTags) setSelectedTags(savedData.selectedTags);
 		}
 
 		const tagsAll = async () => {
@@ -256,10 +252,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		const fetchBlogTags = async () => {
 			try {
 				const selectedTags = await getTagsByBlogId(post.id.toString());
-				// 로컬 스토리지에 태그가 없을 때만 서버 태그 사용
-				if (!savedData?.selectedTags) {
-					setSelectedTags(selectedTags);
-				}
+				setSelectedTags(selectedTags);
 			}
 			catch (error) {
 				console.error("Failed to fetch post tags:", error);
