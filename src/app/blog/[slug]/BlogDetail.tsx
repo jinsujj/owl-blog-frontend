@@ -139,7 +139,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 			setAlertColor(palette.green);
 			setModalMessage("Blog update successfully! " + result.id);
 			openModal();
-			clearLocalStorage(); // 저장 성공 시 로컬 스토리지 클리어
+			clearLocalStorage(); 
 			handlepost();
 		}
 		catch (error) {
@@ -214,7 +214,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 
 	// 초기화 로직
 	useEffect(() => {
-		if (isInitialized) return; // 이미 초기화되었으면 스킵
+		if (isInitialized) return; 
 
 		dispatch(commonAction.setPostId(post?.id || 0));
 		if (post?.publishedAt) {

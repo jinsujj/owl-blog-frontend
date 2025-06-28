@@ -33,7 +33,6 @@ export const useAutoSave = ({
   const isEditorReadyRef = useRef<boolean>(false);
   const isTypingRef = useRef<boolean>(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isFirstSaveRef = useRef<boolean>(true);
   const storageKey = useMemo(() => `draft_${blogId}`, [blogId]);
 
   const saveToLocalStorage = useCallback(
@@ -42,12 +41,6 @@ export const useAutoSave = ({
       const saveData: DraftData = { data, imageUrl, timestamp: Date.now(), blogId };
       localStorage.setItem(storageKey, JSON.stringify(saveData));
       lastSavedDataRef.current = JSON.stringify(data);
-      if (!isFirstSaveRef.current) {
-        dispatch(showTempSaveToast());
-        setTimeout(() => dispatch(hideTempSaveToast()), 2000);
-      } else {
-        isFirstSaveRef.current = false;
-      }
     },
     [blogId, imageUrl, storageKey, dispatch]
   );
@@ -68,9 +61,11 @@ export const useAutoSave = ({
     if (!editor || !isEditorReadyRef.current || isTypingRef.current) return;
     editor.save().then((data: OutputData) => {
       const json = JSON.stringify(data);
-      if (json !== lastSavedDataRef.current) {
+      if (json !== lastSavedDataRef.current && lastSavedDataRef.current !== "") {
         saveToLocalStorage(data);
         console.log("임시저장 완료");
+        dispatch(showTempSaveToast());
+        setTimeout(() => dispatch(hideTempSaveToast()), 2000);
       }
     }).catch(err => console.warn("AutoSave Error:", err));
   }, [saveToLocalStorage]);
@@ -82,8 +77,6 @@ export const useAutoSave = ({
       if (saved) {
         onRestore?.(saved);
         lastSavedDataRef.current = JSON.stringify(saved.data);
-        // 복원 후 첫 저장만 스킵
-        isFirstSaveRef.current = true;
       }
     }
   }, [loadFromLocalStorage, onRestore]);
