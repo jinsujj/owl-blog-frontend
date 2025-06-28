@@ -53,7 +53,7 @@ export const useAutoSave = ({
   const lastSavedDataRef = useRef<string>('');
   const isEditorReadyRef = useRef<boolean>(false);
   const isTypingRef = useRef<boolean>(false);
-  const autoSaveIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 스토리지 키를 메모이제이션
   const storageKey = useMemo(() => `draft_${blogId}`, [blogId]);
@@ -119,8 +119,10 @@ export const useAutoSave = ({
     // 5. 실제 저장 실행
     editorRef.current.save().then((data: OutputData) => {
       const currentData = JSON.stringify(data);
+      // 데이터가 변경된 경우에만 저장
       if (currentData !== lastSavedDataRef.current) {
         saveToLocalStorage(data);
+        console.log("임시저장 완료")
       }
     }).catch((error: Error) => {
       console.warn('AutoSave: Save failed:', error);
@@ -130,25 +132,30 @@ export const useAutoSave = ({
   // setEditorReady를 안정적으로 메모이제이션
   const setEditorReady = useCallback((ready: boolean) => {
     isEditorReadyRef.current = ready;
-    
-    // 에디터가 준비되면 자동 저장 시작
-    if (ready && !autoSaveIntervalRef.current) {
-      autoSaveIntervalRef.current = setInterval(autoSave, 5000);
-    } else if (!ready && autoSaveIntervalRef.current) {
-      clearInterval(autoSaveIntervalRef.current);
-      autoSaveIntervalRef.current = null;
-    }
-  }, [autoSave]);
+  }, []);
 
   // setEditorRef를 안정적으로 메모이제이션
   const setEditorRef = useCallback((editor: EditorJS | null) => {
     editorRef.current = editor;
   }, []);
 
-  // setTypingState를 안정적으로 메모이제이션
+  // setTypingState를 안정적으로 메모이제이션 - 타이핑 종료 후 5초 지연 저장
   const setTypingState = useCallback((isTyping: boolean) => {
     isTypingRef.current = isTyping;
-  }, []);
+    
+    // 기존 타이핑 타임아웃 클리어
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+    
+    // 타이핑이 종료된 경우 5초 후 저장
+    if (!isTyping) {
+      typingTimeoutRef.current = setTimeout(() => {
+        autoSave();
+      }, 5000);
+    }
+  }, [autoSave]);
 
   // 초기 로드 시 로컬 스토리지 데이터 복원 (의존성 최소화)
   useEffect(() => {
@@ -173,12 +180,11 @@ export const useAutoSave = ({
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
     return () => {
-      if (autoSaveIntervalRef.current) {
-        clearInterval(autoSaveIntervalRef.current);
-        autoSaveIntervalRef.current = null;
-      }
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
       }
     };
   }, []);
