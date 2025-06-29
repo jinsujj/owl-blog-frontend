@@ -22,14 +22,12 @@ interface UseAutoSaveProps {
   blogId: number;
   imageUrl: string;
   onRestore?: (data: DraftData) => void;
-  onTempSaveComplete?: () => void;
 }
 
 export const useAutoSave = ({
   blogId,
   imageUrl,
   onRestore,
-  onTempSaveComplete,
 }: UseAutoSaveProps) => {
   const dispatch = useDispatch();
 
@@ -38,7 +36,6 @@ export const useAutoSave = ({
   const isEditorReadyRef = useRef<boolean>(false);
   const isTypingRef = useRef<boolean>(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const storageKey = useMemo(() => `draft_${blogId}`, [blogId]);
 
   const saveToLocalStorage = useCallback(
@@ -50,20 +47,15 @@ export const useAutoSave = ({
       localStorage.setItem(storageKey, JSON.stringify(saveData));
       lastSavedDataRef.current = JSON.stringify(data);
 
-      if (onTempSaveComplete) {
-        onTempSaveComplete();
-      } else {
-        dispatch(showTempSaveToast());
+      dispatch(showTempSaveToast());
         setTimeout(() => {
           dispatch(hideTempSaveToast());
         }, 2000);
-      }
     },
     [
       blogId,
       imageUrl,
       storageKey,
-      onTempSaveComplete,
       dispatch,
     ]
   );
@@ -74,11 +66,13 @@ export const useAutoSave = ({
     return saved ? JSON.parse(saved) : null;
   }, [storageKey]);
 
+
   const clearLocalStorage = useCallback(() => {
     if (typeof window === "undefined") return;
     localStorage.removeItem(storageKey);
   }, [storageKey]);
 
+  
   const autoSave = useCallback(() => {
     if (!editorRef.current || !isEditorReadyRef.current || isTypingRef.current)
       return;
@@ -90,7 +84,6 @@ export const useAutoSave = ({
         const currentData = JSON.stringify(data);
         if (currentData !== lastSavedDataRef.current) {
           saveToLocalStorage(data);
-          console.log("임시저장 완료");
         }
       })
       .catch((err) => console.warn("AutoSave:", err));

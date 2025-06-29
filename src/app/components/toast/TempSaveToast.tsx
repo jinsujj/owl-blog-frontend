@@ -53,33 +53,18 @@ const Container = styled.div<{ $visible: boolean }>`
 
 export default function TempSaveToast() {
   const dispatch = useDispatch();
-  const isLogged = useSelector((state) => state.auth.isLogged);
   const isVisible = useSelector((state) => state.common.tempSaveToast.isVisible);
   const [isRendered, setIsRendered] = useState(false);
-  const pathname = usePathname();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 현재 페이지가 에디터 페이지인지 확인
-  const isEditorPage = pathname === "/editor";
-  const isBlogDetailPage = pathname.startsWith("/blog/");
-
-  // 상태 변화 감지 및 자동 숨김 처리
   useEffect(() => {
-    // 로그인 상태가 아니면 토스트 표시하지 않음
-    if (!isLogged) {
-      setIsRendered(false);
-      return;
-    }
-
     if (isVisible) {
       setIsRendered(true);
       
-      // 3초 후에 토스트 숨기기
       timerRef.current = setTimeout(() => {
         dispatch(hideTempSaveToast());
       }, 3000);
     } else {
-      // 애니메이션 종료 후 완전히 사라지도록 지연 처리
       const timer = setTimeout(() => setIsRendered(false), 300);
       return () => clearTimeout(timer);
     }
@@ -87,9 +72,8 @@ export default function TempSaveToast() {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [isVisible, isLogged, dispatch]);
+  }, [isVisible, dispatch]);
 
-  // 포털 컨테이너 설정
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -107,11 +91,7 @@ export default function TempSaveToast() {
     };
   }, []);
 
-  // 로그인 상태가 아니면 무조건 렌더링하지 않음
-  if (typeof window === "undefined" || 
-      !isRendered || 
-      !isLogged || // isLogged가 false면 무조건 숨김
-      (!isEditorPage && !isBlogDetailPage)) {
+  if (typeof window === "undefined" || !isRendered ) {
     return null;
   }
 
