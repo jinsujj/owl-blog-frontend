@@ -4,7 +4,6 @@ import { hideTempSaveToast, useSelector } from "@/app/store";
 import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import styled, { keyframes, css } from "styled-components";
-import { usePathname } from "next/navigation";
 import { useDispatch } from "react-redux";
 
 const slideIn = keyframes`
