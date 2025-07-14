@@ -108,7 +108,13 @@ const SeriesView = () => {
 		const fetchSeriesMappedBlog = async () => {
 			try {
 				const blogsBySeries = await getBlogBySeries();
-				setSeriesMappedBlogs(blogsBySeries || {});
+				const sortedBlogsBySeries = Object.fromEntries(
+					Object.entries(blogsBySeries || {}).map(([seriesId, posts]) => [
+						seriesId,
+						[...posts].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+					])
+				);
+				setSeriesMappedBlogs(sortedBlogsBySeries || {});
 			} catch (error) {
 				console.error("Failed to fetch blogs", error);
 			}
