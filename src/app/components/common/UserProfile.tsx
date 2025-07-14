@@ -136,18 +136,12 @@ export const UserProfile = () => {
     setIsDark(isDarkMode);
   }, [isDarkMode]);
 
-	const renderTabContent = () => {
-		switch (renderTab) {
-			case "글":
-				return <div>사용자가 작성한 글 목록입니다.</div>;
-			case "시리즈":
-				return <div>사용자가 작성한 시리즈 목록입니다.</div>;
-			case "소개":
-				return <div>사용자에 대한 소개입니다.</div>;
-			default:
-				return null;
-		}
-	};
+	function renderTabContent() {
+		if (renderTab === "글") return <div>사용자가 작성한 글 목록입니다.</div>;
+		if (renderTab === "시리즈") return <div>사용자가 작성한 시리즈 목록입니다.</div>;
+		if (renderTab === "소개") return <div>사용자에 대한 소개입니다.</div>;
+		return null;
+	}
 
 	return (
     <ProfileWrapper $isDark={isDark}>
@@ -173,8 +167,8 @@ export const UserProfile = () => {
       <TabContainer>
         {["글", "시리즈", "소개"].map((tab) => (
           <TabButton
-            $isDark={isDarkMode}
             key={tab}
+            $isDark={isDark}
             $isActive={renderTab === tab}
             onClick={() => dispatch(commonAction.setRenderTab(tab as CommonState["renderTab"]))}
           >

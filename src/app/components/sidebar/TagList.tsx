@@ -81,6 +81,7 @@ export const TagList = ({ posts }: TagListProps) => {
 	const allTags = Object.keys(tagCounts);
 
 	const handleClick = (tag: string) => {
+		dispatch(commonAction.setRenderTab("글"));
 		dispatch(commonAction.setSearchFilter(tag));
 		router.push('/');
 	}

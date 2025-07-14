@@ -73,6 +73,7 @@ export const SideBar = () => {
 	}, []);
 
 	const setToggle = (toggle: boolean) => {
+		dispatch(commonAction.setRenderTab("글"));
 		dispatch(commonAction.setToggle(!toggle));
 	  }
 
