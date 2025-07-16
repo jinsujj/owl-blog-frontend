@@ -2,13 +2,12 @@ import { getBlogById } from "@/app/api/blogApi";
 import { NotPublishedPage } from "./NotPublishedPage";
 import BlogDetail from "./BlogDetail";
 import type { Metadata } from "next";
-import { cache } from "react";
 
 
 // cache 
-const getPostBySlug = cache(async (slug: string) => {
+const getPostBySlug = async (slug: string) => {
   return await getBlogById(slug);
-});
+};
 
 export interface BlogDetailPageProps {
   params: Promise<{ slug: string }>;
