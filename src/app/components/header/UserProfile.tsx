@@ -10,6 +10,7 @@ import { commonAction } from "@/app/store/common";
 import { useRouter } from "next/navigation";
 import { FiEdit, FiLogOut ,} from "react-icons/fi";
 import { LuHistory } from "react-icons/lu";
+import { useAutoSave } from '@/app/hooks/useAutoSave';
 
 interface StyledProps {
 	$isdark: boolean;
@@ -99,8 +100,14 @@ const UserProfile = () => {
 	const imageUrl = useSelector((state) => state.auth.imageUrl);
   const isDarkMode = useSelector((state) => state.common.isDark);
   
+  const { clearLocalStorage } = useAutoSave({
+    blogId: 0,
+    imageUrl: '',
+    onRestore: undefined
+  });
 
 	const onClickPostBlog = () => {
+		clearLocalStorage(); // 기존 localStorage.removeItem("tempPost") 대신 사용
 		console.log(postState);
 		dispatch(commonAction.setPostState("created"));
 		router.push("/editor");
