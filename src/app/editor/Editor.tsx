@@ -494,7 +494,11 @@ const Editor: React.FC<EditorProps> = ({
       <BlogActionWrapper>
         {!isReadOnly && <Thumbnail editorMaxWidth={editorMaxWidth} imageUrl={imageUrl} setImageUrl={setImageUrl} />}
         <ButtonWrapper>
-          {!isReadOnly && <Button onClick={() => editorRef.current?.save().then(onSave)} color={palette.blue} width="100px">Save</Button>}
+          {!isReadOnly && (
+            <Button onClick={() => {setTimeout(() => {editorRef.current?.save().then(onSave); }, 50); }}color={palette.blue} width="100px">
+				Save
+			</Button>
+          )}
           {!isReadOnly && !isPublished && <Button onClick={handlePublish} color={palette.green} width="100px">Publish</Button>}
           {!isReadOnly && isPublished && <Button onClick={handleUnPublish} color={palette.darkRed} width="100px">unPublish</Button>}
         </ButtonWrapper>
