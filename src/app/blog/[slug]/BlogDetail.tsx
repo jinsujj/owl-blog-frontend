@@ -106,6 +106,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 		setEditorReady,
 		setEditorRef,
 		setTypingState,
+		suspendAutoSave,
 		clearLocalStorage,
 		loadFromLocalStorage
 	  } = useAutoSave({
@@ -119,6 +120,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 	}
 
 	const handleSave = async (data: OutputData) => {
+		suspendAutoSave();
 		setEditordata(data);
 		const content = JSON.stringify(data);
 
@@ -139,13 +141,16 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ post }) => {
 			setAlertColor(palette.green);
 			setModalMessage("Blog update successfully! " + result.id);
 			openModal();
-			clearLocalStorage(); 
 			handlepost();
 		}
 		catch (error) {
 			setAlertColor(palette.red);
 			setModalMessage("Failed to update blog. Please try again. " + error);
 			openModal();
+		}
+		finally{
+			clearLocalStorage(); 
+			setTimeout(() => handlepost(), 0);
 		}
 	}
 
